@@ -1,0 +1,56 @@
+{
+  "users": [
+    {
+      "id": "70573dd2-d97c-440e-823f-f22981ed28ea",
+      "name": "Test User",
+      "email": "test@example.com",
+      "passwordHash": "$2b$10$r1ShPOaNHc2EC2nlx.hOT.RgqCpo7q39zVE/J2R.EXbrEm8Utgqpe",
+      "plan": "free",
+      "sbRunsThisMonth": 0,
+      "sbResetMonth": "2026-3"
+    },
+    {
+      "id": "9e176cb7-290d-4471-9202-799acab12aec",
+      "name": "Miles",
+      "email": "miles@test.com",
+      "passwordHash": "$2b$10$nA68yf2qapzahe0.BMXoS.pcpFiDZIygSMS5JD5.oYBjlUDfNhJRu",
+      "plan": "free",
+      "sbRunsThisMonth": 0,
+      "sbResetMonth": "2026-3"
+    },
+    {
+      "id": "9d2d6a75-fafc-45e4-8dc8-4bf483b41b6f",
+      "name": "Miles",
+      "email": "milesehrlich525@gmail.cmiles2@test.comom",
+      "passwordHash": "$2b$10$.lgLV5Owh/LLYEtvpTBfsOydJIORYrclRDtMUzmEkeeqfE6agG9Aa",
+      "plan": "free",
+      "sbRunsThisMonth": 1,
+      "sbResetMonth": "2026-3"
+    },
+    {
+      "id": "a278c8c2-97ea-4742-b1ee-2561d528e809",
+      "name": "Miles",
+      "email": "milesehrlich525@gmail.com",
+      "passwordHash": "$2b$10$cl8ssBhMcariCdfaIqPjR.IAAamiBF5elv9vjSV1QkTWD6o5KiKWy",
+      "plan": "free",
+      "sbRunsThisMonth": 1,
+      "sbResetMonth": "2026-3"
+    },
+    {
+      "id": "4f260198-ea16-4a0e-97d7-089cfb9b0a9b",
+      "name": "Test Person",
+      "email": "milesehrlich525@gmail.ctestperson@example.comom",
+      "passwordHash": "$2b$10$F7ALytbkAYhqXvS5KwlY9eEK9TVefOhyBxRCUDBmx4zJX3F1WFX1e",
+      "plan": "free",
+      "sbRunsThisMonth": 4,
+      "sbResetMonth": "2026-3",
+      "xp": 50,
+      "streak": 1,
+      "lastVisit": "",
+      "completedLessons": [
+        "f1"
+      ],
+      "passedMissions": []
+    }
+  ]
+}

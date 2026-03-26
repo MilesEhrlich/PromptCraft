@@ -1,0 +1,1440 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PromptCraft — Learn to Speak Fluent AI</title>
+<meta name="description" content="Master the art of AI prompting through hands-on missions, live feedback, and real results.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#F7F6F2;--bg2:#EEECE6;--surface:#FFFFFF;--card:#FFFFFF;
+  --border:rgba(0,0,0,.10);--border2:rgba(0,0,0,.18);
+  --text:#18180F;--text2:#4A4A3A;--muted:#8A8878;
+  --accent:#4A7C2F;--accent-bg:rgba(74,124,47,.08);--accent-border:rgba(74,124,47,.25);--accent-text:#3A6224;
+  --orange:#C45A1A;--orange-bg:rgba(196,90,26,.08);
+  --purple:#5B46B0;--purple-bg:rgba(91,70,176,.08);
+  --red:#C0392B;--red-bg:rgba(192,57,43,.08);
+  --grid-line:rgba(0,0,0,.045);
+  --shadow:0 1px 3px rgba(0,0,0,.06),0 4px 16px rgba(0,0,0,.05);
+  --shadow-lg:0 4px 24px rgba(0,0,0,.08),0 1px 4px rgba(0,0,0,.06);
+  --radius:16px;
+}
+[data-theme="dark"] {
+  --bg:#0D0D0F;--bg2:#16161A;--surface:#1A1A20;--card:#1A1A20;
+  --border:rgba(255,255,255,.08);--border2:rgba(255,255,255,.15);
+  --text:#F0EDE8;--text2:#C8C5BC;--muted:#7A786F;
+  --accent:#C8FF47;--accent-bg:rgba(200,255,71,.08);--accent-border:rgba(200,255,71,.25);--accent-text:#C8FF47;
+  --orange:#FF6B35;--orange-bg:rgba(255,107,53,.10);
+  --purple:#9B87FF;--purple-bg:rgba(155,135,255,.10);
+  --red:#FF6B6B;--red-bg:rgba(255,107,107,.10);
+  --grid-line:rgba(200,255,71,.025);
+  --shadow:0 1px 3px rgba(0,0,0,.3),0 4px 16px rgba(0,0,0,.25);
+  --shadow-lg:0 4px 24px rgba(0,0,0,.4),0 1px 4px rgba(0,0,0,.3);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);font-size:16px;line-height:1.6;transition:background .3s,color .3s;overflow-x:hidden}
+/* Grid BG */
+.grid-bg{position:fixed;inset:0;z-index:0;pointer-events:none;background-image:linear-gradient(var(--grid-line) 1px,transparent 1px),linear-gradient(90deg,var(--grid-line) 1px,transparent 1px);background-size:44px 44px}
+.page{position:relative;z-index:1}
+/* Nav */
+nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 48px;height:64px;background:var(--bg);border-bottom:1px solid var(--border);backdrop-filter:blur(12px);transition:background .3s}
+.logo{font-family:'DM Serif Display',serif;font-size:22px;color:var(--accent-text);letter-spacing:-.5px;text-decoration:none;cursor:pointer}
+[data-theme="dark"] .logo{color:var(--accent)}
+.logo span{color:var(--text)}
+.nav-center{display:flex;gap:8px;background:var(--bg2);border:1px solid var(--border);border-radius:40px;padding:4px}
+.nav-link{padding:7px 20px;border-radius:40px;font-size:13px;font-weight:700;color:var(--muted);text-decoration:none;transition:color .15s,background .15s;letter-spacing:.2px;cursor:pointer;border:none;background:transparent;font-family:'Syne',sans-serif}
+.nav-link:hover{color:var(--text)}
+.nav-link.active{background:var(--surface);color:var(--text);box-shadow:var(--shadow)}
+.nav-right{display:flex;align-items:center;gap:12px}
+.theme-toggle{width:38px;height:38px;border-radius:50%;border:1px solid var(--border2);background:var(--surface);color:var(--text2);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.theme-toggle:hover{border-color:var(--accent-text);color:var(--accent-text)}
+[data-theme="dark"] .theme-toggle:hover{border-color:var(--accent);color:var(--accent)}
+.btn-nav{background:var(--text);color:var(--bg);border:none;padding:10px 22px;border-radius:40px;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:opacity .15s,transform .1s}
+.btn-nav:hover{opacity:.85;transform:scale(1.02)}
+/* XP bar in nav */
+.xp-pill{display:flex;align-items:center;gap:8px;background:var(--accent-bg);border:1px solid var(--accent-border);padding:6px 14px;border-radius:40px;font-size:12px;font-weight:700;color:var(--accent-text);cursor:pointer}
+[data-theme="dark"] .xp-pill{color:var(--accent)}
+.xp-pill .streak{color:var(--orange);margin-right:4px}
+/* Pages */
+.view{display:none}
+.view.active{display:block}
+/* Hero */
+.hero{padding:100px 48px 80px;max-width:1000px;margin:0 auto;text-align:center}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:var(--accent-bg);border:1px solid var(--accent-border);color:var(--accent-text);padding:7px 18px;border-radius:40px;font-size:11px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:36px}
+[data-theme="dark"] .hero-badge{color:var(--accent)}
+.badge-dot{width:6px;height:6px;background:var(--accent-text);border-radius:50%;animation:pulse 2.2s ease-in-out infinite}
+[data-theme="dark"] .badge-dot{background:var(--accent)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.hero h1{font-family:'DM Serif Display',serif;font-size:clamp(52px,9vw,96px);line-height:1.0;letter-spacing:-3px;color:var(--text);margin-bottom:28px}
+.hero h1 em{font-style:italic;color:var(--accent-text)}
+[data-theme="dark"] .hero h1 em{color:var(--accent)}
+.hero-sub{font-size:19px;color:var(--text2);max-width:580px;margin:0 auto 52px;font-weight:400;line-height:1.65}
+.hero-actions{display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap}
+.btn-primary{background:var(--text);color:var(--bg);border:none;padding:17px 40px;border-radius:40px;font-family:'Syne',sans-serif;font-size:15px;font-weight:700;cursor:pointer;transition:opacity .15s,transform .1s;letter-spacing:.2px}
+.btn-primary:hover{opacity:.85;transform:scale(1.02)}
+.btn-ghost{background:transparent;color:var(--text2);border:1px solid var(--border2);padding:17px 40px;border-radius:40px;font-family:'Syne',sans-serif;font-size:15px;font-weight:600;cursor:pointer;transition:all .15s}
+.btn-ghost:hover{border-color:var(--accent-text);color:var(--accent-text)}
+[data-theme="dark"] .btn-ghost:hover{border-color:var(--accent);color:var(--accent)}
+/* Stats bar */
+.stats-bar{display:flex;align-items:center;justify-content:center;border-top:1px solid var(--border);border-bottom:1px solid var(--border);flex-wrap:wrap;overflow:hidden}
+.stat{flex:1;min-width:160px;text-align:center;padding:32px 24px;border-right:1px solid var(--border);transition:background .2s}
+.stat:last-child{border-right:none}
+.stat:hover{background:var(--bg2)}
+.stat-num{font-family:'DM Mono',monospace;font-size:32px;font-weight:500;color:var(--accent-text);display:block;margin-bottom:6px}
+[data-theme="dark"] .stat-num{color:var(--accent)}
+.stat-label{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:1px;text-transform:uppercase}
+/* Sections */
+.section{padding:80px 48px;max-width:960px;margin:0 auto}
+.section-eyebrow{font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--accent-text);margin-bottom:16px;display:block}
+[data-theme="dark"] .section-eyebrow{color:var(--accent)}
+.section-title{font-family:'DM Serif Display',serif;font-size:clamp(32px,5vw,56px);line-height:1.05;letter-spacing:-1.5px;color:var(--text);margin-bottom:16px}
+.section-sub{font-size:17px;color:var(--text2);max-width:520px;line-height:1.65;margin-bottom:48px}
+/* Sandbox */
+.sandbox{background:var(--card);border:1px solid var(--border);border-radius:20px;overflow:hidden;box-shadow:var(--shadow-lg)}
+.sandbox-header{display:flex;align-items:center;justify-content:space-between;padding:16px 24px;border-bottom:1px solid var(--border);background:var(--bg2)}
+.sandbox-tabs{display:flex;gap:4px}
+.stab{padding:7px 18px;border-radius:40px;font-size:12px;font-weight:700;cursor:pointer;border:1px solid transparent;font-family:'Syne',sans-serif;letter-spacing:.2px;transition:all .15s;background:transparent;color:var(--muted)}
+.stab:hover{color:var(--text)}
+.stab.active{background:var(--surface);border-color:var(--border);color:var(--text);box-shadow:var(--shadow)}
+.score-pill{font-family:'DM Mono',monospace;font-size:12px;font-weight:500;color:var(--accent-text);background:var(--accent-bg);border:1px solid var(--accent-border);padding:6px 16px;border-radius:40px}
+[data-theme="dark"] .score-pill{color:var(--accent)}
+/* Before/After */
+.sandbox-grid{display:grid;grid-template-columns:1fr 1fr}
+.sandbox-col{padding:28px}
+.sandbox-col+.sandbox-col{border-left:1px solid var(--border)}
+.col-label{font-size:10px;font-weight:800;letter-spacing:1.8px;text-transform:uppercase;color:var(--muted);margin-bottom:14px}
+.prompt-block{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:16px 18px;font-family:'DM Mono',monospace;font-size:13px;color:var(--text);line-height:1.65;min-height:90px}
+.prompt-block.weak{border-color:rgba(196,90,26,.35);color:var(--text2)}
+.prompt-block.strong{border-color:var(--accent-border)}
+.quality-tag{display:inline-flex;align-items:center;gap:5px;margin-top:10px;padding:4px 12px;border-radius:40px;font-size:10px;font-weight:800;letter-spacing:.8px;text-transform:uppercase}
+.quality-tag.bad{background:var(--orange-bg);color:var(--orange)}
+.quality-tag.good{background:var(--accent-bg);color:var(--accent-text)}
+[data-theme="dark"] .quality-tag.good{color:var(--accent)}
+.quality-dot{width:5px;height:5px;border-radius:50%;background:currentColor}
+.response-block{margin-top:22px}
+.response-text{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:16px 18px;font-size:13px;color:var(--muted);line-height:1.65;min-height:90px}
+.response-text.rich{color:var(--text2);border-color:var(--accent-border)}
+/* Live sandbox panel */
+.live-panel{padding:28px;display:none}
+.live-panel.active{display:block}
+.prompt-input{width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:16px 18px;font-family:'DM Mono',monospace;font-size:13px;color:var(--text);line-height:1.65;resize:vertical;min-height:100px;outline:none;transition:border-color .2s}
+.prompt-input:focus{border-color:var(--accent-border)}
+.live-actions{display:flex;align-items:center;justify-content:space-between;margin-top:12px;flex-wrap:wrap;gap:8px}
+.btn-send{background:var(--text);color:var(--bg);border:none;padding:12px 28px;border-radius:40px;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .15s}
+.btn-send:hover{opacity:.85}
+.char-count{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted)}
+.ai-response-box{margin-top:20px;background:var(--bg2);border:1px solid var(--accent-border);border-radius:12px;padding:20px;font-size:13px;color:var(--text2);line-height:1.7;display:none}
+.ai-response-box.show{display:block}
+.ai-score-bar{display:flex;align-items:center;gap:12px;margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--border)}
+.score-label{font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--muted)}
+.score-track{flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden}
+.score-fill{height:100%;border-radius:3px;background:var(--accent-text);transition:width .6s ease}
+[data-theme="dark"] .score-fill{background:var(--accent)}
+.score-val{font-family:'DM Mono',monospace;font-size:14px;font-weight:500;color:var(--accent-text);min-width:36px;text-align:right}
+[data-theme="dark"] .score-val{color:var(--accent)}
+.ai-tips{margin-top:14px;padding:12px 14px;background:var(--surface);border:1px solid var(--border);border-radius:10px;font-size:12px;color:var(--text2)}
+.ai-tips strong{color:var(--text);display:block;margin-bottom:6px;font-size:11px;letter-spacing:.8px;text-transform:uppercase}
+/* Dissect panel */
+.dissect-panel{padding:28px;display:none}
+.dissect-panel.active{display:block}
+.dissect-tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.dtag{padding:6px 14px;border-radius:8px;font-size:12px;font-weight:700;cursor:default}
+.dtag.role{background:var(--purple-bg);color:var(--purple);border:1px solid rgba(91,70,176,.25)}
+[data-theme="dark"] .dtag.role{border-color:rgba(155,135,255,.25)}
+.dtag.context{background:var(--accent-bg);color:var(--accent-text);border:1px solid var(--accent-border)}
+[data-theme="dark"] .dtag.context{color:var(--accent)}
+.dtag.format{background:var(--orange-bg);color:var(--orange);border:1px solid rgba(196,90,26,.25)}
+[data-theme="dark"] .dtag.format{border-color:rgba(255,107,53,.25)}
+.dtag.tone{background:rgba(91,70,176,.06);color:var(--purple);border:1px solid rgba(91,70,176,.2)}
+.dtag.constraint{background:var(--red-bg);color:var(--red);border:1px solid rgba(192,57,43,.25)}
+[data-theme="dark"] .dtag.constraint{border-color:rgba(255,107,107,.25)}
+.dissect-legend{display:flex;flex-wrap:wrap;gap:8px;margin-top:20px;padding-top:16px;border-top:1px solid var(--border)}
+.dleg{font-size:11px;display:flex;align-items:center;gap:6px}
+.dleg-dot{width:8px;height:8px;border-radius:2px}
+/* Tiers */
+.tiers-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+.tier-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px 18px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
+.tier-card:hover{border-color:var(--border2);transform:translateY(-3px);box-shadow:var(--shadow-lg)}
+.tier-card.featured{border-color:var(--accent-text);background:var(--accent-bg)}
+[data-theme="dark"] .tier-card.featured{border-color:var(--accent)}
+.tier-card.locked{opacity:.55;cursor:not-allowed}
+.tier-card.locked:hover{transform:none}
+.tier-num{font-family:'DM Mono',monospace;font-size:10px;font-weight:500;color:var(--muted);display:block;margin-bottom:16px;letter-spacing:.5px}
+.tier-icon{font-size:24px;margin-bottom:14px;display:block}
+.tier-name{font-size:13px;font-weight:700;color:var(--text);display:block;margin-bottom:7px}
+.tier-desc{font-size:11px;color:var(--text2);line-height:1.55}
+.tier-progress{height:3px;background:var(--border);border-radius:2px;margin-top:16px;overflow:hidden}
+.tier-progress-fill{height:100%;border-radius:2px;background:var(--accent-text);transition:width .6s}
+[data-theme="dark"] .tier-progress-fill{background:var(--accent)}
+.lock-badge{position:absolute;top:12px;right:12px;font-size:12px;opacity:.5}
+/* Features */
+.features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.feature-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:28px 24px;transition:all .2s}
+.feature-card:hover{border-color:var(--border2);box-shadow:var(--shadow);transform:translateY(-2px)}
+.feature-icon{font-size:28px;margin-bottom:16px}
+.feature-name{font-size:15px;font-weight:700;color:var(--text);margin-bottom:10px}
+.feature-desc{font-size:13px;color:var(--text2);line-height:1.65}
+/* How it works */
+.steps-row{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:var(--border);border:1px solid var(--border);border-radius:20px;overflow:hidden}
+.step{background:var(--card);padding:40px 32px}
+.step-num{font-family:'DM Mono',monospace;font-size:40px;font-weight:500;line-height:1;margin-bottom:24px;-webkit-text-stroke:1.5px var(--border2);color:transparent}
+.step-title{font-size:17px;font-weight:700;color:var(--text);margin-bottom:10px}
+.step-body{font-size:13px;color:var(--text2);line-height:1.65}
+/* Testimonials */
+.testimonials-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.testi{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:28px 24px}
+.testi-quote{font-family:'DM Serif Display',serif;font-size:16px;color:var(--text);line-height:1.5;margin-bottom:24px;font-style:italic}
+.testi-author{display:flex;align-items:center;gap:12px}
+.testi-avatar{width:36px;height:36px;border-radius:50%;background:var(--bg2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:12px;font-weight:500;color:var(--text2);flex-shrink:0}
+.testi-name{font-size:13px;font-weight:700;color:var(--text)}
+.testi-role{font-size:11px;color:var(--muted);margin-top:1px}
+/* Pricing */
+.pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.pricing-card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:36px 28px;position:relative;overflow:hidden}
+.pricing-card.featured-plan{border-color:var(--accent-text);background:var(--accent-bg)}
+[data-theme="dark"] .pricing-card.featured-plan{border-color:var(--accent)}
+.plan-badge{display:inline-block;background:var(--accent-text);color:var(--bg);font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;padding:4px 12px;border-radius:40px;margin-bottom:20px}
+[data-theme="dark"] .plan-badge{background:var(--accent);color:#0D0D0F}
+.plan-name{font-size:22px;font-weight:700;color:var(--text);margin-bottom:8px}
+.plan-price{font-family:'DM Mono',monospace;font-size:40px;font-weight:500;color:var(--text);margin-bottom:4px;line-height:1}
+.plan-price span{font-size:18px;color:var(--muted)}
+.plan-desc{font-size:13px;color:var(--text2);margin-bottom:28px;line-height:1.5}
+.plan-divider{height:1px;background:var(--border);margin-bottom:24px}
+.plan-features{list-style:none;margin-bottom:32px}
+.plan-features li{font-size:13px;color:var(--text2);padding:7px 0;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.plan-features li:last-child{border-bottom:none}
+.check-icon{width:16px;height:16px;border-radius:50%;background:var(--accent-bg);border:1px solid var(--accent-border);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--accent-text)}
+[data-theme="dark"] .check-icon{color:var(--accent)}
+.btn-plan{width:100%;padding:14px;border-radius:12px;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all .15s;border:1px solid var(--border2);background:var(--surface);color:var(--text)}
+.btn-plan:hover{border-color:var(--text)}
+.btn-plan.primary-plan{background:var(--text);color:var(--bg);border-color:transparent}
+.btn-plan.primary-plan:hover{opacity:.88}
+/* CTA */
+.cta-banner{margin:0 48px 80px;background:var(--text);border-radius:24px;padding:80px 60px;text-align:center;position:relative;overflow:hidden}
+.cta-banner h2{font-family:'DM Serif Display',serif;font-size:clamp(32px,4vw,52px);color:var(--bg);letter-spacing:-1.5px;margin-bottom:16px;position:relative;z-index:1}
+[data-theme="dark"] .cta-banner h2{color:#F0EDE8}
+.cta-banner p{font-size:16px;color:rgba(255,255,255,.5);margin-bottom:40px;position:relative;z-index:1}
+[data-theme="dark"] .cta-banner p{color:rgba(240,237,232,.55)}
+.btn-accent{background:var(--bg);color:var(--text);border:none;padding:18px 48px;border-radius:40px;font-family:'Syne',sans-serif;font-size:16px;font-weight:700;cursor:pointer;transition:transform .15s,opacity .15s;position:relative;z-index:1}
+[data-theme="dark"] .btn-accent{background:var(--accent);color:#0D0D0F}
+.btn-accent:hover{transform:scale(1.03);opacity:.92}
+/* Footer */
+footer{border-top:1px solid var(--border);padding:48px;display:grid;grid-template-columns:1fr auto;gap:40px;align-items:start}
+.footer-logo{font-family:'DM Serif Display',serif;font-size:20px;color:var(--accent-text);margin-bottom:10px}
+[data-theme="dark"] .footer-logo{color:var(--accent)}
+.footer-logo span{color:var(--text)}
+.footer-tagline{font-size:13px;color:var(--muted)}
+.footer-links{display:flex;gap:32px}
+.footer-col{display:flex;flex-direction:column;gap:10px}
+.footer-col-title{font-size:11px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.footer-link{font-size:13px;color:var(--text2);text-decoration:none;transition:color .15s;cursor:pointer}
+.footer-link:hover{color:var(--text)}
+.footer-bottom{border-top:1px solid var(--border);padding:20px 48px;display:flex;justify-content:space-between;align-items:center}
+.footer-copy{font-size:12px;color:var(--muted)}
+/* ─── LEARN VIEW ─── */
+.learn-header{padding:60px 48px 0;max-width:960px;margin:0 auto}
+.progress-overview{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:32px}
+.progress-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;text-align:center}
+.prog-num{font-family:'DM Mono',monospace;font-size:28px;font-weight:500;color:var(--accent-text);display:block}
+[data-theme="dark"] .prog-num{color:var(--accent)}
+.prog-label{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted)}
+/* Streak display */
+.streak-banner{background:linear-gradient(135deg,var(--orange-bg),transparent);border:1px solid rgba(196,90,26,.25);border-radius:var(--radius);padding:20px 28px;display:flex;align-items:center;gap:16px;margin-top:24px}
+[data-theme="dark"] .streak-banner{border-color:rgba(255,107,53,.25)}
+.streak-fire{font-size:32px}
+.streak-info h3{font-size:16px;font-weight:700;color:var(--text)}
+.streak-info p{font-size:13px;color:var(--text2)}
+/* Lesson cards */
+.lessons-section{padding:40px 48px 80px;max-width:960px;margin:0 auto}
+.tier-section{margin-bottom:48px}
+.tier-header{display:flex;align-items:center;gap:12px;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border)}
+.tier-badge{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:40px;font-size:11px;font-weight:800;letter-spacing:.8px;background:var(--accent-bg);color:var(--accent-text);border:1px solid var(--accent-border)}
+[data-theme="dark"] .tier-badge{color:var(--accent)}
+.tier-badge.locked-badge{background:var(--bg2);color:var(--muted);border-color:var(--border)}
+.lessons-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.lesson-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;cursor:pointer;transition:all .2s;display:flex;flex-direction:column;gap:8px}
+.lesson-card:hover{border-color:var(--border2);box-shadow:var(--shadow);transform:translateY(-2px)}
+.lesson-card.done{border-left:3px solid var(--accent-text)}
+[data-theme="dark"] .lesson-card.done{border-left-color:var(--accent)}
+.lesson-card.locked-lesson{opacity:.5;cursor:not-allowed}
+.lesson-card.locked-lesson:hover{transform:none;box-shadow:none}
+.lesson-num{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted)}
+.lesson-title{font-size:14px;font-weight:700;color:var(--text)}
+.lesson-meta{display:flex;align-items:center;gap:8px}
+.lesson-xp{font-size:11px;font-weight:700;color:var(--accent-text);background:var(--accent-bg);padding:2px 8px;border-radius:20px}
+[data-theme="dark"] .lesson-xp{color:var(--accent)}
+.lesson-time{font-size:11px;color:var(--muted)}
+.lesson-done-icon{font-size:14px;margin-left:auto}
+/* Lesson modal */
+.modal-overlay{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;padding:24px;display:none}
+.modal-overlay.open{display:flex}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:24px;max-width:680px;width:100%;max-height:85vh;overflow-y:auto;box-shadow:var(--shadow-lg)}
+.modal-header{padding:28px 32px 20px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
+.modal-title{font-family:'DM Serif Display',serif;font-size:26px;letter-spacing:-.5px;color:var(--text)}
+.modal-close{width:32px;height:32px;border-radius:50%;border:1px solid var(--border);background:var(--bg2);cursor:pointer;font-size:16px;color:var(--muted);flex-shrink:0;transition:all .15s;display:flex;align-items:center;justify-content:center}
+.modal-close:hover{border-color:var(--text);color:var(--text)}
+.modal-body{padding:28px 32px}
+.modal-body p{font-size:15px;color:var(--text2);line-height:1.75;margin-bottom:16px}
+.modal-body h3{font-size:16px;font-weight:700;color:var(--text);margin:24px 0 10px}
+.example-block{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:16px 18px;font-family:'DM Mono',monospace;font-size:12px;color:var(--text2);line-height:1.7;margin-bottom:12px}
+.example-block.good-ex{border-color:var(--accent-border)}
+.modal-footer{padding:20px 32px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.xp-reward{font-size:13px;font-weight:700;color:var(--accent-text)}
+[data-theme="dark"] .xp-reward{color:var(--accent)}
+/* ─── SANDBOX VIEW ─── */
+.sandbox-view{padding:60px 48px 80px;max-width:960px;margin:0 auto}
+.sandbox-full{background:var(--card);border:1px solid var(--border);border-radius:20px;overflow:hidden;box-shadow:var(--shadow-lg)}
+.sandbox-top{padding:28px 28px 20px;border-bottom:1px solid var(--border);background:var(--bg2);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.sandbox-top h2{font-family:'DM Serif Display',serif;font-size:22px;letter-spacing:-.5px}
+.sandbox-body{padding:28px}
+.input-label{font-size:10px;font-weight:800;letter-spacing:1.8px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;display:block}
+.template-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:24px}
+.tmpl-pill{padding:6px 14px;border-radius:40px;border:1px solid var(--border);font-size:12px;font-weight:600;color:var(--text2);cursor:pointer;transition:all .15s;background:var(--surface)}
+.tmpl-pill:hover{border-color:var(--accent-text);color:var(--accent-text)}
+[data-theme="dark"] .tmpl-pill:hover{border-color:var(--accent);color:var(--accent)}
+/* Mission view */
+.missions-section{padding:60px 48px 80px;max-width:960px;margin:0 auto}
+.mission-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:12px;transition:all .2s;cursor:pointer}
+.mission-card:hover{border-color:var(--border2);transform:translateX(4px)}
+.mission-card.active-mission{border-color:var(--orange);background:var(--orange-bg)}
+[data-theme="dark"] .mission-card.active-mission{border-color:var(--orange)}
+.mission-card.done-mission{border-left:3px solid var(--accent-text);opacity:.7}
+[data-theme="dark"] .mission-card.done-mission{border-left-color:var(--accent)}
+.mission-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.mission-title{font-size:15px;font-weight:700;color:var(--text)}
+.mission-xp{font-size:11px;font-weight:700;color:var(--orange);background:var(--orange-bg);padding:3px 10px;border-radius:20px}
+.mission-desc{font-size:13px;color:var(--text2);line-height:1.6}
+.mission-constraint{margin-top:10px;font-size:12px;font-family:'DM Mono',monospace;color:var(--muted);background:var(--bg2);padding:6px 12px;border-radius:8px;border-left:3px solid var(--orange)}
+.mission-sandbox{margin-top:20px;padding-top:20px;border-top:1px solid var(--border)}
+.mission-result{margin-top:16px;padding:16px;border-radius:12px;font-size:13px;line-height:1.65}
+.mission-result.pass{background:var(--accent-bg);border:1px solid var(--accent-border);color:var(--accent-text)}
+[data-theme="dark"] .mission-result.pass{color:var(--accent)}
+.mission-result.fail{background:var(--red-bg);border:1px solid rgba(192,57,43,.25);color:var(--red)}
+/* ─── LIBRARY VIEW ─── */
+.library-view{padding:60px 48px 80px;max-width:960px;margin:0 auto}
+.library-search-bar{position:relative;margin-bottom:24px}
+.library-search-bar input{width:100%;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 20px 16px 48px;font-family:'Syne',sans-serif;font-size:14px;color:var(--text);outline:none;transition:border-color .2s}
+.library-search-bar input:focus{border-color:var(--accent-border)}
+.search-icon{position:absolute;left:18px;top:50%;transform:translateY(-50%);font-size:16px;color:var(--muted)}
+.filter-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:28px}
+.filter-btn{padding:7px 16px;border-radius:40px;border:1px solid var(--border);font-size:12px;font-weight:700;color:var(--muted);cursor:pointer;transition:all .15s;background:transparent;font-family:'Syne',sans-serif}
+.filter-btn:hover,.filter-btn.active{background:var(--accent-bg);border-color:var(--accent-border);color:var(--accent-text)}
+[data-theme="dark"] .filter-btn:hover,[data-theme="dark"] .filter-btn.active{color:var(--accent)}
+.prompt-cards{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.prompt-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:22px;transition:all .2s}
+.prompt-card:hover{border-color:var(--border2);box-shadow:var(--shadow);transform:translateY(-2px)}
+.pc-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px}
+.pc-category{font-size:10px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:var(--accent-text);background:var(--accent-bg);padding:3px 10px;border-radius:20px}
+[data-theme="dark"] .pc-category{color:var(--accent)}
+.pc-copy{width:28px;height:28px;border-radius:8px;border:1px solid var(--border);background:var(--bg2);cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;transition:all .15s;color:var(--muted);padding:0}
+.pc-copy:hover{border-color:var(--accent-text);color:var(--accent-text)}
+[data-theme="dark"] .pc-copy:hover{border-color:var(--accent);color:var(--accent)}
+.pc-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:8px}
+.pc-text{font-family:'DM Mono',monospace;font-size:12px;color:var(--text2);line-height:1.6;background:var(--bg2);border-radius:8px;padding:10px 12px;margin-bottom:12px}
+.pc-meta{display:flex;align-items:center;gap:10px;font-size:11px;color:var(--muted)}
+.pc-score{color:var(--accent-text);font-weight:700}
+[data-theme="dark"] .pc-score{color:var(--accent)}
+/* ─── LEADERBOARD VIEW ─── */
+.leaderboard-view{padding:60px 48px 80px;max-width:960px;margin:0 auto}
+.lb-tabs{display:flex;gap:4px;background:var(--bg2);border:1px solid var(--border);border-radius:40px;padding:4px;width:fit-content;margin-bottom:32px}
+.lb-tab{padding:8px 22px;border-radius:40px;font-size:13px;font-weight:700;color:var(--muted);cursor:pointer;border:none;background:transparent;font-family:'Syne',sans-serif;transition:all .15s}
+.lb-tab.active{background:var(--surface);color:var(--text);box-shadow:var(--shadow)}
+.lb-table{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.lb-row{display:grid;grid-template-columns:48px 1fr auto auto;align-items:center;gap:16px;padding:16px 24px;border-bottom:1px solid var(--border);transition:background .15s}
+.lb-row:last-child{border-bottom:none}
+.lb-row:hover{background:var(--bg2)}
+.lb-row.you{background:var(--accent-bg);border-left:3px solid var(--accent-text)}
+[data-theme="dark"] .lb-row.you{border-left-color:var(--accent)}
+.lb-rank{font-family:'DM Mono',monospace;font-size:14px;font-weight:500;color:var(--muted);text-align:center}
+.lb-rank.top{color:var(--orange);font-weight:700}
+.lb-user{display:flex;align-items:center;gap:12px}
+.lb-avatar{width:36px;height:36px;border-radius:50%;background:var(--bg2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--text2)}
+.lb-name{font-size:14px;font-weight:700;color:var(--text)}
+.lb-badge{font-size:11px;color:var(--muted)}
+.lb-xp{font-family:'DM Mono',monospace;font-size:14px;font-weight:500;color:var(--accent-text);text-align:right}
+[data-theme="dark"] .lb-xp{color:var(--accent)}
+.lb-streak{font-size:13px;text-align:right;color:var(--orange)}
+/* Prompt of the Day */
+.potd-banner{background:linear-gradient(135deg,var(--purple-bg),var(--accent-bg));border:1px solid var(--border);border-radius:var(--radius);padding:24px 28px;margin-bottom:32px}
+.potd-label{font-size:10px;font-weight:800;letter-spacing:1.8px;text-transform:uppercase;color:var(--purple);margin-bottom:12px;display:block}
+.potd-prompt{font-family:'DM Mono',monospace;font-size:13px;color:var(--text);line-height:1.7;margin-bottom:14px;background:var(--surface);border-radius:10px;padding:14px 16px;border:1px solid var(--border)}
+.potd-meta{display:flex;align-items:center;justify-content:space-between}
+.potd-category{font-size:11px;color:var(--muted)}
+.potd-try{font-size:12px;font-weight:700;color:var(--purple);cursor:pointer;border:none;background:none;font-family:'Syne',sans-serif}
+/* XP Toast */
+.xp-toast{position:fixed;bottom:32px;right:32px;background:var(--text);color:var(--bg);padding:16px 24px;border-radius:16px;font-size:14px;font-weight:700;z-index:300;transform:translateY(80px);opacity:0;transition:all .4s;box-shadow:var(--shadow-lg)}
+.xp-toast.show{transform:none;opacity:1}
+/* Animations */
+.fade-up{opacity:0;transform:translateY(24px);transition:opacity .6s ease,transform .6s ease}
+.fade-up.visible{opacity:1;transform:none}
+/* Responsive */
+@media(max-width:900px){
+  nav{padding:0 20px}
+  .nav-center{display:none}
+  .hero{padding:60px 24px 50px}
+  .stats-bar .stat{flex:0 0 50%;border-right:none;border-bottom:1px solid var(--border)}
+  .section,.how-section,.learn-header,.lessons-section,.missions-section,.library-view,.leaderboard-view,.sandbox-view{padding-left:24px;padding-right:24px}
+  .tiers-grid{grid-template-columns:repeat(2,1fr)}
+  .features-grid{grid-template-columns:1fr 1fr}
+  .steps-row{grid-template-columns:1fr;gap:1px}
+  .testimonials-grid,.pricing-grid{grid-template-columns:1fr}
+  .sandbox-grid{grid-template-columns:1fr}
+  .sandbox-col+.sandbox-col{border-left:none;border-top:1px solid var(--border)}
+  .prompt-cards{grid-template-columns:1fr}
+  .lessons-grid{grid-template-columns:repeat(2,1fr)}
+  .progress-overview{grid-template-columns:repeat(2,1fr)}
+  .cta-banner{margin:0 24px 60px;padding:60px 32px}
+  footer{padding:40px 24px;grid-template-columns:1fr}
+  .footer-links{flex-wrap:wrap;gap:20px}
+  .footer-bottom{padding:20px 24px;flex-direction:column;gap:8px;text-align:center}
+  .lb-row{grid-template-columns:40px 1fr auto}
+  .lb-streak{display:none}
+}
+/* Auth Modal */
+.auth-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:1000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s}
+.auth-overlay.open{opacity:1;pointer-events:all}
+.auth-modal{background:var(--surface);border:1px solid var(--border);border-radius:24px;padding:40px;width:100%;max-width:420px;box-shadow:var(--shadow-lg);transform:translateY(8px);transition:transform .2s}
+.auth-overlay.open .auth-modal{transform:translateY(0)}
+.auth-title{font-family:'DM Serif Display',serif;font-size:26px;color:var(--text);margin-bottom:6px}
+.auth-sub{font-size:14px;color:var(--muted);margin-bottom:28px}
+.auth-tabs{display:flex;gap:4px;background:var(--bg2);border-radius:40px;padding:4px;margin-bottom:24px}
+.auth-tab{flex:1;text-align:center;padding:8px;border-radius:40px;border:none;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;cursor:pointer;background:transparent;color:var(--muted);transition:all .15s}
+.auth-tab.active{background:var(--surface);color:var(--text);box-shadow:var(--shadow)}
+.auth-field{margin-bottom:14px}
+.auth-field label{display:block;font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.auth-field input{width:100%;padding:12px 16px;border-radius:12px;border:1px solid var(--border);background:var(--bg2);color:var(--text);font-family:'Syne',sans-serif;font-size:14px;outline:none;transition:border .15s}
+.auth-field input:focus{border-color:var(--accent-text)}
+[data-theme="dark"] .auth-field input:focus{border-color:var(--accent)}
+.btn-auth{width:100%;padding:14px;border:none;border-radius:40px;background:var(--text);color:var(--bg);font-family:'Syne',sans-serif;font-size:14px;font-weight:700;cursor:pointer;margin-top:8px;transition:opacity .15s}
+.btn-auth:hover{opacity:.85}
+.auth-error{color:var(--red);font-size:13px;margin-top:8px;min-height:20px}
+/* Nav avatar */
+.nav-avatar{width:34px;height:34px;border-radius:50%;background:var(--accent-text);color:var(--surface);font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative}
+[data-theme="dark"] .nav-avatar{background:var(--accent);color:var(--bg)}
+.nav-avatar-menu{position:absolute;top:42px;right:0;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:8px;min-width:140px;box-shadow:var(--shadow-lg);z-index:200;display:none}
+.nav-avatar-menu.open{display:block}
+.nav-avatar-menu button{display:block;width:100%;text-align:left;padding:9px 14px;border:none;background:transparent;font-family:'Syne',sans-serif;font-size:13px;font-weight:600;color:var(--text2);cursor:pointer;border-radius:8px}
+.nav-avatar-menu button:hover{background:var(--bg2)}
+/* Sandbox gate */
+.sandbox-gate{text-align:center;padding:60px 24px}
+.sandbox-gate h3{font-family:'DM Serif Display',serif;font-size:28px;color:var(--text);margin-bottom:12px}
+.sandbox-gate p{color:var(--muted);margin-bottom:28px}
+</style>
+</head>
+<body>
+<div class="grid-bg"></div>
+<div class="xp-toast" id="xpToast"></div>
+
+<div class="page">
+<nav>
+  <a class="logo" onclick="showView('home')">Prompt<span>Craft</span></a>
+  <div class="nav-center">
+    <button class="nav-link active" onclick="showView('home')">Home</button>
+    <button class="nav-link" onclick="showView('learn')">Learn</button>
+    <button class="nav-link" onclick="showView('sandbox')">Sandbox</button>
+    <button class="nav-link" onclick="showView('library')">Library</button>
+    <button class="nav-link" onclick="showView('leaderboard')">Leaderboard</button>
+  </div>
+  <div class="nav-right">
+    <div class="xp-pill" onclick="showView('leaderboard')">
+      <span class="streak" id="navStreak">⏱0</span>
+      <span id="navXP">0 XP</span>
+    </div>
+    <button class="theme-toggle" id="themeBtn">◑</button>
+    <div id="navAuthArea">
+      <button class="btn-nav" onclick="openAuth()">Sign In</button>
+    </div>
+  </div>
+</nav>
+
+<!-- Auth Modal -->
+<div class="auth-overlay" id="authModal">
+  <div class="auth-modal">
+    <div class="auth-title">Welcome to PromptCraft</div>
+    <div class="auth-sub">Create a free account to access the sandbox.</div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tabSignup" onclick="switchAuthTab('signup')">Sign Up</button>
+      <button class="auth-tab" id="tabLogin" onclick="switchAuthTab('login')">Log In</button>
+    </div>
+    <!-- Sign Up -->
+    <div id="authSignup">
+      <div class="auth-field"><label>Name</label><input type="text" id="signupName" placeholder="Your name" autocomplete="name"></div>
+      <div class="auth-field"><label>Email</label><input type="email" id="signupEmail" placeholder="you@example.com" autocomplete="email"></div>
+      <div class="auth-field"><label>Password</label><input type="password" id="signupPassword" placeholder="At least 6 characters" autocomplete="new-password"></div>
+      <button class="btn-auth" onclick="handleSignup()">Create Free Account</button>
+      <div class="auth-error" id="signupError"></div>
+    </div>
+    <!-- Log In -->
+    <div id="authLogin" style="display:none">
+      <div class="auth-field"><label>Email</label><input type="email" id="loginEmail" placeholder="you@example.com" autocomplete="email"></div>
+      <div class="auth-field"><label>Password</label><input type="password" id="loginPassword" placeholder="Your password" autocomplete="current-password"></div>
+      <button class="btn-auth" onclick="handleLogin()">Log In</button>
+      <div class="auth-error" id="loginError"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ HOME VIEW ══ -->
+<div class="view active" id="view-home">
+  <section class="hero fade-up">
+    <div class="hero-badge"><div class="badge-dot"></div> The AI Prompting School</div>
+    <h1>Learn to speak<br>fluent <em>AI.</em></h1>
+    <p class="hero-sub">Master the art of prompting through hands-on missions, live feedback, and real results — not passive reading.</p>
+    <div class="hero-actions">
+      <button class="btn-primary" onclick="showView('learn')">Start Learning Free →</button>
+      <button class="btn-ghost" onclick="showView('sandbox')">Try the Sandbox</button>
+    </div>
+  </section>
+
+  <div class="stats-bar fade-up">
+    <div class="stat"><span class="stat-num">47K+</span><span class="stat-label">Active Learners</span></div>
+    <div class="stat"><span class="stat-num">5</span><span class="stat-label">Skill Tiers</span></div>
+    <div class="stat"><span class="stat-num">120+</span><span class="stat-label">Guided Missions</span></div>
+    <div class="stat"><span class="stat-num">94%</span><span class="stat-label">Report Better AI Results</span></div>
+  </div>
+
+  <!-- Prompt of the Day -->
+  <div class="section fade-up" style="padding-bottom:0">
+    <div class="potd-banner">
+      <span class="potd-label">Prompt of the Day</span>
+      <div class="potd-prompt" id="potdText"></div>
+      <div class="potd-meta">
+        <span class="potd-category" id="potdCat"></span>
+        <button class="potd-try" onclick="tryPotd()">Try in Sandbox →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sandbox preview -->
+  <section class="section fade-up">
+    <span class="section-eyebrow">Live Sandbox</span>
+    <h2 class="section-title">See the difference<br>instantly.</h2>
+    <p class="section-sub">Compare a vague prompt to a precise one. Watch what happens when you give AI real context.</p>
+    <div class="sandbox">
+      <div class="sandbox-header">
+        <div class="sandbox-tabs">
+          <button class="stab active" onclick="switchSandboxTab(this,'before-after')">Before &amp; After</button>
+          <button class="stab" onclick="switchSandboxTab(this,'try-live')">Try It Live</button>
+          <button class="stab" onclick="switchSandboxTab(this,'dissect')">Dissect</button>
+        </div>
+        <div class="score-pill" id="homeSandboxScore">Score: 94 / 100</div>
+      </div>
+      <!-- Before/After -->
+      <div id="tab-before-after">
+        <div class="sandbox-grid">
+          <div class="sandbox-col">
+            <div class="col-label">Weak Prompt</div>
+            <div class="prompt-block weak">write me an email about the meeting</div>
+            <div class="quality-tag bad"><span class="quality-dot"></span> Vague — 4/100</div>
+            <div class="response-block">
+              <div class="col-label">AI Response</div>
+              <div class="response-text">Hi, I wanted to touch base about the meeting. Please let me know your thoughts. Best regards.</div>
+            </div>
+          </div>
+          <div class="sandbox-col">
+            <div class="col-label">Strong Prompt</div>
+            <div class="prompt-block strong">Write a concise follow-up email to my team after our Monday standup. Mention Q3 launch is on track, action items are in Jira, next sync Thursday 10am. Tone: professional but warm.</div>
+            <div class="quality-tag good"><span class="quality-dot"></span> Precise — 94/100</div>
+            <div class="response-block">
+              <div class="col-label">AI Response</div>
+              <div class="response-text rich">Hey team — quick recap from this morning. Great news: Q3 launch is on track. Action items are logged in Jira — check your assignments. Next sync is Thursday at 10am. Keep up the momentum!</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Try Live -->
+      <div id="tab-try-live" style="display:none">
+        <div class="live-panel active">
+          <span class="input-label">Your Prompt</span>
+          <textarea class="prompt-input" id="homeLiveInput" placeholder="Type your prompt here…" oninput="updateCharCount('homeLiveCount',this.value)"></textarea>
+          <div class="live-actions">
+            <span class="char-count" id="homeLiveCount">0 chars</span>
+            <button class="btn-send" onclick="runHomeSandbox()">Send Prompt →</button>
+          </div>
+          <div class="ai-response-box" id="homeLiveResponse">
+            <div class="ai-score-bar">
+              <span class="score-label">Quality Score</span>
+              <div class="score-track"><div class="score-fill" id="homeLiveBar" style="width:0%"></div></div>
+              <span class="score-val" id="homeLiveScoreVal">—</span>
+            </div>
+            <div id="homeLiveText"></div>
+            <div class="ai-tips" id="homeLiveTips"></div>
+          </div>
+        </div>
+      </div>
+      <!-- Dissect -->
+      <div id="tab-dissect" style="display:none">
+        <div class="dissect-panel active">
+          <span class="input-label">Paste a prompt to dissect</span>
+          <textarea class="prompt-input" id="dissectInput" placeholder="e.g. Act as a senior copywriter. Write a punchy 3-sentence bio for a startup founder. Keep it under 60 words and avoid jargon." oninput="runDissect(this.value)"></textarea>
+          <div class="dissect-tags" id="dissectTags"></div>
+          <div class="dissect-legend" id="dissectLegend" style="display:none">
+            <span class="dleg"><span class="dleg-dot" style="background:var(--purple)"></span> Role</span>
+            <span class="dleg"><span class="dleg-dot" style="background:var(--accent-text)"></span> Context</span>
+            <span class="dleg"><span class="dleg-dot" style="background:var(--orange)"></span> Format</span>
+            <span class="dleg"><span class="dleg-dot" style="background:var(--red)"></span> Constraint</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Curriculum -->
+  <section class="section fade-up" style="padding-top:0">
+    <span class="section-eyebrow">Curriculum</span>
+    <h2 class="section-title">Five levels.<br>One superpower.</h2>
+    <p class="section-sub">Progress from absolute beginner to certified prompt engineer through structured, practical lessons.</p>
+    <div class="tiers-grid">
+      <div class="tier-card" onclick="showView('learn')"><span class="tier-num">01</span><span class="tier-icon"></span><span class="tier-name">Foundations</span><div class="tier-desc">How AI models think and why word choice changes everything.</div></div>
+      <div class="tier-card" onclick="showView('learn')"><span class="tier-num">02</span><span class="tier-icon"></span><span class="tier-name">Core Techniques</span><div class="tier-desc">Role-setting, context, format control, and tone direction.</div></div>
+      <div class="tier-card" onclick="showView('learn')"><span class="tier-num">03</span><span class="tier-icon"></span><span class="tier-name">Advanced Patterns</span><div class="tier-desc">Chain-of-thought, few-shot examples, and iterative refinement.</div></div>
+      <div class="tier-card" onclick="showView('learn')"><span class="tier-num">04</span><span class="tier-icon"></span><span class="tier-name">Domain Tracks</span><div class="tier-desc">Specialized modules for code, writing, research, and images.</div></div>
+      <div class="tier-card" onclick="showView('learn')"><span class="tier-num">05</span><span class="tier-icon"></span><span class="tier-name">Master Challenges</span><div class="tier-desc">Real-world scenarios graded by an AI evaluator.</div></div>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section class="section fade-up" style="padding-top:0">
+    <span class="section-eyebrow">Features</span>
+    <h2 class="section-title">Built for doing,<br>not just reading.</h2>
+    <p class="section-sub">Every feature turns passive understanding into active skill.</p>
+    <div class="features-grid">
+      <div class="feature-card"><div class="feature-icon"></div><div class="feature-name">Live Sandbox</div><div class="feature-desc">Type a prompt and see AI output instantly. Get a real-time score and improvement tips with every attempt.</div></div>
+      <div class="feature-card"><div class="feature-icon"></div><div class="feature-name">Prompt Dissector</div><div class="feature-desc">Paste any prompt and get it broken down into annotated components — role, context, format, constraints — with a score.</div></div>
+      <div class="feature-card"><div class="feature-icon"></div><div class="feature-name">Guided Missions</div><div class="feature-desc">Pass/fail challenges with clear goals. "Get the AI to write a cover letter in under 50 words." Graded instantly.</div></div>
+      <div class="feature-card"><div class="feature-icon"></div><div class="feature-name">Prompt Library</div><div class="feature-desc">A searchable, community-tested collection of high-performing prompts organized by use case and domain.</div></div>
+      <div class="feature-card"><div class="feature-icon"></div><div class="feature-name">AI Grader</div><div class="feature-desc">Submit your prompt and its response. An AI evaluator returns structured feedback on clarity, precision, and output quality.</div></div>
+      <div class="feature-card"><div class="feature-icon"></div><div class="feature-name">Certification</div><div class="feature-desc">Earn your Certified Prompt Engineer badge upon completing all five tiers. Shareable on LinkedIn and resumes.</div></div>
+    </div>
+  </section>
+
+  <!-- How it works -->
+  <div class="section fade-up" style="padding-top:0">
+    <span class="section-eyebrow">How It Works</span>
+    <h2 class="section-title" style="margin-bottom:40px">Three steps to<br>fluency.</h2>
+    <div class="steps-row">
+      <div class="step"><div class="step-num">01</div><div class="step-title">Learn the concept</div><div class="step-body">Each lesson introduces one technique with a clear explanation, real-world examples, and a before/after comparison that shows the impact immediately.</div></div>
+      <div class="step"><div class="step-num">02</div><div class="step-title">Practice in the sandbox</div><div class="step-body">Apply what you learned in a live environment. Write prompts, see responses, get scored, and iterate until you nail it.</div></div>
+      <div class="step"><div class="step-num">03</div><div class="step-title">Complete the mission</div><div class="step-body">Each tier ends with a real-world challenge. The AI Grader evaluates your submission and you advance when you pass.</div></div>
+    </div>
+  </div>
+
+  <!-- Testimonials -->
+  <section class="section fade-up" style="padding-top:40px">
+    <span class="section-eyebrow">From Learners</span>
+    <h2 class="section-title" style="margin-bottom:48px">What people<br>are saying.</h2>
+    <div class="testimonials-grid">
+      <div class="testi"><div class="testi-quote">"I went from generic AI outputs to writing prompts that feel like they have a co-author inside the model. The sandbox alone is worth it."</div><div class="testi-author"><div class="testi-avatar">MR</div><div><div class="testi-name">Maya Rodriguez</div><div class="testi-role">Content Strategist</div></div></div></div>
+      <div class="testi"><div class="testi-quote">"The Prompt Dissector changed how I think about instructions entirely. Now I apply the same logic to writing documentation for my team."</div><div class="testi-author"><div class="testi-avatar">JK</div><div><div class="testi-name">James Kim</div><div class="testi-role">Senior Engineer, Vercel</div></div></div></div>
+      <div class="testi"><div class="testi-quote">"I finished the Advanced tier in a weekend. The missions felt genuinely hard, and passing them felt genuinely rewarding. Rare for an online course."</div><div class="testi-author"><div class="testi-avatar">SO</div><div><div class="testi-name">Sara Okonkwo</div><div class="testi-role">Product Manager</div></div></div></div>
+    </div>
+  </section>
+
+  <!-- Pricing -->
+  <section class="section fade-up" style="padding-top:0" id="pricing">
+    <span class="section-eyebrow">Pricing</span>
+    <h2 class="section-title">Start free.<br>Go further when ready.</h2>
+    <p class="section-sub">No credit card required. Upgrade only when you want advanced content.</p>
+    <div class="pricing-grid">
+      <div class="pricing-card"><div class="plan-name">Free</div><div class="plan-price">$0</div><div class="plan-desc">Perfect for exploring the basics and getting your first wins with AI.</div><div class="plan-divider"></div><ul class="plan-features"><li>Foundations tier</li><li>Core Techniques tier</li><li>20 sandbox runs/month</li><li>Community Library</li></ul><button class="btn-plan" onclick="showView('learn')">Get Started Free</button></div>
+      <div class="pricing-card featured-plan"><div class="plan-badge">Most Popular</div><div class="plan-name">Pro</div><div class="plan-price">$10 <span>/ mo</span></div><div class="plan-desc">For people serious about making AI work harder for them every day.</div><div class="plan-divider"></div><ul class="plan-features"><li>All five tiers unlocked</li><li>Unlimited sandbox runs</li><li>AI Grader &amp; Dissector</li><li>Domain Tracks</li><li>Certification badge</li></ul><button class="btn-plan primary-plan">Start Pro Trial</button></div>
+      <div class="pricing-card"><div class="plan-name">Team</div><div class="plan-price">$49 <span>/ mo</span></div><div class="plan-desc">Onboard your whole team and track collective progress across all tiers.</div><div class="plan-divider"></div><ul class="plan-features"><li>Everything in Pro</li><li>Up to 10 seats</li><li>Team dashboard</li><li>Custom prompt library</li><li>Priority support</li></ul><button class="btn-plan">Contact Sales</button></div>
+    </div>
+  </section>
+
+  <div class="cta-banner fade-up">
+    <h2>Start speaking fluent AI today.</h2>
+    <p>No credit card required. Upgrade when you're ready.</p>
+    <button class="btn-accent" onclick="showView('learn')">Create Free Account →</button>
+  </div>
+
+  <footer>
+    <div><div class="footer-logo">Prompt<span>Craft</span></div><div class="footer-tagline">Learn to speak fluent AI.</div></div>
+    <div class="footer-links">
+      <div class="footer-col"><div class="footer-col-title">Product</div><a class="footer-link" onclick="showView('learn')">Lessons</a><a class="footer-link" onclick="showView('sandbox')">Sandbox</a><a class="footer-link" onclick="showView('library')">Library</a><a class="footer-link">Certification</a></div>
+      <div class="footer-col"><div class="footer-col-title">Company</div><a class="footer-link">About</a><a class="footer-link">Blog</a><a class="footer-link">Careers</a><a class="footer-link">Contact</a></div>
+      <div class="footer-col"><div class="footer-col-title">Legal</div><a class="footer-link">Privacy</a><a class="footer-link">Terms</a><a class="footer-link">Cookies</a></div>
+    </div>
+  </footer>
+  <div class="footer-bottom"><span class="footer-copy">© 2026 PromptCraft. All rights reserved.</span><span class="footer-copy">Made for learners, by learners.</span></div>
+</div>
+
+<!-- ══ LEARN VIEW ══ -->
+<div class="view" id="view-learn">
+  <div class="learn-header">
+    <span class="section-eyebrow">Your Learning Path</span>
+    <h2 class="section-title">Welcome back.<br>Keep the streak alive.</h2>
+    <div class="streak-banner">
+      <span class="streak-fire">⏱</span>
+      <div class="streak-info">
+        <h3 id="streakTitle">Day 1 Streak!</h3>
+        <p id="streakSub">Complete a lesson today to keep your streak alive.</p>
+      </div>
+    </div>
+    <div class="progress-overview" style="margin-top:24px">
+      <div class="progress-card"><span class="prog-num" id="totalXPDisp">0</span><span class="prog-label">Total XP</span></div>
+      <div class="progress-card"><span class="prog-num" id="lessonsDisp">0</span><span class="prog-label">Lessons Done</span></div>
+      <div class="progress-card"><span class="prog-num" id="missionsDisp">0</span><span class="prog-label">Missions Passed</span></div>
+      <div class="progress-card"><span class="prog-num" id="streakDisp">0⏱ Days</span><span class="prog-label">Day Streak</span></div>
+    </div>
+  </div>
+  <div class="lessons-section" id="lessonsContainer"></div>
+</div>
+
+<!-- ══ SANDBOX VIEW (full) ══ -->
+<div class="view" id="view-sandbox">
+  <div class="sandbox-view">
+    <span class="section-eyebrow">Live Practice</span>
+    <h2 class="section-title" style="margin-bottom:8px">Prompt Sandbox</h2>
+    <p class="section-sub">Type any prompt, get an instant AI response, score, and targeted feedback.</p>
+    <div class="sandbox-full">
+      <div class="sandbox-top">
+        <h2>Prompt Sandbox</h2>
+        <div style="display:flex;gap:8px;align-items:center">
+          <span style="font-size:12px;color:var(--muted);font-family:'DM Mono',monospace" id="sbRunCount">Runs: 0</span>
+          <div class="score-pill" id="sbScorePill">Score: —</div>
+        </div>
+      </div>
+      <div class="sandbox-body">
+        <span class="input-label">Load a Template</span>
+        <div class="template-row" id="templateRow"></div>
+        <span class="input-label">Your Prompt</span>
+        <textarea class="prompt-input" id="sbInput" rows="6" placeholder="Write your prompt here. Be specific: include a role, context, format, and constraints for best results…" oninput="updateCharCount('sbCount',this.value)"></textarea>
+        <div class="live-actions">
+          <span class="char-count" id="sbCount">0 chars</span>
+          <button class="btn-send" onclick="runSandbox()">Send to AI →</button>
+        </div>
+        <div class="ai-response-box" id="sbResponse">
+          <div class="ai-score-bar">
+            <span class="score-label">Quality Score</span>
+            <div class="score-track"><div class="score-fill" id="sbBar" style="width:0%"></div></div>
+            <span class="score-val" id="sbScoreVal">—</span>
+          </div>
+          <span class="input-label">AI Response</span>
+          <div id="sbResponseText" style="font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:14px"></div>
+          <div class="ai-tips" id="sbTips"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ LIBRARY VIEW ══ -->
+<div class="view" id="view-library">
+  <div class="library-view">
+    <span class="section-eyebrow">Community Prompt Library</span>
+    <h2 class="section-title" style="margin-bottom:8px">Find the perfect prompt.</h2>
+    <p class="section-sub">Browse and copy community-tested prompts. Filter by category or search by keyword.</p>
+    <div class="library-search-bar">
+      <input type="text" id="libSearch" placeholder="Search prompts…" oninput="filterLibrary()">
+    </div>
+    <div class="filter-row" id="filterRow"></div>
+    <div class="prompt-cards" id="promptCards"></div>
+  </div>
+</div>
+
+<!-- ══ LEADERBOARD VIEW ══ -->
+<div class="view" id="view-leaderboard">
+  <div class="leaderboard-view">
+    <span class="section-eyebrow">Rankings</span>
+    <h2 class="section-title" style="margin-bottom:24px">Leaderboard</h2>
+    <div class="lb-tabs">
+      <button class="lb-tab active" onclick="switchLbTab(this,'weekly')">This Week</button>
+      <button class="lb-tab" onclick="switchLbTab(this,'alltime')">All Time</button>
+    </div>
+    <div class="lb-table" id="lbTable"></div>
+  </div>
+</div>
+
+<!-- Lesson Modal -->
+<div class="modal-overlay" id="lessonModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modalTitle"></div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-footer">
+      <span class="xp-reward" id="modalXP"></span>
+      <button class="btn-primary" id="modalCompleteBtn" onclick="completeLesson()">Complete Lesson →</button>
+    </div>
+  </div>
+</div>
+</div><!-- /page -->
+<script>
+// ── State ──────────────────────────────────────────────
+const state = JSON.parse(localStorage.getItem('pc_state') || '{"xp":0,"streak":1,"completedLessons":[],"passedMissions":[],"sbRuns":0,"lastVisit":""}');
+function save(){localStorage.setItem('pc_state',JSON.stringify(state))}
+let currentLesson=null;
+
+// ── Auth state ───────────────────────────────────────────
+let authUser = null;
+const FREE_LIMIT = 10;
+
+function getToken(){return localStorage.getItem('pc_token');}
+
+function setAuthUser(user, token){
+  authUser = user;
+  if(token) localStorage.setItem('pc_token', token);
+  if(user.xp !== undefined) state.xp = user.xp;
+  if(user.streak !== undefined) state.streak = user.streak;
+  if(user.completedLessons !== undefined) state.completedLessons = user.completedLessons;
+  if(user.passedMissions !== undefined) state.passedMissions = user.passedMissions;
+  save();
+  updateNavAuth();
+  updateNav(); // update UI stats
+  if(document.getElementById('view-learn').classList.contains('active')) renderLearn();
+}
+
+async function syncProgress(){
+  const token = getToken();
+  if(!token || !authUser) return;
+  try{
+    await fetch('/api/me/progress', {
+      method: 'PUT',
+      headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer '+token},
+      body: JSON.stringify({xp: state.xp, streak: state.streak, lastVisit: state.lastVisit, completedLessons: state.completedLessons, passedMissions: state.passedMissions})
+    });
+  } catch(e){}
+}
+
+function updateNavAuth(){
+  const area = document.getElementById('navAuthArea');
+  if(authUser){
+    const initials = authUser.name.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
+    const runs = authUser.sbRunsThisMonth || 0;
+    const limitText = authUser.plan === 'free' ? ` (${runs}/${FREE_LIMIT} runs)` : '';
+    area.innerHTML = `<div class="nav-avatar" title="${authUser.name}${limitText}" onclick="toggleAvatarMenu(event)">${initials}<div class="nav-avatar-menu"><div style="padding:8px 14px;font-size:12px;color:var(--muted);font-weight:700">${authUser.name}</div><div style="padding:2px 14px 8px;font-size:11px;color:var(--muted)">${runs}/${FREE_LIMIT} sandbox runs</div><button onclick="handleSignout()">Sign Out</button></div></div>`;
+  } else {
+    area.innerHTML = '<button class="btn-nav" onclick="openAuth()">Sign In</button>';
+  }
+}
+
+function toggleAvatarMenu(e){
+  const m = e.currentTarget.querySelector('.nav-avatar-menu');
+  if(m) m.classList.toggle('open');
+  e.stopPropagation();
+}
+document.addEventListener('click', ()=>{
+  document.querySelectorAll('.nav-avatar-menu.open').forEach(m=>m.classList.remove('open'));
+});
+
+function openAuth(tab){
+  document.getElementById('authModal').classList.add('open');
+  if(tab) switchAuthTab(tab);
+}
+function closeAuth(){document.getElementById('authModal').classList.remove('open');}
+
+function switchAuthTab(tab){
+  document.getElementById('authSignup').style.display = tab==='signup'?'':'none';
+  document.getElementById('authLogin').style.display = tab==='login'?'':'none';
+  document.getElementById('tabSignup').classList.toggle('active', tab==='signup');
+  document.getElementById('tabLogin').classList.toggle('active', tab==='login');
+}
+
+async function handleSignup(){
+  const name = document.getElementById('signupName').value.trim();
+  const email = document.getElementById('signupEmail').value.trim();
+  const password = document.getElementById('signupPassword').value;
+  const err = document.getElementById('signupError');
+  err.textContent = '';
+  if(!name||!email||!password){err.textContent='All fields are required.';return;}
+  if(password.length < 6){err.textContent='Password must be at least 6 characters.';return;}
+  try{
+    const res = await fetch('/api/signup',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,email,password})});
+    const data = await res.json();
+    if(!res.ok){err.textContent=data.error||'Signup failed.';return;}
+    setAuthUser(data.user, data.token);
+    closeAuth();
+  }catch(e){err.textContent='Could not connect to server.';}
+}
+
+async function handleLogin(){
+  const email = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  const err = document.getElementById('loginError');
+  err.textContent = '';
+  if(!email||!password){err.textContent='Email and password are required.';return;}
+  try{
+    const res = await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password})});
+    const data = await res.json();
+    if(!res.ok){err.textContent=data.error||'Login failed.';return;}
+    setAuthUser(data.user, data.token);
+    closeAuth();
+  }catch(e){err.textContent='Could not connect to server.';}
+}
+
+function handleSignout(){
+  authUser = null;
+  localStorage.removeItem('pc_token');
+  updateNavAuth();
+  showView('home');
+}
+
+async function restoreSession(){
+  const token = getToken();
+  if(!token) return;
+  try{
+    const res = await fetch('/api/me',{headers:{'Authorization':'Bearer '+token}});
+    if(!res.ok){localStorage.removeItem('pc_token');return;}
+    const user = await res.json();
+    setAuthUser(user, null);
+  }catch(e){/* offline — continue as guest */}
+}
+
+// ── Backend API call (replaces callGemini) ────────────────
+async function callAPI(systemPrompt, userText){
+  const token = getToken();
+  if(!token) throw Object.assign(new Error('not_authenticated'), {code:'not_authenticated'});
+  const res = await fetch('/api/sandbox/run',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+    body:JSON.stringify({systemPrompt, userText})
+  });
+  const data = await res.json();
+  if(res.status === 429) throw Object.assign(new Error('limit_reached'), {code:'limit_reached', data});
+  if(!res.ok) throw new Error(data.error||'API error');
+  // Update local run count
+  if(authUser && data.sbRunsThisMonth !== undefined){
+    authUser.sbRunsThisMonth = data.sbRunsThisMonth;
+    updateNavAuth();
+    const el = document.getElementById('sbRunCount');
+    if(el) el.textContent = `Runs: ${data.sbRunsThisMonth}/${FREE_LIMIT}`;
+  }
+  return data.result;
+}
+
+// Evaluate a prompt using the rubric + Gemini intelligence
+async function evaluatePrompt(prompt) {
+  const system = `You are an expert AI prompt coaching system. A user has submitted a prompt for evaluation.
+
+Evaluate it using this rubric (do NOT reward nonsense, keyword spam, or incoherent text):
+- Role (0-15 pts): Does it assign a clear, meaningful role to the AI? (e.g. "You are a senior copywriter")
+- Format (0-10 pts): Does it specify output format? (list, table, JSON, paragraphs, markdown, etc.)
+- Tone (0-8 pts): Does it direct the tone or style? (professional, casual, concise, empathetic, etc.)
+- Constraint (0-7 pts): Are there specific, sensible constraints? (word limits, structure rules, etc.)
+- Context (0-5 pts): Does it give useful background, audience info, or situational context?
+- Clarity (0-15 pts): Is the intent clear and coherent? (gibberish, spam, or nonsense = 0)
+- Specificity (0-20 pts): How specific and actionable is the request vs vague/generic?
+Base: 20 pts.
+
+Also:
+1. Generate a high-quality AI response TO the prompt (as if you are the AI being prompted). Write it as clean plain text paragraphs. Do NOT use markdown asterisks, bold, italic, hashtags, or bullet symbols of any kind in the response field.
+2. Write 1-3 specific, actionable improvement tips as plain sentences. No asterisks, no bold, no markdown formatting whatsoever.
+
+Return ONLY valid JSON in this exact shape, no markdown wrapper, no explanation outside the JSON:
+{
+  "score": <integer 0-100>,
+  "breakdown": {"role":<int>,"format":<int>,"tone":<int>,"constraint":<int>,"context":<int>,"clarity":<int>,"specificity":<int>},
+  "response": "<plain text AI response, no markdown>",
+  "tips": ["<plain text tip 1>", "<plain text tip 2>"]
+}`;
+  const raw = await callAPI(system, 'Prompt to evaluate: ' + prompt);
+  const match = raw.match(/\{[\s\S]*\}/);
+  if (!match) return JSON.parse(raw);
+  return JSON.parse(match[0]);
+}
+
+// Evaluate whether a mission response passes its constraint
+async function evaluateMission(missionDesc, constraint, aiResponse) {
+  const system = `You are a mission evaluator for a prompt engineering course. Determine if the AI response satisfies the mission constraint. Reply ONLY with valid JSON: {"pass": true/false, "reason": "one sentence explanation"}`;
+  const user = `Mission: ${missionDesc}\nConstraint: ${constraint}\nAI Response: ${aiResponse}`;
+  const raw = await callAPI(system, user);
+  const match = raw.match(/\{[\s\S]*\}/);
+  return JSON.parse(match[0]);
+}
+
+// ── Data ───────────────────────────────────────────────
+const TIERS=[
+  {id:1,name:'Foundations',icon:'',unlocked:true,color:'accent',lessons:[
+    {id:'f1',title:'What Is a Prompt?',xp:50,time:'5 min',body:`<p>A <strong>prompt</strong> is any instruction, question, or context you give to an AI model. The quality of what you get back is almost entirely determined by what you put in.</p><h3>The Golden Rule</h3><p>AI models are not mind-readers. They interpret your words literally. Ambiguity leads to generic, unhelpful output.</p><h3>Bad vs Good</h3><div class="example-block">Tell me about dogs.</div><div class="example-block good-ex">Give me 5 fascinating, lesser-known facts about border collies specifically — the kind I could use to impress someone at a dinner party. Keep each fact to 2 sentences.</div><p>Notice: the second prompt specifies a topic, quantity, audience, use case, and format constraint. That's the difference.</p>`},
+    {id:'f2',title:'How AI Models Think',xp:75,time:'8 min',body:`<p>Large language models predict likely next tokens based on everything in their context window. They don't "understand" language — they model probability distributions over text.</p><h3>What This Means for You</h3><p>The model will produce statistically plausible output. Give it strong signals about what "plausible" should mean: role, domain, tone, format.</p><h3>Context is King</h3><div class="example-block good-ex">You are a pediatric doctor explaining a diagnosis to a worried parent. Use simple language, avoid jargon, and be reassuring but honest.</div><p>This context immediately shifts the probability space toward the output you want.</p>`},
+    {id:'f3',title:'Why Word Choice Matters',xp:60,time:'6 min',body:`<p>Synonyms carry different connotations. "Summarize," "distill," "simplify," and "outline" all mean different things. So do "explain," "analyze," "critique," and "evaluate."</p><h3>Precision Verbs</h3><p>Choose your action verb carefully. "List" gives bullets. "Explain" gives prose. "Compare" gives contrast. "Argue" gives persuasion.</p><div class="example-block">Explain social media.</div><div class="example-block good-ex">Compare the psychological mechanisms behind Instagram and TikTok engagement — specifically why TikTok tends to create stronger habitual use. Cite behavioral psychology concepts.</div>`},
+    {id:'f4',title:'Length & Format Control',xp:65,time:'7 min',body:`<p>AI will match your implied format. Ask generally, get general output. Specify length, structure, and format — get exactly what you need.</p><h3>Format Signals</h3><p>Include phrases like: "in a numbered list," "as a table," "in three paragraphs," "in under 100 words," "using markdown headers." These dramatically shape output.</p><div class="example-block good-ex">Create a comparison table with 4 columns: Tool, Best For, Price, Limitations. Include 5 popular project management tools.</div>`}
+  ]},
+  {id:2,name:'Core Techniques',icon:'',unlocked:true,color:'accent',lessons:[
+    {id:'c1',title:'Role Assignment',xp:80,time:'8 min',body:`<p>One of the most powerful prompting techniques: tell the AI what persona or expert role to adopt. This shifts the model's "prior" toward domain-appropriate language, knowledge, and reasoning style.</p><h3>Role Assignment Formula</h3><div class="example-block good-ex">You are a senior UX designer with 10 years of experience at top tech companies. You are reviewing a mobile app wireframe. Be direct, identify the top 3 usability issues, and suggest specific solutions.</div><p>The role (senior UX designer), experience (10 years), context (reviewing wireframe), and task (identify and suggest) all combine to produce expert-quality output.</p>`},
+    {id:'c2',title:'Context Setting',xp:85,time:'9 min',body:`<p>Context is the background information the model needs to give you a relevant, precise answer. Never assume the AI knows your situation.</p><h3>What to Include</h3><p>Background on your situation, your audience, the purpose of the output, any constraints, and what you've already tried.</p><div class="example-block good-ex">I'm a first-time founder writing a cold email to a VC who invests in B2B SaaS. My startup does automated compliance reporting for healthcare companies. We have 3 paying customers and $18K MRR. The email should be under 150 words and end with a soft ask for a 20-minute call.</div>`},
+    {id:'c3',title:'Tone Direction',xp:70,time:'7 min',body:`<p>Tone profoundly affects how output is received. Without direction, AI defaults to a generic "assistant" tone — polite but often flat.</p><h3>Tone Vocabulary</h3><p>Professional, casual, witty, direct, empathetic, urgent, celebratory, skeptical, authoritative, conversational, technical, accessible, Hemingway-esque...</p><div class="example-block good-ex">Rewrite this product description in a tone that's confident, slightly edgy, and speaks to ambitious 25-35 year olds who dislike corporate speak. No fluff. Every word should earn its place.</div>`},
+    {id:'c4',title:'Output Format Control',xp:75,time:'8 min',body:`<p>Explicitly specifying your desired output format saves editing time and produces immediately usable content.</p><h3>Common Format Instructions</h3><ul style="margin:12px 0 12px 20px;color:var(--text2);font-size:14px;line-height:2"><li>Use markdown with H2 headers and bullet points</li><li>Return only a JSON object with keys: name, price, description</li><li>Format as a 3-act structure with clear scene breaks</li><li>Produce a CSV with columns: Date, Event, Impact</li></ul><div class="example-block good-ex">Generate the output as a JSON array. Each item should have: "title" (string), "difficulty" (easy/medium/hard), "estimated_minutes" (integer), "category" (string). Return only the JSON, no explanation.</div>`}
+  ]},
+  {id:3,name:'Advanced Patterns',icon:'',unlocked:false,color:'purple',lessons:[
+    {id:'a1',title:'Chain-of-Thought Prompting',xp:120,time:'12 min',body:`<p>Chain-of-thought (CoT) prompting asks the model to reason step-by-step before giving a final answer. This dramatically improves accuracy on complex reasoning tasks.</p><h3>How to Trigger It</h3><div class="example-block good-ex">Think through this step by step before giving your final answer: A store sells apples for $0.50 each and oranges for $0.75 each. Alice bought 12 pieces of fruit for $7.50. How many of each did she buy?</div><p>Adding "think step by step" or "reason through this" activates longer, more reliable reasoning chains.</p>`},
+    {id:'a2',title:'Few-Shot Examples',xp:130,time:'14 min',body:`<p>Few-shot prompting provides 2-5 examples of input → output pairs before your actual request. This is one of the highest-leverage techniques for consistent, styled output.</p><h3>Template</h3><div class="example-block good-ex">I'll show you examples, then give you a new input.\n\nInput: "The meeting ran long"\nOutput: "Team sync exceeded scheduled duration"\n\nInput: "Our app crashed"\nOutput: "Application experienced an unexpected service interruption"\n\nInput: "John is bad at Excel"\nOutput:</div><p>The model extracts the pattern and applies it to new inputs.</p>`},
+    {id:'a3',title:'Iterative Refinement',xp:110,time:'11 min',body:`<p>The best prompts are rarely written once. Iterative refinement is a process: generate, evaluate, identify weaknesses, refine, repeat.</p><h3>The Refinement Loop</h3><p>1. Draft a prompt → Get output → 2. Identify what's wrong or missing → 3. Add those signals to the prompt → 4. Repeat until output is excellent.</p><div class="example-block good-ex">The previous output was too formal and used too many bullet points. I need this to read as a natural, flowing blog post written in first person. Rewrite it with those changes, keeping the same core content.</div>`}
+  ]},
+  {id:4,name:'Domain Tracks',icon:'',unlocked:false,color:'orange',lessons:[
+    {id:'d1',title:'Prompting for Code',xp:140,time:'15 min',body:`<p>Coding prompts need extreme precision: language, version, framework, constraints, edge cases, and desired style.</p><div class="example-block good-ex">Write a Python function (3.10+) that takes a list of dictionaries and returns a new list sorted by a given key in O(n log n) time. Handle the case where the key doesn't exist. Include type hints and a docstring. No third-party libraries.</div>`},
+    {id:'d2',title:'Prompting for Writing',xp:120,time:'12 min',body:`<p>For writing tasks, specify: audience, tone, length, format, POV, style references, and what to avoid.</p><div class="example-block good-ex">Write a 400-word LinkedIn post about burnout from the POV of a recovering founder. First-person. Vulnerable but not self-pitying. End with one concrete lesson. Write like a human, not a career coach. No hashtags.</div>`},
+    {id:'d3',title:'Prompting for Research',xp:130,time:'13 min',body:`<p>Research prompts should specify: scope, depth, recency, format, sources to draw from, and output structure.</p><div class="example-block good-ex">Give me a structured briefing on the current state of solid-state batteries as of 2024. Cover: (1) key technical barriers, (2) top 3 companies leading development, (3) realistic commercialization timeline. Use accessible language but don't oversimplify. Cite the type of sources a researcher would trust.</div>`}
+  ]},
+  {id:5,name:'Master Challenges',icon:'',unlocked:false,color:'orange',lessons:[
+    {id:'m1',title:'Master Challenge: Email Suite',xp:200,time:'20 min',body:`<p>Your final challenge for this tier: craft a complete email communication suite for a product launch.</p><h3>The Challenge</h3><p>Using only prompting techniques from all previous tiers, generate 3 emails: (1) internal team announcement, (2) customer announcement, (3) press outreach. Each must have distinct tone, appropriate length, and high specificity. You'll be evaluated on clarity, role use, context richness, and format control.</p><div class="example-block good-ex">Start with: "You are [role]. The context is [X]. Write [format] for [audience]. Tone: [Y]. Constraints: [Z]."</div>`},
+    {id:'m2',title:'Master Challenge: Code Review',xp:250,time:'25 min',body:`<p>Write a prompt that gets an AI to perform a thorough, expert-level code review of a Python function you provide.</p><h3>Requirements</h3><p>Your prompt must elicit feedback on: correctness, performance, readability, edge cases, and security. The AI response should be structured (H2 headers per category), actionable, and ranked by priority.</p><p>This challenge tests your ability to combine role assignment, format control, context setting, and constraint specification simultaneously.</p>`}
+  ]}
+];
+
+const MISSIONS=[
+  {id:'m1',title:'50-Word Cover Letter',xp:100,desc:'Get the AI to write a professional cover letter for a software engineer applying to Google.',constraint:'Response must be 50 words or fewer.',pass:r=>r.split(/\s+/).length<=55},
+  {id:'m2',title:'The Role-Player',xp:120,desc:'Get the AI to explain quantum entanglement as if speaking to a curious 10-year-old.',constraint:'Use an analogy. No equations. Under 100 words.',pass:r=>r.length>50&&!r.includes('=')},
+  {id:'m3',title:'Format Master',xp:140,desc:'Get the AI to compare React, Vue, and Svelte.',constraint:'Output must be a markdown table only. No prose above or below.',pass:r=>r.includes('|')&&r.includes('---')},
+  {id:'m4',title:'Tone Shift',xp:110,desc:'Get the AI to describe how to make coffee.',constraint:'Written like a Michelin-starred chef explaining to a sous chef. Dramatic and precise.',pass:r=>r.length>100},
+  {id:'m5',title:'Constraint King',xp:160,desc:'Get the AI to write a short story.',constraint:'Exactly 6 sentences. Each sentence starts with a consecutive letter: A, B, C, D, E, F.',pass:r=>{const s=r.match(/[^.!?]+[.!?]+/g);return s&&s.length>=6}}
+];
+
+const LIBRARY=[
+  {id:'l1',cat:'Writing',title:'Viral LinkedIn Post',score:96,uses:2341,prompt:'You are a LinkedIn ghostwriter for senior executives. Write a story-driven post about [LESSON LEARNED] that starts with a counterintuitive hook, builds tension, and ends with a clear takeaway. First person, conversational, no hashtags, under 250 words.'},
+  {id:'l2',cat:'Code',title:'Code Reviewer',score:94,uses:1876,prompt:'You are a senior software engineer at a FAANG company. Review this code for: (1) correctness, (2) performance, (3) readability, (4) security, (5) edge cases. Use H2 headers for each category. Be direct. Rank issues by severity. Suggest specific fixes with code examples.'},
+  {id:'l3',cat:'Research',title:'Expert Briefing',score:92,uses:1654,prompt:'Give me a structured 5-minute briefing on [TOPIC]. Format: (1) What it is in one sentence, (2) Why it matters now, (3) 3 key facts, (4) Main controversy or challenge, (5) One thing most people get wrong. Keep language crisp and accessible.'},
+  {id:'l4',cat:'Marketing',title:'Cold Email Writer',score:91,uses:1432,prompt:'Write a cold email for [PRODUCT] targeting [AUDIENCE]. Under 150 words. Lead with their pain point, not your product. End with a soft ask. No buzzwords or generic openings like "I hope this email finds you well." Subject line included.'},
+  {id:'l5',cat:'Productivity',title:'Meeting Summarizer',score:89,uses:1298,prompt:'Summarize the following meeting transcript. Output: (1) One-sentence TL;DR, (2) Key decisions made, (3) Action items with owner and deadline, (4) Open questions. Use bullet points. Be extremely concise — this summary should be scannable in 60 seconds.'},
+  {id:'l6',cat:'Code',title:'Bug Explainer',score:95,uses:2108,prompt:'Act as a patient senior developer explaining a bug to a junior developer. Explain: (1) Why this code fails, (2) What the root cause is, (3) How to fix it, (4) How to prevent this class of bug in future. Use simple language and analogies where helpful.'},
+  {id:'l7',cat:'Writing',title:'Brand Voice Guide',score:88,uses:987,prompt:'Analyze the following 3 sample texts from our brand and extract a voice guide. Identify: tone, vocabulary preferences, sentence structure patterns, what we avoid, and 5 do/don\'t rules. Format as a concise style guide a copywriter could use immediately.'},
+  {id:'l8',cat:'Learning',title:'Concept Explainer',score:93,uses:1765,prompt:'Explain [CONCEPT] using the Feynman technique: start with the simplest possible explanation, build up layer by layer, use one memorable analogy, and end by explaining why this concept matters in the real world. Audience: intelligent adult with no background in this field.'},
+  {id:'l9',cat:'Marketing',title:'Product Description',score:87,uses:876,prompt:'Write a product description for [PRODUCT] targeting [AUDIENCE]. Tone: confident, slightly edgy, no corporate speak. Format: punchy headline, 2-sentence hook, 3 benefit bullets (outcome-focused, not feature-focused), and a one-line CTA. Under 120 words total.'},
+  {id:'l10',cat:'Productivity',title:'Decision Framework',score:90,uses:1123,prompt:'Help me make a decision about [DECISION]. Use the "10-10-10" framework: How will I feel about this in 10 minutes? 10 months? 10 years? Then add: (1) What am I afraid of? (2) What\'s the reversibility? (3) What would I regret more — doing or not doing? Give a final recommendation.'}
+];
+
+const POTD=[
+  {prompt:'You are a world-class editor at The Atlantic. Review the following paragraph and rewrite it to be 40% shorter while losing none of the meaning. Then explain every cut you made and why.',cat:'Writing'},
+  {prompt:'Act as a skeptical venture capitalist who has seen 1,000 pitches. Ask me the 5 hardest questions about my startup idea that most founders fail to answer. Be direct. No softening.',cat:'Business'},
+  {prompt:'Explain the concept of compounding to me using 3 different analogies — one from nature, one from cooking, and one from fitness. Make each one vivid and specific.',cat:'Learning'},
+  {prompt:'You are a senior product designer. I\'ll describe a user problem. Give me 5 wildly different solution directions — ranging from "obvious" to "unconventional" to "moonshot." No wireframes, just concepts.',cat:'Product'},
+  {prompt:'Rewrite the following text in the style of Ernest Hemingway: short sentences, active voice, concrete nouns, zero adverbs, no sentimentality. Preserve the meaning completely.',cat:'Writing'},
+  {prompt:'Create a debate between two experts who strongly disagree about [AI/remote work/social media]. Give each side 3 compelling points and a final rebuttal. Stay steel-manned — both sides should be persuasive.',cat:'Critical Thinking'}
+];
+
+const LEADERBOARD={
+  weekly:[
+    {name:'PromptWizard',badge:'Master',xp:1840,streak:14},
+    {name:'AIAlchemist',badge:'Advanced',xp:1620,streak:9},
+    {name:'NeuralNinja',badge:'Advanced',xp:1490,streak:21},
+    {name:'ContextKing',badge:'Core',xp:1210,streak:7},
+    {name:'YOU',badge:'Learner',xp:0,streak:1,you:true},
+    {name:'PromptPilot',badge:'Core',xp:980,streak:4},
+    {name:'ToneTypist',badge:'Core',xp:870,streak:6},
+    {name:'ChainThinker',badge:'Foundations',xp:730,streak:3},
+    {name:'IterativeIvy',badge:'Foundations',xp:610,streak:2},
+    {name:'NewcomerNex',badge:'Foundations',xp:420,streak:1}
+  ],
+  alltime:[
+    {name:'PromptWizard',badge:'Master',xp:24800,streak:89},
+    {name:'ContextKing',badge:'Advanced',xp:19200,streak:42},
+    {name:'AIAlchemist',badge:'Advanced',xp:17600,streak:31},
+    {name:'NeuralNinja',badge:'Advanced',xp:15900,streak:67},
+    {name:'ToneTypist',badge:'Core',xp:12100,streak:18},
+    {name:'YOU',badge:'Learner',xp:0,streak:1,you:true},
+    {name:'ChainThinker',badge:'Core',xp:9800,streak:15},
+    {name:'PromptPilot',badge:'Core',xp:8400,streak:9},
+    {name:'IterativeIvy',badge:'Foundations',xp:6200,streak:7},
+    {name:'NewcomerNex',badge:'Foundations',xp:3100,streak:3}
+  ]
+};
+
+const RESPONSES=[
+  {keywords:['email','write','send'],resp:'Subject: Team Update — Q3 Launch & Next Steps\n\nHey team, quick recap from this morning\'s standup. Great news: the Q3 launch is on track. Action items are logged in Jira — check your assignments and update statuses by EOD. Our next sync is Thursday at 10am. Keep up the fantastic momentum!\n\nBest, [Your Name]'},
+  {keywords:['explain','what is','define','how does'],resp:'Great question! To break this down clearly: The concept works by establishing a relationship between input and output where each component follows a logical sequence. The first key principle is that context shapes interpretation. The second is that specificity dramatically improves accuracy. Finally, iteration refines the result. Understanding these three pillars gives you a strong foundation.'},
+  {keywords:['list','give me','5','10','top'],resp:'Here are the key items you requested:\n\n1. **First point** — This addresses the core of your question with specific detail that makes it immediately actionable.\n2. **Second point** — Building on the first, this expands the framework with a practical application.\n3. **Third point** — A nuanced consideration that most people overlook but dramatically improves results.\n4. **Fourth point** — The counterintuitive insight that separates experts from novices.\n5. **Fifth point** — How to synthesize the above into a repeatable system.'},
+  {keywords:['code','function','python','javascript','write a'],resp:'```python\ndef process_data(items: list[dict], key: str, reverse: bool = False) -> list[dict]:\n    """Sort a list of dicts by a given key. Returns empty list if key missing.\n    \n    Args:\n        items: List of dictionaries to sort\n        key: Dictionary key to sort by\n        reverse: Sort descending if True\n    \n    Returns:\n        Sorted list of dictionaries\n    """\n    if not items or key not in items[0]:\n        return []\n    return sorted(items, key=lambda x: x.get(key, ""), reverse=reverse)\n```'},
+  {keywords:['story','write a story','fiction','narrative'],resp:'The last light faded over the ridge.\n\nShe had walked for three days — not because she had to, but because the map was wrong and pride kept her moving forward. At the edge of the clearing, a small cabin appeared, smoke curling from its chimney. She knocked once.\n\nThe door opened. An old man squinted at her.\n\n"You\'re late," he said, as if he\'d been expecting her for decades.\n\n"I didn\'t know I was coming," she admitted.\n\nHe smiled. "They never do."'},
+  {keywords:['compare','versus','vs','difference'],resp:'**Comparison Analysis**\n\n| Dimension | Option A | Option B |\n|-----------|----------|----------|\n| **Speed** | Faster for simple tasks | Better for complex workflows |\n| **Learning Curve** | Gentle, intuitive | Steeper, more powerful |\n| **Cost** | Free tier available | Premium pricing |\n| **Best For** | Beginners & solo users | Teams & power users |\n| **Verdict** | Start here | Graduate to this |\n\n**Bottom line:** Choose Option A if you\'re starting out; Option B when you need scale and depth.'}
+];
+
+const TEMPLATES=[
+  {label:'Role + Task','text':'You are a [expert role]. [Task description]. Format the response as [format]. Tone: [tone].'},
+  {label:'Before/After','text':'Here is a weak version: "[weak example]". Rewrite it to be [improvement goal]. Keep the core message but [specific changes].'},
+  {label:'Step-by-Step','text':'Think through this step by step before answering: [complex question or problem]. Show your reasoning, then give your final answer.'},
+  {label:'Few-Shot','text':'Here are examples:\nInput: [example 1 input] → Output: [example 1 output]\nInput: [example 2 input] → Output: [example 2 output]\nNow do: [your actual input]'},
+  {label:'Constraint','text':'Write a [content type] about [topic] for [audience]. Requirements: under [word count] words, use [format], avoid [what to avoid], end with [ending].'}
+];
+
+// ── Scoring (rubric-only fallback if Gemini is unavailable) ───
+function scorePromptFallback(p){
+  let s=20;
+  if(p.length>30)s+=15;
+  if(p.length>80)s+=10;
+  if(p.length>150)s+=10;
+  if(/\b(you are|act as|your role)\b/i.test(p))s+=15;
+  if(/\b(format|list|table|paragraph|bullet|numbered|markdown)\b/i.test(p))s+=10;
+  if(/\b(tone|style|voice|professional|casual|formal|brief)\b/i.test(p))s+=8;
+  if(/\b(under|fewer|limit|max|only|exactly|at most)\b/i.test(p))s+=7;
+  if(/\b(context|background|situation)\b/i.test(p))s+=5;
+  return Math.min(s,100);
+}
+
+// ── XP ──────────────────────────────────────────────────
+function addXP(amount,label){
+  state.xp+=amount;
+  save();
+  updateNav();
+  syncProgress();
+  const t=document.getElementById('xpToast');
+  t.textContent=`+${amount} XP — ${label}`;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
+}
+function updateNav(){
+  document.getElementById('navXP').textContent=state.xp+' XP';
+  document.getElementById('navStreak').textContent='⏱'+state.streak;
+}
+
+// ── Navigation ──────────────────────────────────────────
+function showView(name){
+  // Gate protected views behind auth
+  if(['sandbox','learn','library','leaderboard'].includes(name) && !authUser){
+    openAuth('signup');
+    return;
+  }
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('view-'+name).classList.add('active');
+  document.querySelectorAll('.nav-link').forEach((l,i)=>{
+    l.classList.remove('active');
+    if(['home','learn','sandbox','library','leaderboard'][i]===name)l.classList.add('active');
+  });
+  window.scrollTo({top:0,behavior:'smooth'});
+  if(name==='learn')renderLearn();
+  if(name==='library')renderLibrary();
+  if(name==='leaderboard')renderLeaderboard('weekly');
+  if(name==='sandbox')renderSandboxTemplates();
+}
+
+// ── Learn ────────────────────────────────────────────────
+function renderLearn(){
+  // Update stats
+  document.getElementById('totalXPDisp').textContent=state.xp;
+  document.getElementById('lessonsDisp').textContent=state.completedLessons.length;
+  document.getElementById('missionsDisp').textContent=state.passedMissions.length;
+  document.getElementById('streakDisp').textContent=state.streak+'⏱';
+  document.getElementById('streakTitle').textContent=`Day ${state.streak} Streak!`;
+  document.getElementById('streakSub').textContent=state.streak===1?'Complete a lesson today to start your streak!':'Great momentum! Don\'t break the chain.';
+
+  const container=document.getElementById('lessonsContainer');
+  container.innerHTML='';
+  TIERS.forEach(tier=>{
+    const sd=document.createElement('div');sd.className='tier-section';
+    const tierDone=state.completedLessons.filter(id=>tier.lessons.some(l=>l.id===id)).length;
+    const badge=tier.unlocked?`<span class="tier-badge">${tier.name}</span>`:`<span class="tier-badge locked-badge">Locked: ${tier.name}</span>`;
+    sd.innerHTML=`<div class="tier-header">${badge}<span style="font-size:12px;color:var(--muted);margin-left:auto">${tierDone}/${tier.lessons.length} complete</span></div><div class="lessons-grid" id="tier-${tier.id}-lessons"></div>`;
+    container.appendChild(sd);
+    const grid=sd.querySelector(`#tier-${tier.id}-lessons`);
+    tier.lessons.forEach(lesson=>{
+      const done=state.completedLessons.includes(lesson.id);
+      const locked=!tier.unlocked;
+      const card=document.createElement('div');
+      card.className=`lesson-card${done?' done':''}${locked?' locked-lesson':''}`;
+      card.innerHTML=`<span class="lesson-num">${lesson.id.toUpperCase()}</span><span class="lesson-title">${lesson.title}</span><div class="lesson-meta"><span class="lesson-xp">+${lesson.xp} XP</span><span class="lesson-time">Duration: ${lesson.time}</span>${done?'<span class="lesson-done-icon" style="margin-left:auto;font-size:11px;font-weight:700;color:var(--accent-text)">DONE</span>':''}</div>`;
+      if(!locked)card.onclick=()=>openLesson(lesson);
+      grid.appendChild(card);
+    });
+  });
+
+  // Missions section
+  const ms=document.createElement('div');ms.className='tier-section';
+  ms.innerHTML='<div class="tier-header"><span class="tier-badge">Guided Missions</span></div>';
+  MISSIONS.forEach(m=>{
+    const done=state.passedMissions.includes(m.id);
+    const mc=document.createElement('div');
+    mc.className=`mission-card${done?' done-mission':''}`;
+    mc.innerHTML=`<div class="mission-top"><span class="mission-title">${done?'DONE: ':''} ${m.title}</span><span class="mission-xp">+${m.xp} XP</span></div><div class="mission-desc">${m.desc}</div><div class="mission-constraint">Constraint: ${m.constraint}</div><div class="mission-sandbox" style="display:none"><span class="input-label" style="margin-top:12px;display:block">Your Prompt</span><textarea class="prompt-input" id="mission-${m.id}-input" placeholder="Write your prompt…"></textarea><div class="live-actions" style="margin-top:8px"><button class="btn-send" onclick="runMission('${m.id}')">Submit Mission →</button></div><div id="mission-${m.id}-result"></div></div>`;
+    mc.querySelector('.mission-top').onclick=()=>{
+      const sb=mc.querySelector('.mission-sandbox');
+      sb.style.display=sb.style.display==='none'?'block':'none';
+    };
+    ms.appendChild(mc);
+  });
+  container.appendChild(ms);
+}
+
+function openLesson(lesson){
+  currentLesson=lesson;
+  document.getElementById('modalTitle').textContent=lesson.title;
+  document.getElementById('modalBody').innerHTML=lesson.body;
+  document.getElementById('modalXP').textContent=`+${lesson.xp} XP on completion`;
+  const btn=document.getElementById('modalCompleteBtn');
+  if(state.completedLessons.includes(lesson.id)){btn.textContent='Already Completed ✓';btn.style.opacity='.5';}
+  else{btn.textContent='Complete Lesson →';btn.style.opacity='1';}
+  document.getElementById('lessonModal').classList.add('open');
+}
+function closeModal(){document.getElementById('lessonModal').classList.remove('open');currentLesson=null;}
+function completeLesson(){
+  if(!currentLesson||state.completedLessons.includes(currentLesson.id))return;
+  state.completedLessons.push(currentLesson.id);
+  addXP(currentLesson.xp,'Lesson Complete!');
+  save();closeModal();renderLearn();
+}
+
+// ── Missions ─────────────────────────────────────────────
+async function runMission(id){
+  const m=MISSIONS.find(x=>x.id===id);
+  const input=document.getElementById(`mission-${id}-input`);
+  const result=document.getElementById(`mission-${id}-result`);
+  if(!input.value.trim()){return;}
+  const btn=input.closest('.mission-sandbox').querySelector('.btn-send');
+  if(btn){btn.disabled=true;btn.textContent='Evaluating...';btn.style.opacity='0.6';}
+  result.className='mission-result';result.innerHTML='Asking Gemini to evaluate…';result.style.display='block';
+  try {
+    // First get the AI response to the prompt
+    const evalResult = await evaluatePrompt(input.value);
+    const aiResp = evalResult.response || '';
+    // Then ask Gemini to judge mission pass/fail
+    const judgment = await evaluateMission(m.desc, m.constraint, aiResp);
+    const pass = judgment.pass;
+    if(pass&&!state.passedMissions.includes(id)){state.passedMissions.push(id);addXP(m.xp,'Mission Passed!');save();renderLearn();}
+    result.innerHTML=pass
+      ?`<strong>Mission Passed!</strong> ${judgment.reason}<br><br><em style="font-size:12px;opacity:.7">AI response: "${aiResp.substring(0,120)}..."</em>`
+      :`<strong>Not quite.</strong> ${judgment.reason} Refine your prompt and try again.`;
+  } catch(e) {
+    console.error('Gemini mission error:', e);
+    // Fallback to local check
+    const aiResp = '(offline evaluation)';
+    result.className='mission-result fail';
+    result.innerHTML='Note: Could not reach Gemini. Check your connection and try again.';
+  }
+  if(btn){btn.disabled=false;btn.textContent='Submit Mission →';btn.style.opacity='1';}
+}
+
+// ── Sandbox ──────────────────────────────────────────────
+function renderSandboxTemplates(){
+  const row=document.getElementById('templateRow');
+  if(row.children.length)return;
+  TEMPLATES.forEach(t=>{
+    const btn=document.createElement('button');btn.className='tmpl-pill';btn.textContent=t.label;
+    btn.onclick=()=>{const input=document.getElementById('sbInput');input.value=t.text;updateCharCount('sbCount',t.text);};
+    row.appendChild(btn);
+  });
+}
+
+function setLoading(btnId, loading, originalText='Send to AI →') {
+  const btn = document.getElementById(btnId);
+  if (!btn) return;
+  if (loading) {
+    btn.disabled = true;
+    btn.textContent = 'Thinking…';
+    btn.style.opacity = '0.6';
+  } else {
+    btn.disabled = false;
+    btn.textContent = originalText;
+    btn.style.opacity = '1';
+  }
+}
+
+function formatMarkdown(text) {
+  if (!text) return '';
+  return text
+    .replace(/\n\n/g, '</p><p style="margin-top:12px">')
+    .replace(/\n/g, '<br>')
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.*?)\*/g, '<em>$1</em>');
+}
+
+async function runSandbox(){
+  if(!authUser){openAuth('signup');return;}
+  const input=document.getElementById('sbInput');
+  const v=input.value.trim();if(!v)return;
+  const sendBtn = document.querySelector('#view-sandbox .btn-send');
+  if(sendBtn){sendBtn.disabled=true;sendBtn.textContent='Thinking…';sendBtn.style.opacity='0.6';}
+  try {
+    const result = await evaluatePrompt(v);
+    const score = result.score;
+    document.getElementById('sbScorePill').textContent=`Score: ${score}/100`;
+    const box=document.getElementById('sbResponse');box.classList.add('show');
+    document.getElementById('sbBar').style.width=score+'%';
+    document.getElementById('sbScoreVal').textContent=score+'/100';
+    document.getElementById('sbResponseText').textContent = result.response || '(No response generated)';
+    const tips = result.tips||[];
+    const bd = result.breakdown||{};
+    const bdHtml = Object.keys(bd).length ? `<div style="margin-top:10px;display:flex;flex-wrap:wrap;gap:6px">${Object.entries(bd).map(([k,v])=>`<span style="font-size:11px;padding:3px 8px;border-radius:6px;background:var(--bg);border:1px solid var(--border)">${k}: ${v}</span>`).join('')}</div>` : '';
+    document.getElementById('sbTips').innerHTML=`<strong>AI Feedback</strong>${tips.map(t=>`<div style="margin-top:6px">• ${t}</div>`).join('')}${bdHtml}`;
+    if(score>=70)addXP(25,'Sandbox Practice');
+  } catch(e) {
+    if(e.code === 'not_authenticated'){openAuth('signup');return;}
+    if(e.code === 'limit_reached'){
+      document.getElementById('sbResponse').classList.add('show');
+      document.getElementById('sbResponseText').textContent='You have used all 10 free sandbox runs this month. Upgrade to Pro for unlimited access.';
+      document.getElementById('sbTips').innerHTML='<button class="btn-primary" onclick="showView(\'home\')" style="margin-top:12px">View Upgrade Options</button>';
+      if(sendBtn){sendBtn.disabled=false;sendBtn.textContent='Send to AI →';sendBtn.style.opacity='1';}
+      return;
+    }
+    console.error('API error:', e);
+    const score = scorePromptFallback(v);
+    const box=document.getElementById('sbResponse');box.classList.add('show');
+    document.getElementById('sbBar').style.width=score+'%';
+    document.getElementById('sbScoreVal').textContent=score+'/100 (offline)';
+    document.getElementById('sbResponseText').textContent='(Server unavailable — showing offline score)';
+    document.getElementById('sbTips').innerHTML=`<strong>Note</strong><div style="margin-top:4px">Could not reach the server. Make sure it is running.</div>`;
+  }
+  if(sendBtn){sendBtn.disabled=false;sendBtn.textContent='Send to AI →';sendBtn.style.opacity='1';}
+}
+
+async function runHomeSandbox(){
+  if(!authUser){openAuth('signup');return;}
+  const input=document.getElementById('homeLiveInput');
+  const v=input.value.trim();if(!v)return;
+  const sendBtn = document.querySelector('#tab-try-live .btn-send');
+  if(sendBtn){sendBtn.disabled=true;sendBtn.textContent='Thinking…';sendBtn.style.opacity='0.6';}
+  try {
+    const result = await evaluatePrompt(v);
+    const score = result.score;
+    const box=document.getElementById('homeLiveResponse');box.classList.add('show');
+    document.getElementById('homeLiveBar').style.width=score+'%';
+    document.getElementById('homeLiveScoreVal').textContent=score+'/100';
+    document.getElementById('homeLiveText').textContent = result.response || '';
+    const tips = result.tips||[];
+    document.getElementById('homeLiveTips').innerHTML=`<strong>AI Feedback</strong>${tips.map(t=>`<div style="margin-top:6px">• ${t}</div>`).join('')}`;
+    document.getElementById('homeSandboxScore').textContent='Score: '+score+' / 100';
+  } catch(e) {
+    if(e.code==='not_authenticated'){openAuth('signup');return;}
+    if(e.code==='limit_reached'){document.getElementById('homeLiveText').textContent='Monthly limit reached. Upgrade to Pro for unlimited runs.';if(sendBtn){sendBtn.disabled=false;sendBtn.textContent='Send Prompt →';sendBtn.style.opacity='1';}return;}
+    console.error('API error:', e);
+    const score = scorePromptFallback(v);
+    document.getElementById('homeSandboxScore').textContent='Score: '+score+' / 100 (offline)';
+  }
+  if(sendBtn){sendBtn.disabled=false;sendBtn.textContent='Send Prompt →';sendBtn.style.opacity='1';}
+}
+
+function updateCharCount(id,v){document.getElementById(id).textContent=v.length+' chars';}
+
+// ── Sandbox tabs ──────────────────────────────────────────
+function switchSandboxTab(btn,tab){
+  document.querySelectorAll('.stab').forEach(s=>s.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-before-after').style.display=tab==='before-after'?'block':'none';
+  document.getElementById('tab-try-live').style.display=tab==='try-live'?'block':'none';
+  document.getElementById('tab-dissect').style.display=tab==='dissect'?'block':'none';
+}
+
+// ── Dissect ───────────────────────────────────────────────
+async function runDissect(text){
+  const tags=document.getElementById('dissectTags');
+  const legend=document.getElementById('dissectLegend');
+  if(!text.trim()){tags.innerHTML='';legend.style.display='none';return;}
+  tags.innerHTML='<span class="dtag" style="background:transparent;color:var(--muted)">Analyzing with AI...</span>';
+  legend.style.display='none';
+  try {
+    const token = getToken();
+    if(!token) throw Object.assign(new Error('not_authenticated'), {code:'not_authenticated'});
+    const res = await fetch('/api/sandbox/dissect',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+      body:JSON.stringify({userText: text})
+    });
+    const data = await res.json();
+    if(res.status === 429) throw Object.assign(new Error('limit_reached'), {code:'limit_reached'});
+    if(!res.ok) throw new Error('API error');
+    
+    // Update local run count
+    if(authUser && data.sbRunsThisMonth !== undefined){
+      authUser.sbRunsThisMonth = data.sbRunsThisMonth;
+      updateNavAuth();
+      const el = document.getElementById('sbRunCount');
+      if(el) el.textContent = `Runs: ${data.sbRunsThisMonth}/${FREE_LIMIT}`;
+    }
+
+    tags.innerHTML='';
+    let found = false;
+    const p = data.result || {};
+    if(p.role){found=true;tags.innerHTML+=`<span class="dtag role">Role: "${p.role}"</span>`;}
+    if(p.context){found=true;tags.innerHTML+=`<span class="dtag context">Context: "${p.context}"</span>`;}
+    if(p.format){found=true;tags.innerHTML+=`<span class="dtag format">Format: "${p.format}"</span>`;}
+    if(p.constraint){found=true;tags.innerHTML+=`<span class="dtag constraint">Constraint: "${p.constraint}"</span>`;}
+    if(p.tone){found=true;tags.innerHTML+=`<span class="dtag tone">Tone: "${p.tone}"</span>`;}
+    if(!found){tags.innerHTML='<span class="dtag constraint" style="background:transparent;color:var(--muted);border-color:var(--border)">No strong signals detected.</span>';}
+    legend.style.display=found?'flex':'none';
+  } catch(e) {
+    if(e.code==='not_authenticated'){openAuth('signup');tags.innerHTML='';return;}
+    if(e.code==='limit_reached'){tags.innerHTML='<span class="dtag constraint" style="margin-top:10px">Monthly limit reached. Upgrade to Pro.</span>';return;}
+    tags.innerHTML='<span class="dtag constraint">Error analyzing prompt.</span>';
+  }
+}
+
+// ── Library ──────────────────────────────────────────────
+let activeFilter='All';
+function renderLibrary(){
+  const cats=['All',...new Set(LIBRARY.map(p=>p.cat))];
+  const filterRow=document.getElementById('filterRow');
+  if(!filterRow.children.length){
+    cats.forEach(c=>{const btn=document.createElement('button');btn.className='filter-btn'+(c==='All'?' active':'');btn.textContent=c;btn.onclick=()=>{activeFilter=c;document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');filterLibrary();};filterRow.appendChild(btn);});
+  }
+  filterLibrary();
+}
+function filterLibrary(){
+  const q=(document.getElementById('libSearch').value||'').toLowerCase();
+  const cards=document.getElementById('promptCards');cards.innerHTML='';
+  LIBRARY.filter(p=>(activeFilter==='All'||p.cat===activeFilter)&&(p.title.toLowerCase().includes(q)||p.prompt.toLowerCase().includes(q)||p.cat.toLowerCase().includes(q)))
+  .forEach(p=>{
+    const c=document.createElement('div');c.className='prompt-card';
+    const copySvg=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>`;
+    c.innerHTML=`<div class="pc-top"><span class="pc-category">${p.cat}</span><button class="pc-copy" onclick="copyPrompt('${p.id}',this)" title="Copy">${copySvg}</button></div><div class="pc-title">${p.title}</div><div class="pc-text">${p.prompt.substring(0,120)}${p.prompt.length>120?'...':''}</div><div class="pc-meta"><span class="pc-score">Score: ${p.score}/100</span><span>·</span><span>${p.uses.toLocaleString()} uses</span><button class="potd-try" onclick="useInSandbox('${p.id}')" style="margin-left:auto;font-size:11px">Try in Sandbox →</button></div>`;
+    cards.appendChild(c);
+  });
+}
+function copyPrompt(id,btn){
+  const p=LIBRARY.find(x=>x.id===id);if(!p)return;
+  const original=btn.innerHTML;
+  navigator.clipboard.writeText(p.prompt).then(()=>{
+    btn.innerHTML=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+    setTimeout(()=>btn.innerHTML=original,1500);
+  });
+}
+function useInSandbox(id){const p=LIBRARY.find(x=>x.id===id);if(!p)return;showView('sandbox');setTimeout(()=>{const input=document.getElementById('sbInput');if(input){input.value=p.prompt;updateCharCount('sbCount',p.prompt);}},150);}
+
+// ── Leaderboard ──────────────────────────────────────────
+function renderLeaderboard(tab){
+  const data=[...LEADERBOARD[tab]].map(r=>({...r}));
+  // Insert user's real XP
+  data.forEach(r=>{if(r.you){r.xp=state.xp;r.streak=state.streak;}});
+  data.sort((a,b)=>b.xp-a.xp);
+  const table=document.getElementById('lbTable');table.innerHTML='';
+  data.forEach((r,i)=>{
+    const row=document.createElement('div');row.className='lb-row'+(r.you?' you':'');
+    const initials=r.name.split(/(?=[A-Z])/).map(w=>w[0]).join('').substring(0,2).toUpperCase()||r.name.substring(0,2).toUpperCase();
+    const rankDisp=i+1;
+    row.innerHTML=`<div class="lb-rank ${i<3?'top':''}">${rankDisp}</div><div class="lb-user"><div class="lb-avatar">${initials}</div><div><div class="lb-name">${r.you?'You ('+r.name+')':r.name}</div><div class="lb-badge">${r.badge}</div></div></div><div class="lb-xp">${r.xp.toLocaleString()} XP</div><div class="lb-streak">${r.streak} Days</div>`;
+    table.appendChild(row);
+  });
+}
+function switchLbTab(btn,tab){
+  document.querySelectorAll('.lb-tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  renderLeaderboard(tab);
+}
+
+// ── Prompt of the Day ─────────────────────────────────────
+function renderPOTD(){
+  const day=new Date().getDay();
+  const p=POTD[day%POTD.length];
+  document.getElementById('potdText').textContent=p.prompt;
+  document.getElementById('potdCat').textContent='Category: '+p.cat;
+}
+function tryPotd(){
+  const day=new Date().getDay();
+  const p=POTD[day%POTD.length];
+  showView('sandbox');
+  setTimeout(()=>{const input=document.getElementById('sbInput');if(input){input.value=p.prompt;updateCharCount('sbCount',p.prompt);}},150);
+}
+
+// ── Theme ─────────────────────────────────────────────────
+const html=document.documentElement;
+if(window.matchMedia('(prefers-color-scheme: dark)').matches)html.setAttribute('data-theme','dark');
+document.getElementById('themeBtn').addEventListener('click',()=>{html.setAttribute('data-theme',html.getAttribute('data-theme')==='dark'?'light':'dark');});
+
+// ── Auth modal close on overlay click ─────────────────────
+document.getElementById('authModal').addEventListener('click',function(e){if(e.target===this)closeAuth();});
+
+// ── Scroll fade-in ────────────────────────────────────────
+const obs=new IntersectionObserver((entries)=>{entries.forEach((e,i)=>{if(e.isIntersecting){setTimeout(()=>e.target.classList.add('visible'),i*60);obs.unobserve(e.target);}});},{threshold:0.08});
+document.querySelectorAll('.fade-up').forEach(el=>obs.observe(el));
+
+// ── Modal close on overlay ────────────────────────────────
+document.getElementById('lessonModal').addEventListener('click',function(e){if(e.target===this)closeModal();});
+
+// ── Init ──────────────────────────────────────────────────
+updateNav();
+renderPOTD();
+restoreSession();
+</script>
+</body>
+</html>
