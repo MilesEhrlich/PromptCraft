@@ -87,6 +87,20 @@
       "lastVisit": "",
       "completedLessons": [],
       "passedMissions": []
+    },
+    {
+      "id": "b070dea9-e66c-49a6-94eb-34073a3dd5ef",
+      "name": "Demo User",
+      "email": "demo-screenshot-1774571979213@test.com",
+      "passwordHash": "$2b$10$rSwoVuJhRFActnhizf.RN.KHQy6NRpwYC28MW6LIbiF/WpMdEXYnq",
+      "plan": "free",
+      "sbRunsThisMonth": 0,
+      "sbResetMonth": "2026-3",
+      "xp": 10,
+      "streak": 1,
+      "lastVisit": "",
+      "completedLessons": [],
+      "passedMissions": []
     }
   ]
 }
