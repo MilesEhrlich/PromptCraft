@@ -29,6 +29,7 @@ function geminiUrl(model) {
   return `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`;
 }
 const FREE_RUN_LIMIT = 10;
+const PRO_RUN_LIMIT = 140;
 
 // ── Database ──────────────────────────────────────────────────────────────
 const adapter = new JSONFile(path.join(__dirname, 'db.json'));
@@ -129,13 +130,25 @@ app.put('/api/me/progress', requireAuth, async (req, res) => {
   res.json({ success: true });
 });
 
+// PUT /api/me/plan — toggle between free and pro (dev/demo toggle)
+app.put('/api/me/plan', requireAuth, async (req, res) => {
+  const user = getUser(req.user.id);
+  if (!user) return res.status(404).json({ error: 'User not found' });
+  const { plan } = req.body;
+  if (plan !== 'free' && plan !== 'pro') return res.status(400).json({ error: 'Plan must be "free" or "pro"' });
+  user.plan = plan;
+  await db.write();
+  const limit = plan === 'pro' ? PRO_RUN_LIMIT : FREE_RUN_LIMIT;
+  res.json({ plan: user.plan, sbRunsThisMonth: user.sbRunsThisMonth, limit });
+});
+
 // POST /api/sandbox/run  — proxy to Gemini + enforce monthly limit
 app.post('/api/sandbox/run', requireAuth, async (req, res) => {
   const user = getUser(req.user.id);
   if (!user) return res.status(404).json({ error: 'User not found' });
   checkMonthReset(user);
 
-  const limit = user.plan === 'free' ? FREE_RUN_LIMIT : Infinity;
+  const limit = user.plan === 'pro' ? PRO_RUN_LIMIT : FREE_RUN_LIMIT;
   if (user.sbRunsThisMonth >= limit) {
     await db.write();
     return res.status(429).json({ error: 'Monthly sandbox limit reached', limit, used: user.sbRunsThisMonth });
@@ -177,7 +190,7 @@ app.post('/api/sandbox/dissect', requireAuth, async (req, res) => {
   if (!user) return res.status(404).json({ error: 'User not found' });
   checkMonthReset(user);
 
-  const limit = user.plan === 'free' ? FREE_RUN_LIMIT : Infinity;
+  const limit = user.plan === 'pro' ? PRO_RUN_LIMIT : FREE_RUN_LIMIT;
   if (user.sbRunsThisMonth >= limit) {
     await db.write();
     return res.status(429).json({ error: 'Monthly sandbox limit reached', limit, used: user.sbRunsThisMonth });

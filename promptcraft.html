@@ -135,8 +135,8 @@ nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-co
 [data-theme="dark"] .score-fill{background:var(--accent)}
 .score-val{font-family:'DM Mono',monospace;font-size:14px;font-weight:500;color:var(--accent-text);min-width:36px;text-align:right}
 [data-theme="dark"] .score-val{color:var(--accent)}
-.ai-tips{margin-top:14px;padding:12px 14px;background:var(--surface);border:1px solid var(--border);border-radius:10px;font-size:12px;color:var(--text2)}
-.ai-tips strong{color:var(--text);display:block;margin-bottom:6px;font-size:11px;letter-spacing:.8px;text-transform:uppercase}
+.ai-tips{margin-top:14px;padding:16px 18px;background:var(--surface);border:1px solid var(--border);border-radius:10px;font-size:16px;line-height:1.7;color:var(--text2)}
+.ai-tips strong{color:var(--text);display:block;margin-bottom:8px;font-size:14px;letter-spacing:.8px;text-transform:uppercase}
 /* Dissect panel */
 .dissect-panel{padding:28px;display:none}
 .dissect-panel.active{display:block}
@@ -418,6 +418,11 @@ footer{border-top:1px solid var(--border);padding:48px;display:grid;grid-templat
 .nav-avatar-menu.open{display:block}
 .nav-avatar-menu button{display:block;width:100%;text-align:left;padding:9px 14px;border:none;background:transparent;font-family:'Syne',sans-serif;font-size:13px;font-weight:600;color:var(--text2);cursor:pointer;border-radius:8px}
 .nav-avatar-menu button:hover{background:var(--bg2)}
+.nav-avatar-menu .plan-toggle{display:flex;align-items:center;gap:8px;padding:9px 14px;font-size:13px;font-weight:600;color:var(--text2)}
+.plan-toggle select{font-family:'Syne',sans-serif;font-size:12px;font-weight:700;border:1px solid var(--border);border-radius:8px;padding:4px 8px;background:var(--bg2);color:var(--text);cursor:pointer;outline:none}
+.plan-toggle select:focus{border-color:var(--accent-text)}
+.btn-offline{background:var(--bg2);color:var(--text2);border:1px solid var(--border2);padding:10px 20px;border-radius:40px;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .15s}
+.btn-offline:hover{border-color:var(--text);color:var(--text)}
 /* Sandbox gate */
 .sandbox-gate{text-align:center;padding:60px 24px}
 .sandbox-gate h3{font-family:'DM Serif Display',serif;font-size:28px;color:var(--text);margin-bottom:12px}
@@ -627,7 +632,9 @@ footer{border-top:1px solid var(--border);padding:48px;display:grid;grid-templat
     <span class="section-eyebrow">From Learners</span>
     <h2 class="section-title" style="margin-bottom:48px">What people<br>are saying.</h2>
     <div class="testimonials-grid">
-      <div class="testi"><div class="testi-quote">"I went from generic AI outputs to writing prompts that feel like they have a co-author inside the model. The sandbox alone is worth it."</div><div class="testi-author"><div class="testi-avatar">MR</div><div><div class="testi-name">Maya Rodriguez</div><div class="testi-role">Content Strategist</div></div></div></div>
+      <div class="testi"><div class="testi-quote">"I went from generic AI outputs to writing prompts that feel like they have a co-author inside the model. The sandbox alone is worth it."</div><div class="testi-author"><div class="testi-avatar">MR</div><div><div class="testi-name">Kaori Garcia
+        
+      </div><div class="testi-role">Content Strategist</div></div></div></div>
       <div class="testi"><div class="testi-quote">"The Prompt Dissector changed how I think about instructions entirely. Now I apply the same logic to writing documentation for my team."</div><div class="testi-author"><div class="testi-avatar">JK</div><div><div class="testi-name">James Kim</div><div class="testi-role">Senior Engineer, Vercel</div></div></div></div>
       <div class="testi"><div class="testi-quote">"I finished the Advanced tier in a weekend. The missions felt genuinely hard, and passing them felt genuinely rewarding. Rare for an online course."</div><div class="testi-author"><div class="testi-avatar">SO</div><div><div class="testi-name">Sara Okonkwo</div><div class="testi-role">Product Manager</div></div></div></div>
     </div>
@@ -706,6 +713,7 @@ footer{border-top:1px solid var(--border);padding:48px;display:grid;grid-templat
         <textarea class="prompt-input" id="sbInput" rows="6" placeholder="Write your prompt here. Be specific: include a role, context, format, and constraints for best results…" oninput="updateCharCount('sbCount',this.value)"></textarea>
         <div class="live-actions">
           <span class="char-count" id="sbCount">0 chars</span>
+          <button class="btn-offline" onclick="runSandboxOffline()">Offline Score</button>
           <button class="btn-send" onclick="runSandbox()">Send to AI →</button>
         </div>
         <div class="ai-response-box" id="sbResponse">
@@ -807,8 +815,10 @@ function updateNavAuth(){
   if(authUser){
     const initials = authUser.name.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
     const runs = authUser.sbRunsThisMonth || 0;
-    const limitText = authUser.plan === 'free' ? ` (${runs}/${FREE_LIMIT} runs)` : '';
-    area.innerHTML = `<div class="nav-avatar" title="${authUser.name}${limitText}" onclick="toggleAvatarMenu(event)">${initials}<div class="nav-avatar-menu"><div style="padding:8px 14px;font-size:12px;color:var(--muted);font-weight:700">${authUser.name}</div><div style="padding:2px 14px 8px;font-size:11px;color:var(--muted)">${runs}/${FREE_LIMIT} sandbox runs</div><button onclick="handleSignout()">Sign Out</button></div></div>`;
+    const isPro = authUser.plan === 'pro';
+    const limit = isPro ? 140 : FREE_LIMIT;
+    const planLabel = isPro ? ' <span style="font-size:10px;color:var(--accent-text);font-weight:800">PRO</span>' : '';
+    area.innerHTML = `<div class="nav-avatar" title="${authUser.name}" onclick="toggleAvatarMenu(event)">${initials}<div class="nav-avatar-menu" onclick="event.stopPropagation()"><div style="padding:8px 14px;font-size:12px;color:var(--muted);font-weight:700">${authUser.name}${planLabel}</div><div style="padding:2px 14px 8px;font-size:11px;color:var(--muted)">${runs}/${limit} sandbox runs</div><div class="plan-toggle"><span>Plan:</span><select onchange="switchPlan(this.value)"><option value="free"${!isPro?' selected':''}>Free</option><option value="pro"${isPro?' selected':''}>Pro</option></select></div><button onclick="handleSignout()">Sign Out</button></div></div>`;
   } else {
     area.innerHTML = '<button class="btn-nav" onclick="openAuth()">Sign In</button>';
   }
@@ -875,6 +885,22 @@ function handleSignout(){
   showView('home');
 }
 
+async function switchPlan(plan){
+  const token = getToken();
+  if(!token||!authUser) return;
+  try{
+    const res = await fetch('/api/me/plan',{method:'PUT',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({plan})});
+    const data = await res.json();
+    if(res.ok){
+      authUser.plan = data.plan;
+      authUser.sbRunsThisMonth = data.sbRunsThisMonth;
+      updateNavAuth();
+      const el = document.getElementById('sbRunCount');
+      if(el) el.textContent = `Runs: ${data.sbRunsThisMonth}/${data.limit}`;
+    }
+  }catch(e){}
+}
+
 async function restoreSession(){
   const token = getToken();
   if(!token) return;
@@ -898,12 +924,12 @@ async function callAPI(systemPrompt, userText){
   const data = await res.json();
   if(res.status === 429) throw Object.assign(new Error('limit_reached'), {code:'limit_reached', data});
   if(!res.ok) throw new Error(data.error||'API error');
-  // Update local run count
   if(authUser && data.sbRunsThisMonth !== undefined){
     authUser.sbRunsThisMonth = data.sbRunsThisMonth;
     updateNavAuth();
+    const limit = data.limit || (authUser.plan==='pro' ? 140 : FREE_LIMIT);
     const el = document.getElementById('sbRunCount');
-    if(el) el.textContent = `Runs: ${data.sbRunsThisMonth}/${FREE_LIMIT}`;
+    if(el) el.textContent = `Runs: ${data.sbRunsThisMonth}/${limit}`;
   }
   return data.result;
 }
@@ -1053,18 +1079,27 @@ const TEMPLATES=[
 ];
 
 // ── Scoring (rubric-only fallback if Gemini is unavailable) ───
-function scorePromptFallback(p){
-  let s=20;
-  if(p.length>30)s+=15;
-  if(p.length>80)s+=10;
-  if(p.length>150)s+=10;
-  if(/\b(you are|act as|your role)\b/i.test(p))s+=15;
-  if(/\b(format|list|table|paragraph|bullet|numbered|markdown)\b/i.test(p))s+=10;
-  if(/\b(tone|style|voice|professional|casual|formal|brief)\b/i.test(p))s+=8;
-  if(/\b(under|fewer|limit|max|only|exactly|at most)\b/i.test(p))s+=7;
-  if(/\b(context|background|situation)\b/i.test(p))s+=5;
-  return Math.min(s,100);
+function scorePromptOffline(p){
+  const checks = [
+    {key:'length1', pts:15, pass: p.length>30, label:'Decent length (30+ chars)'},
+    {key:'length2', pts:10, pass: p.length>80, label:'Good detail (80+ chars)'},
+    {key:'length3', pts:10, pass: p.length>150, label:'Rich detail (150+ chars)'},
+    {key:'role', pts:15, pass: /\b(you are|act as|your role|pretend|persona)\b/i.test(p), label:'Role assignment', tip:'Assign a role, e.g. "You are a senior copywriter…"'},
+    {key:'format', pts:10, pass: /\b(format|list|table|paragraph|bullet|numbered|markdown|json|csv|steps)\b/i.test(p), label:'Output format', tip:'Specify a format, e.g. "as a numbered list" or "in a table"'},
+    {key:'tone', pts:8, pass: /\b(tone|style|voice|professional|casual|formal|brief|friendly|concise|witty|empathetic)\b/i.test(p), label:'Tone direction', tip:'Direct the tone, e.g. "in a professional but friendly tone"'},
+    {key:'constraint', pts:7, pass: /\b(under|fewer|limit|max|only|exactly|at most|no more than|must not|avoid|without)\b/i.test(p), label:'Constraints', tip:'Add constraints, e.g. "under 100 words" or "avoid jargon"'},
+    {key:'context', pts:5, pass: /\b(context|background|situation|audience|scenario|purpose|goal)\b/i.test(p), label:'Context provided', tip:'Give background, e.g. "The audience is first-year college students"'},
+  ];
+  let s = 20;
+  const found = [];
+  const missing = [];
+  for(const c of checks){
+    if(c.pass){ s += c.pts; if(c.label && !c.key.startsWith('length')) found.push(c.label); }
+    else if(c.tip) missing.push(c);
+  }
+  return {score: Math.min(s,100), found, missing};
 }
+function scorePromptFallback(p){ return scorePromptOffline(p).score; }
 
 // ── XP ──────────────────────────────────────────────────
 function addXP(amount,label){
@@ -1156,7 +1191,7 @@ function openLesson(lesson){
   document.getElementById('modalXP').textContent=`+${lesson.xp} XP on completion`;
   const btn=document.getElementById('modalCompleteBtn');
   if(state.completedLessons.includes(lesson.id)){btn.textContent='Already Completed ✓';btn.style.opacity='.5';}
-  else{btn.textContent='Complete Lesson →';btn.style.opacity='1';}
+  else{btn.textContent='Mark complete';btn.style.opacity='1';}
   document.getElementById('lessonModal').classList.add('open');
 }
 function closeModal(){document.getElementById('lessonModal').classList.remove('open');currentLesson=null;}
@@ -1268,6 +1303,27 @@ async function runSandbox(){
   if(sendBtn){sendBtn.disabled=false;sendBtn.textContent='Send to AI →';sendBtn.style.opacity='1';}
 }
 
+function runSandboxOffline(){
+  const input=document.getElementById('sbInput');
+  const v=input.value.trim();if(!v)return;
+  const {score, found, missing} = scorePromptOffline(v);
+  document.getElementById('sbScorePill').textContent=`Score: ${score}/100 (offline)`;
+  const box=document.getElementById('sbResponse');box.classList.add('show');
+  document.getElementById('sbBar').style.width=score+'%';
+  document.getElementById('sbScoreVal').textContent=score+'/100 (offline)';
+
+  const foundHtml = found.length
+    ? `<div style="margin-top:8px"><strong style="color:var(--accent-text)">Detected in your prompt:</strong>${found.map(f=>`<div style="margin-top:4px;padding:4px 10px;display:inline-block;margin-right:6px;border-radius:6px;background:var(--accent-bg);border:1px solid var(--accent-border);font-size:12px">&#10003; ${f}</div>`).join('')}</div>`
+    : '';
+  const missingHtml = missing.length
+    ? `<div style="margin-top:12px"><strong>Missing — add these to boost your score:</strong>${missing.map(m=>`<div style="margin-top:6px;padding:6px 10px;border-radius:8px;background:var(--bg);border:1px solid var(--border);font-size:13px"><strong>${m.label}:</strong> ${m.tip}</div>`).join('')}</div>`
+    : '<div style="margin-top:8px;color:var(--accent-text);font-weight:700">Great job — your prompt covers all the key components!</div>';
+
+  document.getElementById('sbResponseText').innerHTML = foundHtml + missingHtml;
+  document.getElementById('sbTips').innerHTML=`<div style="font-size:12px;color:var(--muted);margin-top:8px">Offline analysis — no AI run used. Send to AI for a full response and detailed feedback.</div>`;
+  if(score>=70)addXP(10,'Sandbox Practice (offline)');
+}
+
 async function runHomeSandbox(){
   if(!authUser){openAuth('signup');return;}
   const input=document.getElementById('homeLiveInput');
@@ -1330,12 +1386,12 @@ async function runDissect(text){
     if(res.status === 429) throw Object.assign(new Error('limit_reached'), {code:'limit_reached'});
     if(!res.ok) throw new Error('API error');
     
-    // Update local run count
     if(authUser && data.sbRunsThisMonth !== undefined){
       authUser.sbRunsThisMonth = data.sbRunsThisMonth;
       updateNavAuth();
+      const limit = data.limit || (authUser.plan==='pro' ? 140 : FREE_LIMIT);
       const el = document.getElementById('sbRunCount');
-      if(el) el.textContent = `Runs: ${data.sbRunsThisMonth}/${FREE_LIMIT}`;
+      if(el) el.textContent = `Runs: ${data.sbRunsThisMonth}/${limit}`;
     }
 
     tags.innerHTML='';

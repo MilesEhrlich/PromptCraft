@@ -32,14 +32,15 @@
       "name": "Miles",
       "email": "milesehrlich525@gmail.com",
       "passwordHash": "$2b$10$cl8ssBhMcariCdfaIqPjR.IAAamiBF5elv9vjSV1QkTWD6o5KiKWy",
-      "plan": "free",
-      "sbRunsThisMonth": 4,
+      "plan": "pro",
+      "sbRunsThisMonth": 16,
       "sbResetMonth": "2026-3",
-      "xp": 125,
+      "xp": 285,
       "streak": 1,
       "lastVisit": "",
       "completedLessons": [
-        "f1"
+        "f1",
+        "c2"
       ],
       "passedMissions": []
     },
@@ -57,6 +58,34 @@
       "completedLessons": [
         "f1"
       ],
+      "passedMissions": []
+    },
+    {
+      "id": "dc97ded1-ce9a-4aa0-9aae-bc9fe3edf91b",
+      "name": "Demo User",
+      "email": "demo-screenshot-1774571437457@test.com",
+      "passwordHash": "$2b$10$MKVtFlX6dnjMSXYN5GBXJ.IshQmULmxK6IdxyZAWAZauV20oyw28W",
+      "plan": "free",
+      "sbRunsThisMonth": 0,
+      "sbResetMonth": "2026-3",
+      "xp": 10,
+      "streak": 1,
+      "lastVisit": "",
+      "completedLessons": [],
+      "passedMissions": []
+    },
+    {
+      "id": "afd20389-e570-416e-8681-105a885a10cc",
+      "name": "Demo User",
+      "email": "demo-screenshot-1774571512205@test.com",
+      "passwordHash": "$2b$10$fG9CYJXgNOfsZSF.t8aw0ekY7b09wAqRB80UEgJqgj3eXDOojr9nS",
+      "plan": "free",
+      "sbRunsThisMonth": 0,
+      "sbResetMonth": "2026-3",
+      "xp": 10,
+      "streak": 1,
+      "lastVisit": "",
+      "completedLessons": [],
       "passedMissions": []
     }
   ]
