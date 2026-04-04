@@ -1,0 +1,10 @@
+import { JSONFile } from 'lowdb/node';
+import { Low } from 'lowdb';
+const adapter = new JSONFile('db.json');
+const db = new Low(adapter, {});
+await db.read();
+const team = db.data.teams[0];
+console.log("Before: ", team.settings.enableTeamLibrary);
+team.settings.enableTeamLibrary = false;
+await db.write();
+console.log("After: ", team.settings.enableTeamLibrary);

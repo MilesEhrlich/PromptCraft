@@ -365,19 +365,22 @@ app.get('/api/teams/mine', requireAuth, async (req, res) => {
   if (!team) return res.json({ team: null });
   const member = db.data.teamMembers.find(m => m.userId === user.id && m.teamId === user.teamId);
   const memberCount = db.data.teamMembers.filter(m => m.teamId === user.teamId).length;
-  res.json({ team, role: member?.role || 'member', memberCount });
+  // Inject defaults for any settings fields added after team creation
+  const settingDefaults = { showStreaks: true, showXP: true, leaderboardType: 'team', blockCommunityPublish: false, requirePromptApproval: true, enableTeamLibrary: true };
+  const teamWithDefaults = { ...team, settings: { ...settingDefaults, ...(team.settings || {}) } };
+  res.json({ team: teamWithDefaults, role: member?.role || 'member', memberCount });
 });
 
 // PUT /api/teams/:teamId/settings
 app.put('/api/teams/:teamId/settings', requireAuth, (req, res, next) => requireTeamRole('owner','admin')(req, res, next), async (req, res) => {
   const team = db.data.teams.find(t => t.id === req.params.teamId);
   if (!team) return res.status(404).json({ error: 'Team not found' });
-  const allowed = ['showStreaks','showXP','leaderboardType','blockCommunityPublish','requirePromptApproval'];
+  const allowed = ['showStreaks','showXP','leaderboardType','blockCommunityPublish','requirePromptApproval','enableTeamLibrary'];
   for (const k of allowed) {
     if (req.body[k] !== undefined) team.settings[k] = req.body[k];
   }
   await db.write();
-  res.json({ success: true, settings: team.settings });
+  console.log("body:", req.body, "team settings after:", team.settings); res.json({ success: true, settings: team.settings });
 });
 
 // PUT /api/teams/:teamId/name
@@ -579,11 +582,17 @@ app.get('/api/teams/:teamId/analytics', requireAuth, (req, res, next) => require
 // GET /api/teams/:teamId/prompts
 app.get('/api/teams/:teamId/prompts', requireAuth, (req, res, next) => requireTeamRole('owner','admin','member')(req, res, next), (req, res) => {
   const isAdminOrOwner = ['owner','admin'].includes(req.teamMember.role);
-  const prompts = db.data.teamPrompts.filter(p => {
-    if (p.teamId !== req.params.teamId) return false;
-    if (isAdminOrOwner) return true;
-    return p.status === 'approved';
-  });
+  const prompts = db.data.teamPrompts
+    .filter(p => {
+      if (p.teamId !== req.params.teamId) return false;
+      if (isAdminOrOwner) return true;
+      return p.status === 'approved';
+    })
+    .map(p => {
+      if (p.publishedBy) return p;
+      const u = db.data.users.find(u => u.id === p.submittedBy);
+      return { ...p, publishedBy: u?.name || 'Unknown' };
+    });
   res.json(prompts);
 });
 
@@ -595,9 +604,11 @@ app.post('/api/teams/:teamId/prompts', requireAuth, (req, res, next) => requireT
   if (!isAppropriate(prompt) || !isAppropriate(title)) return res.status(422).json({ error: 'Content contains inappropriate material' });
   const team = db.data.teams.find(t => t.id === req.params.teamId);
   const status = team?.settings?.requirePromptApproval ? 'pending' : 'approved';
+  const submitter = getUser(req.user.id);
   const entry = {
     id: 'tp_' + crypto.randomUUID(), teamId: req.params.teamId,
-    submittedBy: req.user.id, title: title.trim().substring(0, 80),
+    submittedBy: req.user.id, publishedBy: submitter?.name || 'Unknown',
+    title: title.trim().substring(0, 80),
     prompt: prompt.trim(), category, score, status,
     reviewedBy: null, reviewedAt: null,
     submittedAt: new Date().toISOString(), uses: 0
