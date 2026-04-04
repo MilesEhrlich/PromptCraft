@@ -7,6 +7,7 @@ import { JSONFile } from 'lowdb/node';
 import { fileURLToPath } from 'url';
 import path from 'path';
 import { readFileSync } from 'fs';
+import { randomBytes } from 'crypto';
 import Anthropic from '@anthropic-ai/sdk';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -33,6 +34,11 @@ const adapter = new JSONFile(path.join(__dirname, 'db.json'));
 const db = new Low(adapter, { users: [], communityPrompts: [] });
 await db.read();
 if (!db.data.communityPrompts) db.data.communityPrompts = [];
+if (!db.data.teams) db.data.teams = [];
+if (!db.data.teamMembers) db.data.teamMembers = [];
+if (!db.data.teamInvites) db.data.teamInvites = [];
+if (!db.data.teamPrompts) db.data.teamPrompts = [];
+if (!db.data.certificates) db.data.certificates = [];
 
 // ── Express setup ─────────────────────────────────────────────────────────
 const app = express();
@@ -59,6 +65,20 @@ function getUser(id) {
   return db.data.users.find(u => u.id === id);
 }
 
+function requireTeamRole(...roles) {
+  return (req, res, next) => {
+    const user = getUser(req.user.id);
+    if (!user?.teamId) return res.status(403).json({ error: 'Not a team member' });
+    if (req.params.teamId && user.teamId !== req.params.teamId)
+      return res.status(403).json({ error: 'Wrong team' });
+    const member = db.data.teamMembers.find(m => m.userId === user.id && m.teamId === user.teamId);
+    if (!member || !roles.includes(member.role))
+      return res.status(403).json({ error: 'Insufficient role' });
+    req.teamMember = member;
+    next();
+  };
+}
+
 // ── Reset monthly runs if month changed ───────────────────────────────────
 function checkMonthReset(user) {
   const now = new Date();
@@ -82,11 +102,11 @@ app.post('/api/signup', async (req, res) => {
   const passwordHash = await bcrypt.hash(password, 10);
   const now = new Date();
   const monthKey = `${now.getFullYear()}-${now.getMonth() + 1}`;
-  const user = { id, name, email: email.toLowerCase(), passwordHash, plan: 'free', sbRunsThisMonth: 0, sbResetMonth: monthKey, xp: 0, streak: 1, lastVisit: '', completedLessons: [], passedMissions: [] };
+  const user = { id, name, email: email.toLowerCase(), passwordHash, plan: 'free', sbRunsThisMonth: 0, sbResetMonth: monthKey, xp: 0, streak: 1, lastVisit: '', completedLessons: [], passedMissions: [], teamId: null, teamRole: null };
   db.data.users.push(user);
   await db.write();
   const token = jwt.sign({ id, email: user.email, name }, JWT_SECRET, { expiresIn: '30d' });
-  res.json({ token, user: { id, name, email: user.email, plan: user.plan, sbRunsThisMonth: user.sbRunsThisMonth, xp: user.xp, streak: user.streak, lastVisit: user.lastVisit, completedLessons: user.completedLessons, passedMissions: user.passedMissions } });
+  res.json({ token, user: { id, name, email: user.email, plan: user.plan, sbRunsThisMonth: user.sbRunsThisMonth, xp: user.xp, streak: user.streak, lastVisit: user.lastVisit, completedLessons: user.completedLessons, passedMissions: user.passedMissions, teamId: user.teamId, teamRole: user.teamRole } });
 });
 
 // POST /api/login
@@ -100,7 +120,7 @@ app.post('/api/login', async (req, res) => {
   checkMonthReset(user);
   await db.write();
   const token = jwt.sign({ id: user.id, email: user.email, name: user.name }, JWT_SECRET, { expiresIn: '30d' });
-  res.json({ token, user: { id: user.id, name: user.name, email: user.email, plan: user.plan, sbRunsThisMonth: user.sbRunsThisMonth, xp: user.xp, streak: user.streak, lastVisit: user.lastVisit, completedLessons: user.completedLessons, passedMissions: user.passedMissions } });
+  res.json({ token, user: { id: user.id, name: user.name, email: user.email, plan: user.plan, sbRunsThisMonth: user.sbRunsThisMonth, xp: user.xp, streak: user.streak, lastVisit: user.lastVisit, completedLessons: user.completedLessons, passedMissions: user.passedMissions, teamId: user.teamId || null, teamRole: user.teamRole || null } });
 });
 
 // GET /api/me
@@ -109,7 +129,7 @@ app.get('/api/me', requireAuth, async (req, res) => {
   if (!user) return res.status(404).json({ error: 'User not found' });
   checkMonthReset(user);
   await db.write();
-  res.json({ id: user.id, name: user.name, email: user.email, plan: user.plan, sbRunsThisMonth: user.sbRunsThisMonth, xp: user.xp, streak: user.streak, lastVisit: user.lastVisit, completedLessons: user.completedLessons, passedMissions: user.passedMissions });
+  res.json({ id: user.id, name: user.name, email: user.email, plan: user.plan, sbRunsThisMonth: user.sbRunsThisMonth, xp: user.xp, streak: user.streak, lastVisit: user.lastVisit, completedLessons: user.completedLessons, passedMissions: user.passedMissions, teamId: user.teamId || null, teamRole: user.teamRole || null });
 });
 
 // PUT /api/me/progress
@@ -276,6 +296,12 @@ app.get('/api/library', (req, res) => {
 app.post('/api/library', requireAuth, async (req, res) => {
   const user = getUser(req.user.id);
   if (!user) return res.status(404).json({ error: 'User not found' });
+  if (user.teamId) {
+    const team = db.data.teams.find(t => t.id === user.teamId);
+    if (team?.settings?.blockCommunityPublish) {
+      return res.status(403).json({ error: 'Community publishing disabled by your team admin' });
+    }
+  }
   if (user.plan !== 'pro') return res.status(403).json({ error: 'Pro plan required to publish prompts' });
 
   const { prompt, title, category, score } = req.body;
@@ -299,6 +325,345 @@ app.post('/api/library', requireAuth, async (req, res) => {
   await db.write();
   res.json({ success: true, entry });
 });
+
+// ── Teams ─────────────────────────────────────────────────────────────────
+
+// POST /api/teams — create a team
+app.post('/api/teams', requireAuth, async (req, res) => {
+  const user = getUser(req.user.id);
+  if (!user) return res.status(404).json({ error: 'User not found' });
+  if (user.teamId) return res.status(409).json({ error: 'Already on a team' });
+  const { name } = req.body;
+  if (!name || !name.trim()) return res.status(400).json({ error: 'Team name required' });
+  const teamId = 'team_' + crypto.randomUUID();
+  const team = {
+    id: teamId,
+    name: name.trim(),
+    ownerId: user.id,
+    createdAt: new Date().toISOString(),
+    settings: {
+      showStreaks: true, showXP: true, leaderboardType: 'team',
+      blockCommunityPublish: false, requirePromptApproval: true
+    },
+    assignedCategories: {}
+  };
+  db.data.teams.push(team);
+  const member = { id: 'tm_' + crypto.randomUUID(), teamId, userId: user.id, role: 'owner', joinedAt: new Date().toISOString() };
+  db.data.teamMembers.push(member);
+  user.teamId = teamId;
+  user.teamRole = 'owner';
+  await db.write();
+  res.json({ team, role: 'owner' });
+});
+
+// GET /api/teams/mine
+app.get('/api/teams/mine', requireAuth, async (req, res) => {
+  const user = getUser(req.user.id);
+  if (!user) return res.status(404).json({ error: 'User not found' });
+  if (!user.teamId) return res.json({ team: null });
+  const team = db.data.teams.find(t => t.id === user.teamId);
+  if (!team) return res.json({ team: null });
+  const member = db.data.teamMembers.find(m => m.userId === user.id && m.teamId === user.teamId);
+  const memberCount = db.data.teamMembers.filter(m => m.teamId === user.teamId).length;
+  res.json({ team, role: member?.role || 'member', memberCount });
+});
+
+// PUT /api/teams/:teamId/settings
+app.put('/api/teams/:teamId/settings', requireAuth, (req, res, next) => requireTeamRole('owner','admin')(req, res, next), async (req, res) => {
+  const team = db.data.teams.find(t => t.id === req.params.teamId);
+  if (!team) return res.status(404).json({ error: 'Team not found' });
+  const allowed = ['showStreaks','showXP','leaderboardType','blockCommunityPublish','requirePromptApproval'];
+  for (const k of allowed) {
+    if (req.body[k] !== undefined) team.settings[k] = req.body[k];
+  }
+  await db.write();
+  res.json({ success: true, settings: team.settings });
+});
+
+// PUT /api/teams/:teamId/name
+app.put('/api/teams/:teamId/name', requireAuth, (req, res, next) => requireTeamRole('owner')(req, res, next), async (req, res) => {
+  const team = db.data.teams.find(t => t.id === req.params.teamId);
+  if (!team) return res.status(404).json({ error: 'Team not found' });
+  const { name } = req.body;
+  if (!name || !name.trim()) return res.status(400).json({ error: 'Team name required' });
+  team.name = name.trim();
+  await db.write();
+  res.json({ success: true, name: team.name });
+});
+
+// PUT /api/teams/:teamId/categories
+app.put('/api/teams/:teamId/categories', requireAuth, (req, res, next) => requireTeamRole('owner','admin')(req, res, next), async (req, res) => {
+  const team = db.data.teams.find(t => t.id === req.params.teamId);
+  if (!team) return res.status(404).json({ error: 'Team not found' });
+  const { assignedCategories } = req.body;
+  if (assignedCategories && typeof assignedCategories === 'object') {
+    team.assignedCategories = assignedCategories;
+  }
+  await db.write();
+  res.json({ success: true, assignedCategories: team.assignedCategories });
+});
+
+// ── Invites ───────────────────────────────────────────────────────────────
+
+// POST /api/teams/:teamId/invites
+app.post('/api/teams/:teamId/invites', requireAuth, (req, res, next) => requireTeamRole('owner','admin')(req, res, next), async (req, res) => {
+  const { label } = req.body;
+  const token = randomBytes(32).toString('hex');
+  const invite = {
+    id: 'inv_' + crypto.randomUUID(), teamId: req.params.teamId,
+    token, createdBy: req.user.id, label: label || '',
+    createdAt: new Date().toISOString(),
+    expiresAt: new Date(Date.now() + 30*24*60*60*1000).toISOString(),
+    usedBy: null, usedAt: null
+  };
+  db.data.teamInvites.push(invite);
+  await db.write();
+  res.json({ invite, link: `/?invite=${token}` });
+});
+
+// POST /api/teams/:teamId/invites/bulk
+app.post('/api/teams/:teamId/invites/bulk', requireAuth, (req, res, next) => requireTeamRole('owner','admin')(req, res, next), async (req, res) => {
+  const { labels } = req.body;
+  if (!Array.isArray(labels) || labels.length === 0) return res.status(400).json({ error: 'labels array required' });
+  if (labels.length > 50) return res.status(400).json({ error: 'Maximum 50 invites at once' });
+  const invites = labels.map(label => {
+    const token = randomBytes(32).toString('hex');
+    return {
+      id: 'inv_' + crypto.randomUUID(), teamId: req.params.teamId,
+      token, createdBy: req.user.id, label: label || '',
+      createdAt: new Date().toISOString(),
+      expiresAt: new Date(Date.now() + 30*24*60*60*1000).toISOString(),
+      usedBy: null, usedAt: null
+    };
+  });
+  db.data.teamInvites.push(...invites);
+  await db.write();
+  res.json({ invites: invites.map(inv => ({ ...inv, link: `/?invite=${inv.token}` })) });
+});
+
+// GET /api/teams/:teamId/invites
+app.get('/api/teams/:teamId/invites', requireAuth, (req, res, next) => requireTeamRole('owner','admin')(req, res, next), (req, res) => {
+  const now = new Date().toISOString();
+  const pending = db.data.teamInvites.filter(inv =>
+    inv.teamId === req.params.teamId && !inv.usedBy && inv.expiresAt > now
+  );
+  res.json(pending.map(inv => ({ ...inv, link: `/?invite=${inv.token}` })));
+});
+
+// DELETE /api/teams/:teamId/invites/:inviteId
+app.delete('/api/teams/:teamId/invites/:inviteId', requireAuth, (req, res, next) => requireTeamRole('owner','admin')(req, res, next), async (req, res) => {
+  const idx = db.data.teamInvites.findIndex(inv => inv.id === req.params.inviteId && inv.teamId === req.params.teamId);
+  if (idx === -1) return res.status(404).json({ error: 'Invite not found' });
+  db.data.teamInvites.splice(idx, 1);
+  await db.write();
+  res.json({ success: true });
+});
+
+// GET /api/invites/:token — public preview
+app.get('/api/invites/:token', (req, res) => {
+  const inv = db.data.teamInvites.find(i => i.token === req.params.token);
+  if (!inv) return res.json({ valid: false, reason: 'Invalid invite link' });
+  if (inv.usedBy) return res.json({ valid: false, reason: 'This invite has already been used' });
+  if (new Date(inv.expiresAt) < new Date()) return res.json({ valid: false, reason: 'This invite has expired' });
+  const team = db.data.teams.find(t => t.id === inv.teamId);
+  const creator = db.data.users.find(u => u.id === inv.createdBy);
+  res.json({ valid: true, teamName: team?.name || 'Unknown Team', inviterName: creator?.name || 'Someone' });
+});
+
+// POST /api/invites/:token/accept
+app.post('/api/invites/:token/accept', requireAuth, async (req, res) => {
+  const user = getUser(req.user.id);
+  if (!user) return res.status(404).json({ error: 'User not found' });
+  if (user.teamId) return res.status(409).json({ error: 'Already on a team' });
+  const inv = db.data.teamInvites.find(i => i.token === req.params.token);
+  if (!inv) return res.status(404).json({ error: 'Invalid invite link' });
+  if (inv.usedBy) return res.status(410).json({ error: 'This invite has already been used' });
+  if (new Date(inv.expiresAt) < new Date()) return res.status(410).json({ error: 'This invite has expired' });
+  const member = { id: 'tm_' + crypto.randomUUID(), teamId: inv.teamId, userId: user.id, role: 'member', joinedAt: new Date().toISOString() };
+  db.data.teamMembers.push(member);
+  inv.usedBy = user.id;
+  inv.usedAt = new Date().toISOString();
+  user.teamId = inv.teamId;
+  user.teamRole = 'member';
+  await db.write();
+  const team = db.data.teams.find(t => t.id === inv.teamId);
+  res.json({ success: true, team, role: 'member' });
+});
+
+// ── Members ───────────────────────────────────────────────────────────────
+
+// GET /api/teams/:teamId/members
+app.get('/api/teams/:teamId/members', requireAuth, (req, res, next) => requireTeamRole('owner','admin','member')(req, res, next), (req, res) => {
+  const members = db.data.teamMembers.filter(m => m.teamId === req.params.teamId);
+  const result = members.map(m => {
+    const u = getUser(m.userId);
+    if (!u) return null;
+    return {
+      id: u.id, name: u.name, role: m.role, joinedAt: m.joinedAt,
+      lastVisit: u.lastVisit, streak: u.streak || 0, xp: u.xp || 0,
+      lessonsCompleted: (u.completedLessons || []).length,
+      missionsPassed: (u.passedMissions || []).length
+    };
+  }).filter(Boolean);
+  res.json(result);
+});
+
+// PUT /api/teams/:teamId/members/:userId/role
+app.put('/api/teams/:teamId/members/:userId/role', requireAuth, (req, res, next) => requireTeamRole('owner')(req, res, next), async (req, res) => {
+  const { role } = req.body;
+  if (!['admin','member'].includes(role)) return res.status(400).json({ error: 'Role must be admin or member' });
+  const team = db.data.teams.find(t => t.id === req.params.teamId);
+  if (req.params.userId === team.ownerId) return res.status(400).json({ error: 'Cannot change owner role' });
+  const member = db.data.teamMembers.find(m => m.userId === req.params.userId && m.teamId === req.params.teamId);
+  if (!member) return res.status(404).json({ error: 'Member not found' });
+  member.role = role;
+  const targetUser = getUser(req.params.userId);
+  if (targetUser) targetUser.teamRole = role;
+  await db.write();
+  res.json({ success: true, role });
+});
+
+// DELETE /api/teams/:teamId/members/:userId
+app.delete('/api/teams/:teamId/members/:userId', requireAuth, (req, res, next) => requireTeamRole('owner','admin')(req, res, next), async (req, res) => {
+  const team = db.data.teams.find(t => t.id === req.params.teamId);
+  if (req.params.userId === team.ownerId) return res.status(400).json({ error: 'Cannot remove the team owner' });
+  const idx = db.data.teamMembers.findIndex(m => m.userId === req.params.userId && m.teamId === req.params.teamId);
+  if (idx === -1) return res.status(404).json({ error: 'Member not found' });
+  db.data.teamMembers.splice(idx, 1);
+  const targetUser = getUser(req.params.userId);
+  if (targetUser) { targetUser.teamId = null; targetUser.teamRole = null; }
+  await db.write();
+  res.json({ success: true });
+});
+
+// DELETE /api/teams/leave
+app.delete('/api/teams/leave', requireAuth, async (req, res) => {
+  const user = getUser(req.user.id);
+  if (!user) return res.status(404).json({ error: 'User not found' });
+  if (!user.teamId) return res.status(400).json({ error: 'Not on a team' });
+  const team = db.data.teams.find(t => t.id === user.teamId);
+  if (team && team.ownerId === user.id) return res.status(400).json({ error: 'Owner cannot leave. Transfer ownership first.' });
+  const idx = db.data.teamMembers.findIndex(m => m.userId === user.id && m.teamId === user.teamId);
+  if (idx !== -1) db.data.teamMembers.splice(idx, 1);
+  user.teamId = null;
+  user.teamRole = null;
+  await db.write();
+  res.json({ success: true });
+});
+
+// ── Team Analytics ────────────────────────────────────────────────────────
+
+// GET /api/teams/:teamId/analytics
+app.get('/api/teams/:teamId/analytics', requireAuth, (req, res, next) => requireTeamRole('owner','admin')(req, res, next), (req, res) => {
+  const members = db.data.teamMembers.filter(m => m.teamId === req.params.teamId);
+  const users = members.map(m => getUser(m.userId)).filter(Boolean);
+  if (users.length === 0) return res.json({ completionRate: 0, categoryBreakdown: [], topPerformers: [] });
+  const totalLessons = 13; // approximate total lessons across all tracks
+  const completionRates = users.map(u => (u.completedLessons || []).length / totalLessons);
+  const avgCompletion = completionRates.reduce((a, b) => a + b, 0) / users.length;
+  const categories = ['core','writing','code','research','marketing','productivity','learning','data','design','hr','legal','finance','selfdev'];
+  const categoryBreakdown = categories.map(cat => {
+    const avgPct = users.reduce((sum, u) => {
+      const done = (u.completedLessons || []).filter(l => l.startsWith(cat[0])).length;
+      return sum + done;
+    }, 0) / users.length;
+    return { categoryId: cat, avgPct: Math.round(avgPct * 100) };
+  });
+  const topPerformers = users.map(u => ({ id: u.id, name: u.name, xp: u.xp || 0, lessonsCompleted: (u.completedLessons||[]).length }))
+    .sort((a, b) => b.xp - a.xp).slice(0, 5);
+  res.json({ completionRate: Math.round(avgCompletion * 100), categoryBreakdown, topPerformers });
+});
+
+// ── Team Prompt Library ───────────────────────────────────────────────────
+
+// GET /api/teams/:teamId/prompts
+app.get('/api/teams/:teamId/prompts', requireAuth, (req, res, next) => requireTeamRole('owner','admin','member')(req, res, next), (req, res) => {
+  const isAdminOrOwner = ['owner','admin'].includes(req.teamMember.role);
+  const prompts = db.data.teamPrompts.filter(p => {
+    if (p.teamId !== req.params.teamId) return false;
+    if (isAdminOrOwner) return true;
+    return p.status === 'approved';
+  });
+  res.json(prompts);
+});
+
+// POST /api/teams/:teamId/prompts
+app.post('/api/teams/:teamId/prompts', requireAuth, (req, res, next) => requireTeamRole('owner','admin','member')(req, res, next), async (req, res) => {
+  const { title, prompt, category, score } = req.body;
+  if (!title || !prompt || !category) return res.status(400).json({ error: 'title, prompt, category required' });
+  if (!score || score < 85) return res.status(400).json({ error: 'Score must be 85 or above' });
+  if (!isAppropriate(prompt) || !isAppropriate(title)) return res.status(422).json({ error: 'Content contains inappropriate material' });
+  const team = db.data.teams.find(t => t.id === req.params.teamId);
+  const status = team?.settings?.requirePromptApproval ? 'pending' : 'approved';
+  const entry = {
+    id: 'tp_' + crypto.randomUUID(), teamId: req.params.teamId,
+    submittedBy: req.user.id, title: title.trim().substring(0, 80),
+    prompt: prompt.trim(), category, score, status,
+    reviewedBy: null, reviewedAt: null,
+    submittedAt: new Date().toISOString(), uses: 0
+  };
+  db.data.teamPrompts.push(entry);
+  await db.write();
+  res.json({ success: true, entry });
+});
+
+// PUT /api/teams/:teamId/prompts/:promptId/review
+app.put('/api/teams/:teamId/prompts/:promptId/review', requireAuth, (req, res, next) => requireTeamRole('owner','admin')(req, res, next), async (req, res) => {
+  const { action } = req.body;
+  if (!['approve','reject'].includes(action)) return res.status(400).json({ error: 'action must be approve or reject' });
+  const prompt = db.data.teamPrompts.find(p => p.id === req.params.promptId && p.teamId === req.params.teamId);
+  if (!prompt) return res.status(404).json({ error: 'Prompt not found' });
+  prompt.status = action === 'approve' ? 'approved' : 'rejected';
+  prompt.reviewedBy = req.user.id;
+  prompt.reviewedAt = new Date().toISOString();
+  await db.write();
+  res.json({ success: true, status: prompt.status });
+});
+
+// DELETE /api/teams/:teamId/prompts/:promptId
+app.delete('/api/teams/:teamId/prompts/:promptId', requireAuth, async (req, res) => {
+  const user = getUser(req.user.id);
+  if (!user) return res.status(404).json({ error: 'User not found' });
+  const prompt = db.data.teamPrompts.find(p => p.id === req.params.promptId && p.teamId === req.params.teamId);
+  if (!prompt) return res.status(404).json({ error: 'Prompt not found' });
+  const member = db.data.teamMembers.find(m => m.userId === user.id && m.teamId === req.params.teamId);
+  if (!member) return res.status(403).json({ error: 'Not a team member' });
+  if (!['owner','admin'].includes(member.role) && prompt.submittedBy !== user.id)
+    return res.status(403).json({ error: 'Insufficient permissions' });
+  const idx = db.data.teamPrompts.findIndex(p => p.id === req.params.promptId);
+  db.data.teamPrompts.splice(idx, 1);
+  await db.write();
+  res.json({ success: true });
+});
+
+// ── Certificates ──────────────────────────────────────────────────────────
+
+// POST /api/certificates
+app.post('/api/certificates', requireAuth, async (req, res) => {
+  const user = getUser(req.user.id);
+  if (!user) return res.status(404).json({ error: 'User not found' });
+  const { type, categoryId, categoryName } = req.body;
+  if (!type) return res.status(400).json({ error: 'type required' });
+  const existing = db.data.certificates.find(c => c.userId === user.id && c.type === type && c.categoryId === categoryId);
+  if (existing) return res.json({ cert: existing, alreadyExists: true });
+  const cert = {
+    id: 'cert_' + crypto.randomUUID(), userId: user.id, teamId: user.teamId || null,
+    type, categoryId: categoryId || null, categoryName: categoryName || null,
+    earnedAt: new Date().toISOString()
+  };
+  db.data.certificates.push(cert);
+  await db.write();
+  res.json({ cert });
+});
+
+// GET /api/certificates/mine
+app.get('/api/certificates/mine', requireAuth, (req, res) => {
+  const certs = db.data.certificates.filter(c => c.userId === req.user.id);
+  res.json(certs);
+});
+
+// Modify POST /api/library to check blockCommunityPublish
+// (already defined above — we patch by overriding the route handler logic via checking team settings)
 
 // ── Start ─────────────────────────────────────────────────────────────────
 const PORT = process.env.PORT || 3000;

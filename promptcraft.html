@@ -549,6 +549,75 @@ footer{border-top:1px solid var(--border);padding:48px;display:grid;grid-templat
 .usage-bar-fill.warn{background:#f59e0b}
 .usage-bar-fill.full{background:var(--red)}
 .settings-divider{font-size:11px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);margin:20px 0 8px;padding-top:12px;border-top:1px solid var(--border)}
+/* ── Teams ───────────────────────────────────────────────── */
+.teams-view{padding:60px 48px 80px;max-width:1100px;margin:0 auto}
+.teams-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:36px;gap:16px;flex-wrap:wrap}
+.teams-dashboard{display:flex;gap:24px}
+.teams-sidebar{width:160px;flex-shrink:0;display:flex;flex-direction:column;gap:2px}
+.teams-sidebar-btn{width:100%;text-align:left;padding:9px 14px;border-radius:10px;border:none;background:transparent;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--muted);cursor:pointer;transition:color .15s,background .15s}
+.teams-sidebar-btn:hover{color:var(--text)}
+.teams-sidebar-btn.active{background:var(--accent-bg);color:var(--accent-text)}
+.teams-content{flex:1;min-width:0}
+.teams-section{display:none}
+.teams-section.active{display:block}
+.members-table{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden}
+.members-row{display:grid;grid-template-columns:1fr 80px 90px 80px 60px 70px 110px;align-items:center;gap:10px;padding:12px 18px;border-bottom:1px solid var(--border);font-size:13px}
+.members-row:last-child{border-bottom:none}
+.members-row.header{background:var(--bg2);font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--muted)}
+.role-badge{display:inline-block;padding:3px 8px;border-radius:20px;font-size:10px;font-weight:800;letter-spacing:.5px;text-transform:uppercase}
+.role-badge.owner{background:rgba(245,158,11,.15);color:#d97706}
+.role-badge.admin{background:var(--purple-bg,rgba(139,92,246,.15));color:var(--purple,#7c3aed)}
+.role-badge.member{background:var(--bg2);color:var(--muted)}
+.tier-dots{display:flex;gap:3px}
+.tier-dot{width:8px;height:8px;border-radius:50%;background:var(--border2)}
+.tier-dot.done{background:var(--accent-text)}
+.analytic-row{display:grid;grid-template-columns:160px 1fr 48px;align-items:center;gap:12px;margin-bottom:14px}
+.analytic-track{height:8px;background:var(--border);border-radius:4px;overflow:hidden}
+.analytic-fill{height:100%;border-radius:4px;background:var(--accent-text);transition:width .6s ease}
+.assign-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.assign-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px}
+.assign-card-name{font-size:13px;font-weight:700;margin-bottom:8px}
+.assign-select{width:100%;padding:7px 10px;border-radius:8px;border:1px solid var(--border);background:var(--bg2);color:var(--text);font-family:'Syne',sans-serif;font-size:12px;font-weight:600;cursor:pointer}
+.tp-status{display:inline-flex;padding:3px 8px;border-radius:20px;font-size:10px;font-weight:800}
+.tp-status.pending{background:rgba(245,158,11,.15);color:#d97706}
+.tp-status.approved{background:var(--accent-bg);color:var(--accent-text)}
+.tp-status.rejected{background:rgba(239,68,68,.15);color:#dc2626}
+.cat-card.team-locked{opacity:.4;cursor:not-allowed}
+.cat-card.team-locked:hover{border-color:var(--border2)!important;background:var(--surface)!important;box-shadow:none!important}
+.cat-card.team-locked::after{display:none!important}
+.pc-team-badge{display:inline-block;padding:2px 7px;border-radius:20px;font-size:9px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;background:rgba(139,92,246,.15);color:#7c3aed;margin-left:6px}
+.certificate-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1100;display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;pointer-events:none;transition:opacity .2s}
+.certificate-overlay.open{opacity:1;pointer-events:all}
+.certificate-frame{background:var(--surface);border:3px solid var(--accent-text);border-radius:24px;max-width:680px;width:100%;padding:60px;text-align:center}
+.cert-name{font-family:'DM Serif Display',serif;font-size:40px;color:var(--text);letter-spacing:-1px;margin-bottom:8px}
+.cert-track{font-family:'DM Serif Display',serif;font-size:28px;color:var(--accent-text);font-style:italic;margin-bottom:16px}
+.cert-date{font-family:monospace;font-size:12px;color:var(--muted);margin-top:24px}
+.cert-actions{display:flex;gap:12px;justify-content:center;margin-top:32px}
+.remove-fine-print{font-size:12px;color:var(--muted);line-height:1.65;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:10px;padding:12px 14px;margin:16px 0}
+.invite-link-row{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--border)}
+.invite-link-row:last-child{border-bottom:none}
+.invite-link-text{font-size:12px;font-family:monospace;color:var(--muted);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.teams-empty{padding:48px 24px;text-align:center;color:var(--muted);font-size:14px}
+.teams-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px}
+.teams-card+.teams-card{margin-top:12px}
+.tp-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:10px}
+.tp-card-title{font-weight:700;font-size:14px;margin-bottom:6px}
+.tp-card-meta{font-size:11px;color:var(--muted);margin-bottom:10px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.tp-card-prompt{font-size:13px;color:var(--text2);line-height:1.6;padding:10px;background:var(--bg2);border-radius:8px;margin-bottom:10px;max-height:80px;overflow:hidden}
+.tp-actions{display:flex;gap:8px;flex-wrap:wrap}
+.team-settings-row{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--border)}
+.team-settings-row:last-child{border-bottom:none}
+.team-settings-label{font-size:14px;font-weight:700}
+.team-settings-sub{font-size:12px;color:var(--muted);margin-top:2px}
+.toggle-switch{position:relative;width:40px;height:22px;flex-shrink:0}
+.toggle-switch input{opacity:0;width:0;height:0}
+.toggle-slider{position:absolute;cursor:pointer;inset:0;background:var(--border2);border-radius:22px;transition:.3s}
+.toggle-slider:before{position:absolute;content:'';height:16px;width:16px;left:3px;bottom:3px;background:white;border-radius:50%;transition:.3s}
+input:checked+.toggle-slider{background:var(--accent-text)}
+input:checked+.toggle-slider:before{transform:translateX(18px)}
+.onboard-modal{background:var(--card);border-radius:20px;padding:40px;max-width:440px;width:100%;position:relative}
+@media print{body>*:not(.certificate-overlay){display:none!important}.certificate-overlay{position:static;background:none;opacity:1;pointer-events:all}.cert-actions,.certificate-overlay .settings-close{display:none!important}}
+@media(max-width:768px){.teams-dashboard{flex-direction:column}.teams-sidebar{width:100%;flex-direction:row;flex-wrap:wrap}.members-row{grid-template-columns:1fr 80px 80px;}.members-row>*:nth-child(n+4){display:none}}
 </style>
 </head>
 <body>
@@ -564,6 +633,7 @@ footer{border-top:1px solid var(--border);padding:48px;display:grid;grid-templat
     <button class="nav-link" onclick="showView('sandbox')">Sandbox</button>
     <button class="nav-link" onclick="showView('library')">Library</button>
     <button class="nav-link" onclick="showView('leaderboard')">Leaderboard</button>
+    <button class="nav-link" id="teamNavBtn" style="display:none" onclick="showView('teams')">Team</button>
   </div>
   <div class="nav-right">
     <div class="xp-pill" onclick="showView('leaderboard')">
@@ -928,7 +998,7 @@ footer{border-top:1px solid var(--border);padding:48px;display:grid;grid-templat
       <div class="pricing-card"><div class="plan-name">Free</div><div class="plan-price">$0</div><div class="plan-desc">Perfect for exploring the basics and getting your first wins with AI.</div><div class="plan-divider"></div><ul class="plan-features"><li>Foundations tier</li><li>Core Techniques tier</li><li>10 AI-powered sandbox runs/month</li><li>Community Library</li></ul><button class="btn-plan" onclick="showView('learn')">Get Started Free</button></div>
       <div class="pricing-card featured-plan"><div class="plan-badge">Most Popular</div><div class="plan-name">Pro</div><div class="plan-price">$10 <span>/ mo</span></div><div class="plan-desc">For people serious about making AI work harder for them every day.</div><div class="plan-divider"></div><ul class="plan-features"><li>All five tiers unlocked</li><li>140 AI-powered sandbox <runs>
       <month></month></li><li>AI Grader &amp; Dissector</li><li>Domain Tracks</li><li>Certification badge</li></ul><button class="btn-plan primary-plan">Start Pro Trial</button></div>
-      <div class="pricing-card"><div class="plan-name">Team</div><div class="plan-price">$79 <span>/ mo</span></div><div class="plan-desc">Onboard your whole team and track collective progress across all tiers.</div><div class="plan-divider"></div><ul class="plan-features"><li>Everything in Pro</li><li>Up to 10 seats</li><li>Team dashboard</li><li>Custom prompt library</li><li>Priority support</li></ul><button class="btn-plan">Contact Sales</button></div>
+      <div class="pricing-card"><div class="plan-name">Team</div><div class="plan-price">$79 <span>/ mo</span></div><div class="plan-desc">Onboard your whole team and track collective progress across all tiers.</div><div class="plan-divider"></div><ul class="plan-features"><li>Everything in Pro</li><li>Up to 10 seats</li><li>Team dashboard</li><li>Custom prompt library</li><li>Priority support</li></ul><button class="btn-plan" onclick="openStartTeamsFlow()">Start Teams →</button></div>
     </div>
   </section>
 
@@ -1034,6 +1104,141 @@ footer{border-top:1px solid var(--border);padding:48px;display:grid;grid-templat
   </div>
 </div>
 
+<!-- Teams View -->
+<div class="view" id="view-teams">
+  <div class="teams-view">
+    <div class="teams-header">
+      <div>
+        <span class="section-eyebrow">Team Dashboard</span>
+        <h2 class="section-title" id="teamNameDisplay">Your Team</h2>
+      </div>
+      <button class="btn-primary" onclick="openInviteModal()">+ Invite Members</button>
+    </div>
+    <div class="teams-dashboard">
+      <nav class="teams-sidebar">
+        <button class="teams-sidebar-btn active" onclick="showTeamTab('members',this)">Members</button>
+        <button class="teams-sidebar-btn" onclick="showTeamTab('analytics',this)">Analytics</button>
+        <button class="teams-sidebar-btn" onclick="showTeamTab('library',this)">Library</button>
+        <button class="teams-sidebar-btn" onclick="showTeamTab('assign',this)">Assign</button>
+        <button class="teams-sidebar-btn" onclick="showTeamTab('tmsettings',this)">Settings</button>
+      </nav>
+      <div class="teams-content">
+        <div class="teams-section active" id="tsec-members"><div class="teams-empty">Loading…</div></div>
+        <div class="teams-section" id="tsec-analytics"><div class="teams-empty">Loading…</div></div>
+        <div class="teams-section" id="tsec-library"><div class="teams-empty">Loading…</div></div>
+        <div class="teams-section" id="tsec-assign"><div class="teams-empty">Loading…</div></div>
+        <div class="teams-section" id="tsec-tmsettings"><div class="teams-empty">Loading…</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Accept Invite Modal -->
+<div class="auth-overlay" id="acceptInviteModal">
+  <div class="onboard-modal">
+    <button class="settings-close" onclick="document.getElementById('acceptInviteModal').classList.remove('open')">✕</button>
+    <div id="acceptInviteContent">
+      <div style="font-size:32px;margin-bottom:16px">🤝</div>
+      <h3 style="font-size:22px;margin-bottom:8px" id="acceptInviteTeamName">Join Team</h3>
+      <p style="color:var(--muted);font-size:14px;margin-bottom:24px" id="acceptInviteSubtitle">You've been invited to join a team on PromptCraft.</p>
+      <button class="btn-primary" style="width:100%" onclick="acceptInviteClick()">Join Team →</button>
+      <div class="pub-error" id="acceptInviteError" style="margin-top:10px"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Invite Modal -->
+<div class="auth-overlay" id="inviteModal">
+  <div class="onboard-modal" style="max-width:520px">
+    <button class="settings-close" onclick="document.getElementById('inviteModal').classList.remove('open')">✕</button>
+    <h3 style="font-size:20px;margin-bottom:20px">Invite Members</h3>
+    <div style="display:flex;gap:0;margin-bottom:20px;border:1px solid var(--border);border-radius:12px;overflow:hidden">
+      <button class="lb-tab active" style="flex:1;border-radius:0;border:none" id="invTabSingle" onclick="switchInvTab('single')">Single Link</button>
+      <button class="lb-tab" style="flex:1;border-radius:0;border:none" id="invTabBulk" onclick="switchInvTab('bulk')">Bulk</button>
+    </div>
+    <div id="invSinglePanel">
+      <input class="pub-input" id="invLabelInput" placeholder="Label (optional, e.g. name or email)" style="width:100%;margin-bottom:12px">
+      <button class="btn-primary" style="width:100%" onclick="createInviteClick()">Create Link →</button>
+      <div id="invSingleResult" style="margin-top:14px"></div>
+    </div>
+    <div id="invBulkPanel" style="display:none">
+      <textarea class="pub-input" id="invBulkInput" placeholder="Enter labels, one per line (up to 50)" rows="5" style="width:100%;font-family:monospace;font-size:12px;resize:vertical;margin-bottom:12px"></textarea>
+      <button class="btn-primary" style="width:100%" onclick="createBulkInvitesClick()">Create All Links →</button>
+      <div id="invBulkResult" style="margin-top:14px;max-height:240px;overflow-y:auto"></div>
+    </div>
+    <div class="pub-error" id="inviteError" style="margin-top:10px"></div>
+  </div>
+</div>
+
+<!-- Remove Member Modal -->
+<div class="auth-overlay" id="removeMemberModal">
+  <div class="onboard-modal" style="max-width:420px">
+    <h3 style="font-size:20px;margin-bottom:4px;color:var(--red,#dc2626)">Remove Member</h3>
+    <p style="color:var(--muted);font-size:14px;margin-bottom:4px">Remove <strong id="removeMemberName"></strong> from your team?</p>
+    <div class="remove-fine-print">Removing this member will unlink them from your team. Their personal account and learning data remain intact on their own account but will no longer be accessible to your organization. This action cannot be undone.</div>
+    <div style="display:flex;gap:10px;margin-top:4px">
+      <button class="btn-ghost" style="flex:1" onclick="document.getElementById('removeMemberModal').classList.remove('open')">Cancel</button>
+      <button class="btn-primary" style="flex:1;background:var(--red,#dc2626);border-color:transparent" onclick="confirmRemoveMember()">Remove Member</button>
+    </div>
+  </div>
+</div>
+
+<!-- Team Prompt Submit Modal -->
+<div class="auth-overlay" id="teamPromptSubmitModal">
+  <div class="onboard-modal" style="max-width:480px">
+    <button class="settings-close" onclick="document.getElementById('teamPromptSubmitModal').classList.remove('open')">✕</button>
+    <h3 style="font-size:20px;margin-bottom:16px">Submit to Team Library</h3>
+    <div style="margin-bottom:12px">
+      <label style="font-size:12px;font-weight:700;color:var(--muted);display:block;margin-bottom:6px">TITLE</label>
+      <input class="pub-input" id="tpTitle" placeholder="Give your prompt a title…" maxlength="80" style="width:100%">
+    </div>
+    <div style="margin-bottom:16px">
+      <label style="font-size:12px;font-weight:700;color:var(--muted);display:block;margin-bottom:6px">CATEGORY</label>
+      <select class="assign-select" id="tpCategory" style="width:100%">
+        <option value="writing">Writing</option><option value="code">Code</option><option value="research">Research</option>
+        <option value="marketing">Marketing</option><option value="productivity">Productivity</option><option value="learning">Learning</option>
+        <option value="data">Data</option><option value="design">Design</option><option value="hr">HR</option>
+        <option value="legal">Legal</option><option value="finance">Finance</option><option value="selfdev">Self Development</option>
+        <option value="other">Other</option>
+      </select>
+    </div>
+    <div class="pub-error" id="tpError" style="margin-bottom:10px"></div>
+    <button class="btn-primary" style="width:100%" onclick="submitToTeamLibraryClick()">Submit →</button>
+  </div>
+</div>
+
+<!-- Certificate Modal -->
+<div class="certificate-overlay" id="certificateModal">
+  <div class="certificate-frame">
+    <button class="settings-close" onclick="document.getElementById('certificateModal').classList.remove('open')">✕</button>
+    <div style="font-size:14px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:24px">Certificate of Completion</div>
+    <div class="cert-name" id="certName"></div>
+    <div style="font-size:14px;color:var(--muted);margin-bottom:8px">has successfully completed</div>
+    <div class="cert-track" id="certTrack"></div>
+    <div style="width:80px;height:2px;background:var(--accent-text);margin:20px auto"></div>
+    <div class="cert-date" id="certDate"></div>
+    <div style="font-size:11px;color:var(--border2);margin-top:6px" id="certId"></div>
+    <div class="cert-actions">
+      <button class="btn-ghost" onclick="document.getElementById('certificateModal').classList.remove('open')">Close</button>
+      <button class="btn-primary" onclick="window.print()">Print / Save PDF</button>
+    </div>
+  </div>
+</div>
+
+<!-- Teams Onboarding Modal -->
+<div class="auth-overlay" id="createTeamModal">
+  <div class="onboard-modal">
+    <button class="settings-close" onclick="document.getElementById('createTeamModal').classList.remove('open')">✕</button>
+    <div style="font-size:32px;margin-bottom:16px">🏢</div>
+    <h3 style="font-size:22px;margin-bottom:8px">Create Your Team</h3>
+    <p style="color:var(--muted);font-size:14px;margin-bottom:20px">Set up your organization on PromptCraft and start inviting members.</p>
+    <label style="font-size:12px;font-weight:700;color:var(--muted);display:block;margin-bottom:6px">ORGANIZATION NAME</label>
+    <input class="pub-input" id="createTeamName" placeholder="e.g. Acme Corp" style="width:100%;margin-bottom:16px">
+    <div class="pub-error" id="createTeamError" style="margin-bottom:10px"></div>
+    <button class="btn-primary" style="width:100%" onclick="submitCreateTeam()">Create Team →</button>
+  </div>
+</div>
+
 <!-- Lesson Modal -->
 <div class="modal-overlay" id="lessonModal">
   <div class="modal">
@@ -1099,6 +1304,7 @@ async function syncProgress(){
 
 function updateNavAuth(){
   const area = document.getElementById('navAuthArea');
+  const teamBtn = document.getElementById('teamNavBtn');
   if(authUser){
     const initials = authUser.name.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
     const runs = authUser.sbRunsThisMonth || 0;
@@ -1106,8 +1312,10 @@ function updateNavAuth(){
     const limit = isPro ? 140 : FREE_LIMIT;
     const planLabel = isPro ? ' <span style="font-size:10px;color:var(--accent-text);font-weight:800">PRO</span>' : '';
     area.innerHTML = `<div class="nav-avatar" title="${authUser.name}" onclick="toggleAvatarMenu(event)">${initials}<div class="nav-avatar-menu" onclick="event.stopPropagation()"><div style="padding:8px 14px 4px;font-size:12px;color:var(--muted);font-weight:700">${authUser.name}${planLabel}</div><div style="padding:2px 14px 8px;font-size:11px;color:var(--muted)">${runs}/${limit} sandbox runs</div><hr style="border:none;border-top:1px solid var(--border);margin:4px 8px"><button onclick="openSettings()">Settings</button><button onclick="handleSignout()">Sign Out</button></div></div>`;
+    if(teamBtn) teamBtn.style.display = (authUser.teamRole==='owner'||authUser.teamRole==='admin') ? '' : 'none';
   } else {
     area.innerHTML = '<button class="btn-nav" onclick="openAuth()">Sign In</button>';
+    if(teamBtn) teamBtn.style.display = 'none';
   }
 }
 
@@ -1147,6 +1355,9 @@ async function handleSignup(){
     if(!res.ok){err.textContent=data.error||'Signup failed.';return;}
     setAuthUser(data.user, data.token);
     closeAuth();
+    await initTeams();
+    if(_pendingTeamsFlow){ _pendingTeamsFlow=false; openStartTeamsFlow(); }
+    else if(_pendingInviteToken){ const t=_pendingInviteToken; fetch('/api/invites/'+t).then(r=>r.json()).then(d=>{if(d.valid)showAcceptInviteModal(d,t);}); }
   }catch(e){err.textContent='Could not connect to server.';}
 }
 
@@ -1162,6 +1373,9 @@ async function handleLogin(){
     if(!res.ok){err.textContent=data.error||'Login failed.';return;}
     setAuthUser(data.user, data.token);
     closeAuth();
+    await initTeams();
+    if(_pendingTeamsFlow){ _pendingTeamsFlow=false; openStartTeamsFlow(); }
+    else if(_pendingInviteToken){ const t=_pendingInviteToken; fetch('/api/invites/'+t).then(r=>r.json()).then(d=>{if(d.valid)showAcceptInviteModal(d,t);}); }
   }catch(e){err.textContent='Could not connect to server.';}
 }
 
@@ -1196,6 +1410,8 @@ async function restoreSession(){
     if(!res.ok){localStorage.removeItem('pc_token');return;}
     const user = await res.json();
     setAuthUser(user, null);
+    await initTeams();
+    checkInviteParam();
   }catch(e){/* offline — continue as guest */}
 }
 
@@ -2099,21 +2315,27 @@ function updateNav(){
 // ── Navigation ──────────────────────────────────────────
 function showView(name){
   // Gate protected views behind auth
-  if(['sandbox','learn','library','leaderboard'].includes(name) && !authUser){
+  if(['sandbox','learn','library','leaderboard','teams'].includes(name) && !authUser){
     openAuth('signup');
     return;
   }
+  // Teams view requires admin/owner role
+  if(name==='teams' && authUser && authUser.teamRole!=='owner' && authUser.teamRole!=='admin'){
+    showView('home'); return;
+  }
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   document.getElementById('view-'+name).classList.add('active');
-  document.querySelectorAll('.nav-link').forEach((l,i)=>{
+  const navNames=['home','learn','sandbox','library','leaderboard','teams'];
+  document.querySelectorAll('.nav-link').forEach(l=>{
     l.classList.remove('active');
-    if(['home','learn','sandbox','library','leaderboard'][i]===name)l.classList.add('active');
+    if(l.getAttribute('onclick')&&l.getAttribute('onclick').includes("'"+name+"'"))l.classList.add('active');
   });
   window.scrollTo({top:0,behavior:'smooth'});
   if(name==='learn')renderLearn();
   if(name==='library')renderLibrary();
   if(name==='leaderboard')renderLeaderboard('weekly');
   if(name==='sandbox')renderSandboxTemplates();
+  if(name==='teams')renderTeamDashboard();
 }
 
 // ── Scroll animations ────────────────────────────────────
@@ -2147,8 +2369,9 @@ function renderCategoryPicker(){
     const total=tiers.reduce((s,t)=>s+t.lessons.length,0);
     const done=tiers.reduce((s,t)=>s+t.lessons.filter(l=>state.completedLessons.includes(l.id)).length,0);
     const pct=total>0?Math.round((done/total)*100):0;
-    return `<div class="cat-card${c.id===cat?' active':''}" onclick="selectCategory('${c.id}')">
-      <span class="cat-name">${c.name}</span>
+    const locked=isCategoryLockedByTeam(c.id);
+    return `<div class="cat-card${c.id===cat?' active':''}${locked?' team-locked':''}" ${locked?'':'onclick="selectCategory(\''+c.id+'\')"'}>
+      <span class="cat-name">${c.name}${locked?' 🔒':''}</span>
       <div class="cat-progress-wrap">
         <div class="cat-progress-bar"><div class="cat-progress-fill" style="width:${pct}%"></div></div>
         <span class="cat-progress">${done}/${total}</span>
@@ -2363,6 +2586,15 @@ function finishLesson(){
   state.completedLessons.push(currentLesson.id);
   addXP(currentLesson.xp,'Lesson Complete!');
   save();closeModal();renderLearn();
+  syncProgress();
+  // Check if a track is now fully complete
+  const cat = state.currentCategory || 'core';
+  const tiers = cat==='core' ? TIERS : (CATEGORY_TRACKS[cat]||[]);
+  const catName = CATEGORIES.find(c=>c.id===cat)?.name || cat;
+  const allIds = tiers.flatMap(t=>t.lessons.map(l=>l.id));
+  if(allIds.length>0 && allIds.every(id=>state.completedLessons.includes(id))){
+    setTimeout(()=>checkAndOfferCertificate(cat, catName), 800);
+  }
 }
 
 // ── Missions ─────────────────────────────────────────────
@@ -2481,10 +2713,18 @@ async function runSandbox(){
     } else {
       document.getElementById('sbResponseText').innerHTML='';
     }
-    // Publish area — pro users with score ≥ 90
+    // Publish area — pro users with score ≥ 90, team users with score ≥ 85
     const pubArea = document.getElementById('sbPublishArea');
-    if(score >= 90 && authUser && authUser.plan === 'pro'){
-      pubArea.innerHTML=`
+    let pubHtml = '';
+    // Team library submission (score ≥ 85, on a team)
+    if(score >= 85 && authUser && authUser.teamId){
+      pubHtml += `<button class="btn-publish" style="background:rgba(139,92,246,.15);color:#7c3aed;border-color:rgba(139,92,246,.3);margin-bottom:8px" onclick="openTeamPromptSubmitModal()">Submit to Team Library</button>`;
+    }
+    // Community library (pro, score ≥ 90)
+    const teamData_local = window.teamData;
+    const blockCommunity = teamData_local?.settings?.blockCommunityPublish;
+    if(score >= 90 && authUser && authUser.plan === 'pro' && !blockCommunity){
+      pubHtml += `
         <button class="btn-publish" onclick="togglePublishForm()">Publish to Community Library</button>
         <div class="publish-form" id="publishForm">
           <div class="pub-row">
@@ -2502,11 +2742,10 @@ async function runSandbox(){
           <div class="pub-error" id="pubError"></div>
           <button class="btn-send" style="width:100%;padding:12px" onclick="submitPublish()">Publish →</button>
         </div>`;
-    } else if(score >= 90 && authUser && authUser.plan !== 'pro'){
-      pubArea.innerHTML=`<div style="margin-top:12px;font-size:13px;color:var(--muted);display:flex;align-items:center;gap:6px">Scored 90+! <span style="font-weight:700;color:var(--purple)">Upgrade to Pro</span> to publish to the Community Library.</div>`;
-    } else {
-      pubArea.innerHTML='';
+    } else if(score >= 90 && authUser && authUser.plan !== 'pro' && !authUser.teamId){
+      pubHtml += `<div style="margin-top:12px;font-size:13px;color:var(--muted);display:flex;align-items:center;gap:6px">Scored 90+! <span style="font-weight:700;color:var(--purple)">Upgrade to Pro</span> to publish to the Community Library.</div>`;
     }
+    pubArea.innerHTML = pubHtml;
     if(score>=75)addXP(25,'Sandbox Practice');
   } catch(e) {
     if(e.code === 'not_authenticated'){openAuth('signup');return;}
@@ -2746,12 +2985,22 @@ function copyPrompt(id,btn){
 function useInSandbox(id){const p=LIBRARY.find(x=>x.id===id);if(!p)return;showView('sandbox');setTimeout(()=>{const input=document.getElementById('sbInput');if(input){input.value=p.prompt;updateCharCount('sbCount',p.prompt);}},150);}
 
 // ── Leaderboard ──────────────────────────────────────────
-function renderLeaderboard(tab){
+async function renderLeaderboard(tab){
+  const lbType = window.teamData?.settings?.leaderboardType ?? 'global';
+  const table = document.getElementById('lbTable');
+  if(lbType === 'none'){
+    table.innerHTML = '<div class="teams-empty" style="padding:40px;text-align:center;color:var(--muted)">Leaderboard hidden by your team admin.</div>';
+    return;
+  }
+  if(lbType === 'team' && authUser && authUser.teamId){
+    await renderTeamLeaderboard();
+    return;
+  }
   const data=[...LEADERBOARD[tab]].map(r=>({...r}));
   // Insert user's real XP
   data.forEach(r=>{if(r.you){r.xp=state.xp;r.streak=state.streak;}});
   data.sort((a,b)=>b.xp-a.xp);
-  const table=document.getElementById('lbTable');table.innerHTML='';
+  table.innerHTML='';
   data.forEach((r,i)=>{
     const row=document.createElement('div');row.className='lb-row'+(r.you?' you':'');
     const initials=r.name.split(/(?=[A-Z])/).map(w=>w[0]).join('').substring(0,2).toUpperCase()||r.name.substring(0,2).toUpperCase();
@@ -2759,6 +3008,24 @@ function renderLeaderboard(tab){
     row.innerHTML=`<div class="lb-rank ${i<3?'top':''}">${rankDisp}</div><div class="lb-user"><div class="lb-avatar">${initials}</div><div><div class="lb-name">${r.you?'You ('+r.name+')':r.name}</div><div class="lb-badge">${r.badge}</div></div></div><div class="lb-xp">${r.xp.toLocaleString()} XP</div><div class="lb-streak">${r.streak} Days</div>`;
     table.appendChild(row);
   });
+}
+
+async function renderTeamLeaderboard(){
+  if(!authUser?.teamId) return;
+  const table = document.getElementById('lbTable');
+  try{
+    const res = await fetch('/api/teams/'+authUser.teamId+'/members',{headers:{'Authorization':'Bearer '+getToken()}});
+    if(!res.ok){table.innerHTML='<div class="teams-empty">Could not load team data.</div>';return;}
+    const members = await res.json();
+    members.sort((a,b)=>b.xp-a.xp);
+    table.innerHTML='';
+    members.forEach((m,i)=>{
+      const row=document.createElement('div');row.className='lb-row'+(m.id===authUser.id?' you':'');
+      const initials=m.name.substring(0,2).toUpperCase();
+      row.innerHTML=`<div class="lb-rank ${i<3?'top':''}">${i+1}</div><div class="lb-user"><div class="lb-avatar">${initials}</div><div><div class="lb-name">${m.id===authUser.id?'You ('+m.name+')':m.name}</div><div class="lb-badge"><span class="role-badge ${m.role}">${m.role}</span></div></div></div><div class="lb-xp">${(m.xp||0).toLocaleString()} XP</div><div class="lb-streak">${m.streak||0} Days</div>`;
+      table.appendChild(row);
+    });
+  }catch(e){table.innerHTML='<div class="teams-empty">Could not load team leaderboard.</div>';}
 }
 function switchLbTab(btn,tab){
   document.querySelectorAll('.lb-tab').forEach(t=>t.classList.remove('active'));
@@ -2910,8 +3177,528 @@ function confirmDeleteAccount(){
   alert('Account signed out. Contact support to complete deletion.');
 }
 
+// ── Teams ─────────────────────────────────────────────────
+window.teamData = null;
+let _pendingTeamsFlow = false;
+let _pendingInviteToken = null;
+let _pendingRemoveUserId = null;
+
+function isCategoryLockedByTeam(catId){
+  return window.teamData?.assignedCategories?.[catId] === 'locked';
+}
+
+async function initTeams(){
+  if(!authUser) return;
+  try{
+    const res = await fetch('/api/teams/mine',{headers:{'Authorization':'Bearer '+getToken()}});
+    if(!res.ok) return;
+    const data = await res.json();
+    window.teamData = data.team || null;
+    if(data.team){
+      const nameEl = document.getElementById('teamNameDisplay');
+      if(nameEl) nameEl.textContent = data.team.name;
+    }
+    updateNavAuth();
+  }catch(e){}
+}
+
+function checkInviteParam(){
+  const token = new URLSearchParams(window.location.search).get('invite');
+  if(!token) return;
+  _pendingInviteToken = token;
+  fetch('/api/invites/'+token).then(r=>r.json()).then(data=>{
+    if(!data.valid){alert('This invite link is invalid: '+(data.reason||'Unknown error'));return;}
+    if(!authUser){
+      // show auth first, then accept after login
+      openAuth('signup');
+      return;
+    }
+    showAcceptInviteModal(data, token);
+  }).catch(()=>{});
+}
+
+function showAcceptInviteModal(data, token){
+  document.getElementById('acceptInviteTeamName').textContent = 'Join '+data.teamName;
+  document.getElementById('acceptInviteSubtitle').textContent = data.inviterName+' invited you to join '+data.teamName+' on PromptCraft.';
+  document.getElementById('acceptInviteError').textContent = '';
+  document.getElementById('acceptInviteModal').classList.add('open');
+}
+
+async function acceptInviteClick(){
+  const token = _pendingInviteToken;
+  if(!token) return;
+  if(!authUser){openAuth('signup');return;}
+  const errEl = document.getElementById('acceptInviteError');
+  errEl.textContent = '';
+  try{
+    const res = await fetch('/api/invites/'+token+'/accept',{method:'POST',headers:{'Authorization':'Bearer '+getToken()}});
+    const data = await res.json();
+    if(!res.ok){errEl.textContent=data.error||'Could not join team.';return;}
+    authUser.teamId = data.team.id;
+    authUser.teamRole = 'member';
+    window.teamData = data.team;
+    document.getElementById('acceptInviteModal').classList.remove('open');
+    history.replaceState({}, '', '/');
+    _pendingInviteToken = null;
+    updateNavAuth();
+    alert('You\'ve joined '+data.team.name+'!');
+  }catch(e){errEl.textContent='Could not connect to server.';}
+}
+
+function openStartTeamsFlow(){
+  if(!authUser){
+    _pendingTeamsFlow = true;
+    openAuth('signup');
+    return;
+  }
+  if(authUser.teamId){showView('teams');return;}
+  document.getElementById('createTeamName').value = '';
+  document.getElementById('createTeamError').textContent = '';
+  document.getElementById('createTeamModal').classList.add('open');
+}
+
+async function submitCreateTeam(){
+  const name = document.getElementById('createTeamName').value.trim();
+  const errEl = document.getElementById('createTeamError');
+  errEl.textContent = '';
+  if(!name){errEl.textContent='Please enter an organization name.';return;}
+  const btn = document.querySelector('#createTeamModal .btn-primary');
+  if(btn){btn.disabled=true;btn.textContent='Creating…';}
+  try{
+    const res = await fetch('/api/teams',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+getToken()},body:JSON.stringify({name})});
+    const data = await res.json();
+    if(!res.ok){errEl.textContent=data.error||'Could not create team.';return;}
+    authUser.teamId = data.team.id;
+    authUser.teamRole = 'owner';
+    window.teamData = data.team;
+    const nameEl = document.getElementById('teamNameDisplay');
+    if(nameEl) nameEl.textContent = data.team.name;
+    document.getElementById('createTeamModal').classList.remove('open');
+    updateNavAuth();
+    showView('teams');
+  }catch(e){errEl.textContent='Could not connect to server.';}
+  if(btn){btn.disabled=false;btn.textContent='Create Team →';}
+}
+
+function showTeamTab(id, btn){
+  document.querySelectorAll('.teams-section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.teams-sidebar-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tsec-'+id).classList.add('active');
+  if(btn) btn.classList.add('active');
+  if(id==='members') renderTeamMembers();
+  if(id==='analytics') renderTeamAnalytics();
+  if(id==='library') renderTeamLibraryTab();
+  if(id==='assign') renderAssignGrid();
+  if(id==='tmsettings') renderTeamSettings();
+}
+
+// Small toast for settings feedback (reuses the xpToast element but different styling)
+function showTeamToast(msg, isError){
+  const t = document.getElementById('xpToast');
+  if(!t) return;
+  t.textContent = msg;
+  t.style.background = isError ? 'var(--red,#dc2626)' : 'var(--accent-text)';
+  t.classList.add('show');
+  setTimeout(()=>{t.classList.remove('show');t.style.background='';}, 2000);
+}
+
+async function renderTeamDashboard(){
+  await initTeams();
+  if(!window.teamData){
+    document.querySelector('.teams-dashboard').innerHTML='<div style="flex:1;padding:60px;text-align:center"><p style="font-size:18px;font-weight:700;margin-bottom:8px">No Team Yet</p><p style="color:var(--muted)">Create a team to get started.</p><button class="btn-primary" style="margin-top:20px" onclick="openStartTeamsFlow()">Create Team</button></div>';
+    return;
+  }
+  // Restore sidebar if it was replaced
+  if(!document.getElementById('tsec-members')){
+    location.reload();
+    return;
+  }
+  document.getElementById('teamNameDisplay').textContent = window.teamData.name;
+  // Activate first tab
+  const activeTab = document.querySelector('.teams-section.active');
+  if(!activeTab || !activeTab.id) renderTeamMembers();
+  else {
+    const tabId = activeTab.id.replace('tsec-','');
+    showTeamTab(tabId, document.querySelector('.teams-sidebar-btn.active'));
+  }
+}
+
+async function renderTeamMembers(){
+  const sec = document.getElementById('tsec-members');
+  if(!authUser?.teamId){sec.innerHTML='<div class="teams-empty">Not on a team.</div>';return;}
+  try{
+    const res = await fetch('/api/teams/'+authUser.teamId+'/members',{headers:{'Authorization':'Bearer '+getToken()}});
+    if(!res.ok){sec.innerHTML='<div class="teams-empty">Could not load members.</div>';return;}
+    const members = await res.json();
+    const isOwner = authUser.teamRole === 'owner';
+    const isAdmin = authUser.teamRole === 'admin' || isOwner;
+    sec.innerHTML = `<div class="members-table">
+      <div class="members-row header"><span>Name</span><span>Role</span><span>Joined</span><span>Last Active</span><span>Streak</span><span>XP</span><span>Actions</span></div>
+      ${members.map(m=>`<div class="members-row">
+        <span style="font-weight:700">${m.name}${m.id===authUser.id?' <span style="font-size:10px;color:var(--muted)">(you)</span>':''}</span>
+        <span><span class="role-badge ${m.role}">${m.role}</span></span>
+        <span style="color:var(--muted);font-size:12px">${m.joinedAt?new Date(m.joinedAt).toLocaleDateString():'-'}</span>
+        <span style="color:var(--muted);font-size:12px">${m.lastVisit||'-'}</span>
+        <span style="color:var(--muted)">${m.streak||0}</span>
+        <span style="font-weight:700">${(m.xp||0).toLocaleString()}</span>
+        <span style="display:flex;gap:6px;align-items:center">
+          ${isOwner && m.id!==authUser.id && m.role!=='owner' ? `<select style="font-size:11px;padding:3px 6px;border-radius:6px;border:1px solid var(--border);background:var(--bg2);color:var(--text);cursor:pointer" onchange="changeRole('${m.id}',this.value)"><option value="member"${m.role==='member'?' selected':''}>Member</option><option value="admin"${m.role==='admin'?' selected':''}>Admin</option></select>` : ''}
+          ${isAdmin && m.id!==authUser.id && m.role!=='owner' ? `<button class="btn-ghost" style="font-size:11px;padding:4px 8px;color:var(--red,#dc2626);border-color:rgba(220,38,38,.3)" onclick="openRemoveMemberModal('${m.id}','${m.name.replace(/'/g,"\\'")}')">Remove</button>` : ''}
+        </span>
+      </div>`).join('')}
+    </div>`;
+  }catch(e){sec.innerHTML='<div class="teams-empty">Error loading members.</div>';}
+}
+
+async function renderTeamAnalytics(){
+  const sec = document.getElementById('tsec-analytics');
+  if(!authUser?.teamId){sec.innerHTML='<div class="teams-empty">Not on a team.</div>';return;}
+  try{
+    const res = await fetch('/api/teams/'+authUser.teamId+'/analytics',{headers:{'Authorization':'Bearer '+getToken()}});
+    if(!res.ok){sec.innerHTML='<div class="teams-empty">Could not load analytics.</div>';return;}
+    const data = await res.json();
+    sec.innerHTML = `
+      <div class="teams-card" style="margin-bottom:20px">
+        <div style="font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:12px">Team Completion Rate</div>
+        <div style="display:flex;align-items:center;gap:16px">
+          <div style="flex:1;height:12px;background:var(--border);border-radius:6px;overflow:hidden"><div style="height:100%;background:var(--accent-text);border-radius:6px;width:${data.completionRate}%"></div></div>
+          <span style="font-size:24px;font-weight:800;min-width:52px;text-align:right">${data.completionRate}%</span>
+        </div>
+      </div>
+      <div class="teams-card" style="margin-bottom:20px">
+        <div style="font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:16px">Top Performers</div>
+        ${data.topPerformers.map((p,i)=>`<div style="display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--border)"><span style="font-size:14px;font-weight:800;color:var(--muted);min-width:20px">${i+1}</span><span style="font-weight:700;flex:1">${p.name}</span><span style="color:var(--accent-text);font-weight:800">${p.xp.toLocaleString()} XP</span></div>`).join('')}
+      </div>`;
+  }catch(e){sec.innerHTML='<div class="teams-empty">Error loading analytics.</div>';}
+}
+
+async function renderTeamLibraryTab(){
+  const sec = document.getElementById('tsec-library');
+  if(!authUser?.teamId){sec.innerHTML='<div class="teams-empty">Not on a team.</div>';return;}
+  const isAdmin = authUser.teamRole==='owner'||authUser.teamRole==='admin';
+  try{
+    const res = await fetch('/api/teams/'+authUser.teamId+'/prompts',{headers:{'Authorization':'Bearer '+getToken()}});
+    if(!res.ok){sec.innerHTML='<div class="teams-empty">Could not load prompts.</div>';return;}
+    const prompts = await res.json();
+    if(prompts.length===0){sec.innerHTML='<div class="teams-empty">No prompts yet. Score 85+ in the sandbox to submit one.</div>';return;}
+    sec.innerHTML = prompts.map(p=>`<div class="tp-card">
+      <div class="tp-card-title">${p.title} <span class="tp-status ${p.status}">${p.status}</span></div>
+      <div class="tp-card-meta">
+        <span>By ${p.publishedBy||'Unknown'}</span>
+        <span>Score: ${p.score}</span>
+        <span>${p.category}</span>
+        <span>${new Date(p.submittedAt).toLocaleDateString()}</span>
+      </div>
+      <div class="tp-card-prompt">${p.prompt}</div>
+      <div class="tp-actions">
+        <button class="btn-ghost" style="font-size:12px;padding:6px 10px" onclick="copyTeamPrompt('${p.id}',this)">Copy</button>
+        ${isAdmin && p.status==='pending' ? `<button class="btn-primary" style="font-size:12px;padding:6px 10px" onclick="reviewTeamPrompt('${p.id}','approve')">Approve</button><button class="btn-ghost" style="font-size:12px;padding:6px 10px;color:var(--red,#dc2626)" onclick="reviewTeamPrompt('${p.id}','reject')">Reject</button>` : ''}
+        ${isAdmin ? `<button class="btn-ghost" style="font-size:12px;padding:6px 10px;color:var(--red,#dc2626)" onclick="deleteTeamPrompt('${p.id}')">Delete</button>` : ''}
+      </div>
+    </div>`).join('');
+    // Store prompts for copy
+    window._teamPrompts = prompts;
+  }catch(e){sec.innerHTML='<div class="teams-empty">Error loading library.</div>';}
+}
+
+function copyTeamPrompt(id, btn){
+  const p = (window._teamPrompts||[]).find(x=>x.id===id);
+  if(!p) return;
+  navigator.clipboard.writeText(p.prompt).then(()=>{
+    const orig = btn.textContent;
+    btn.textContent = 'Copied!';
+    setTimeout(()=>{btn.textContent=orig;}, 1500);
+  });
+}
+
+async function reviewTeamPrompt(promptId, action){
+  if(!authUser?.teamId) return;
+  try{
+    await fetch('/api/teams/'+authUser.teamId+'/prompts/'+promptId+'/review',{method:'PUT',headers:{'Content-Type':'application/json','Authorization':'Bearer '+getToken()},body:JSON.stringify({action})});
+    renderTeamLibraryTab();
+  }catch(e){}
+}
+
+async function deleteTeamPrompt(promptId){
+  if(!confirm('Delete this prompt?')) return;
+  try{
+    await fetch('/api/teams/'+authUser.teamId+'/prompts/'+promptId,{method:'DELETE',headers:{'Authorization':'Bearer '+getToken()}});
+    renderTeamLibraryTab();
+  }catch(e){}
+}
+
+function renderAssignGrid(){
+  const sec = document.getElementById('tsec-assign');
+  if(!window.teamData){sec.innerHTML='<div class="teams-empty">No team data.</div>';return;}
+  const cats = CATEGORIES.filter(c=>c.id!=='core');
+  const assigned = window.teamData.assignedCategories || {};
+  sec.innerHTML = `<p style="font-size:13px;color:var(--muted);margin-bottom:16px">Control which categories team members can access. Locked categories are hidden from members.</p>
+  <div class="assign-grid">
+    ${cats.map(c=>`<div class="assign-card">
+      <div class="assign-card-name">${c.name}</div>
+      <select class="assign-select" id="assign-${c.id}">
+        <option value="optional"${assigned[c.id]==='optional'||!assigned[c.id]?' selected':''}>Optional</option>
+        <option value="required"${assigned[c.id]==='required'?' selected':''}>Required</option>
+        <option value="locked"${assigned[c.id]==='locked'?' selected':''}>Locked</option>
+      </select>
+    </div>`).join('')}
+  </div>
+  <button class="btn-primary" style="margin-top:20px" onclick="saveAssignments()">Save Assignments</button>
+  <span id="assignFeedback" style="margin-left:12px;font-size:13px;color:var(--accent-text)"></span>`;
+}
+
+async function saveAssignments(){
+  const fb = document.getElementById('assignFeedback');
+  if(!authUser?.teamId){
+    if(fb){fb.style.color='var(--red,#dc2626)';fb.textContent='Not connected to team.';}
+    return;
+  }
+  const cats = CATEGORIES.filter(c=>c.id!=='core');
+  const assignedCategories = {};
+  cats.forEach(c=>{
+    const sel = document.getElementById('assign-'+c.id);
+    if(sel) assignedCategories[c.id] = sel.value;
+  });
+  if(fb) fb.textContent='Saving…';
+  try{
+    const res = await fetch('/api/teams/'+authUser.teamId+'/categories',{method:'PUT',headers:{'Content-Type':'application/json','Authorization':'Bearer '+getToken()},body:JSON.stringify({assignedCategories})});
+    if(res.ok){
+      window.teamData.assignedCategories = assignedCategories;
+      if(fb){fb.style.color='var(--accent-text)';fb.textContent='Saved!';setTimeout(()=>{fb.textContent='';},2000);}
+    } else {
+      const d = await res.json();
+      if(fb){fb.style.color='var(--red,#dc2626)';fb.textContent=d.error||'Save failed.';}
+    }
+  }catch(e){if(fb){fb.style.color='var(--red,#dc2626)';fb.textContent='Connection error.';}}
+}
+
+function renderTeamSettings(){
+  const sec = document.getElementById('tsec-tmsettings');
+  if(!window.teamData){sec.innerHTML='<div class="teams-empty">No team data.</div>';return;}
+  const s = window.teamData.settings || {};
+  sec.innerHTML = `
+    <div class="teams-card">
+      <div style="font-size:14px;font-weight:800;margin-bottom:16px">Privacy & Visibility</div>
+      <div class="team-settings-row">
+        <div><div class="team-settings-label">Show Streaks</div><div class="team-settings-sub">Members can see each other's streaks</div></div>
+        <label class="toggle-switch"><input type="checkbox" id="ts-showStreaks" ${s.showStreaks!==false?'checked':''} onchange="saveTeamSetting('showStreaks',this.checked)"><span class="toggle-slider"></span></label>
+      </div>
+      <div class="team-settings-row">
+        <div><div class="team-settings-label">Show XP</div><div class="team-settings-sub">Members can see each other's XP in leaderboard</div></div>
+        <label class="toggle-switch"><input type="checkbox" id="ts-showXP" ${s.showXP!==false?'checked':''} onchange="saveTeamSetting('showXP',this.checked)"><span class="toggle-slider"></span></label>
+      </div>
+      <div class="team-settings-row">
+        <div><div class="team-settings-label">Block Community Publishing</div><div class="team-settings-sub">Prevent members from publishing to the public library</div></div>
+        <label class="toggle-switch"><input type="checkbox" id="ts-blockCommunity" ${s.blockCommunityPublish?'checked':''} onchange="saveTeamSetting('blockCommunityPublish',this.checked)"><span class="toggle-slider"></span></label>
+      </div>
+      <div class="team-settings-row">
+        <div><div class="team-settings-label">Require Prompt Approval</div><div class="team-settings-sub">Submitted prompts must be approved before appearing in the team library</div></div>
+        <label class="toggle-switch"><input type="checkbox" id="ts-requireApproval" ${s.requirePromptApproval!==false?'checked':''} onchange="saveTeamSetting('requirePromptApproval',this.checked)"><span class="toggle-slider"></span></label>
+      </div>
+    </div>
+    <div class="teams-card" style="margin-top:12px">
+      <div style="font-size:14px;font-weight:800;margin-bottom:16px">Leaderboard</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        ${['global','team','none'].map(opt=>`<label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:14px"><input type="radio" name="lbType" value="${opt}" ${(s.leaderboardType||'team')===opt?'checked':''} onchange="saveTeamSetting('leaderboardType','${opt}')">${opt==='global'?'Global (all PromptCraft users)':opt==='team'?'Team only':'Hidden'}</label>`).join('')}
+      </div>
+    </div>
+    <div class="teams-card" style="margin-top:12px">
+      <div style="font-size:14px;font-weight:800;margin-bottom:8px">Team Name</div>
+      <div style="display:flex;gap:10px">
+        <input class="pub-input" id="teamNameInput" value="${window.teamData.name}" placeholder="Team name" style="flex:1">
+        <button class="btn-primary" onclick="saveTeamName()">Save</button>
+      </div>
+      <div id="teamNameFeedback" style="font-size:12px;color:var(--accent-text);margin-top:6px"></div>
+    </div>`;
+}
+
+async function saveTeamSetting(key, value){
+  if(!authUser?.teamId || !window.teamData){
+    showTeamToast('Not connected to a team. Try refreshing.', true);
+    return;
+  }
+  try{
+    const body = {};
+    body[key] = value;
+    const res = await fetch('/api/teams/'+authUser.teamId+'/settings',{method:'PUT',headers:{'Content-Type':'application/json','Authorization':'Bearer '+getToken()},body:JSON.stringify(body)});
+    if(res.ok){
+      if(window.teamData.settings) window.teamData.settings[key] = value;
+      showTeamToast('Saved ✓');
+    } else {
+      const d = await res.json();
+      showTeamToast(d.error||'Save failed', true);
+    }
+  }catch(e){ showTeamToast('Connection error', true); }
+}
+
+async function saveTeamName(){
+  const input = document.getElementById('teamNameInput');
+  const fb = document.getElementById('teamNameFeedback');
+  if(!input?.value.trim()){if(fb){fb.style.color='var(--red,#dc2626)';fb.textContent='Name cannot be empty.';}return;}
+  if(!authUser?.teamId){if(fb){fb.style.color='var(--red,#dc2626)';fb.textContent='Not connected to team.';}return;}
+  if(fb) fb.textContent='Saving…';
+  try{
+    const res = await fetch('/api/teams/'+authUser.teamId+'/name',{method:'PUT',headers:{'Content-Type':'application/json','Authorization':'Bearer '+getToken()},body:JSON.stringify({name:input.value.trim()})});
+    const data = await res.json();
+    if(res.ok){
+      window.teamData.name = data.name;
+      document.getElementById('teamNameDisplay').textContent = data.name;
+      if(fb){fb.style.color='var(--accent-text)';fb.textContent='Saved!';setTimeout(()=>{fb.textContent='';},2000);}
+    } else {
+      if(fb){fb.style.color='var(--red,#dc2626)';fb.textContent=data.error||'Save failed.';}
+    }
+  }catch(e){if(fb){fb.style.color='var(--red,#dc2626)';fb.textContent='Connection error.';}}
+}
+
+// ── Invite flow ────────────────────────────────────────────
+function openInviteModal(){
+  document.getElementById('invLabelInput').value='';
+  document.getElementById('invSingleResult').innerHTML='';
+  document.getElementById('invBulkInput').value='';
+  document.getElementById('invBulkResult').innerHTML='';
+  document.getElementById('inviteError').textContent='';
+  document.getElementById('inviteModal').classList.add('open');
+}
+
+function switchInvTab(tab){
+  document.getElementById('invSinglePanel').style.display = tab==='single'?'':'none';
+  document.getElementById('invBulkPanel').style.display = tab==='bulk'?'':'none';
+  document.getElementById('invTabSingle').classList.toggle('active', tab==='single');
+  document.getElementById('invTabBulk').classList.toggle('active', tab==='bulk');
+}
+
+async function createInviteClick(){
+  const label = document.getElementById('invLabelInput').value.trim();
+  const errEl = document.getElementById('inviteError');
+  errEl.textContent = '';
+  try{
+    const res = await fetch('/api/teams/'+authUser.teamId+'/invites',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+getToken()},body:JSON.stringify({label})});
+    const data = await res.json();
+    if(!res.ok){errEl.textContent=data.error||'Could not create invite.';return;}
+    const fullLink = window.location.origin + data.link;
+    document.getElementById('invSingleResult').innerHTML = `
+      <div class="invite-link-row" style="border:none;background:var(--bg2);padding:10px 12px;border-radius:10px">
+        <span class="invite-link-text">${fullLink}</span>
+        <button class="btn-ghost" style="font-size:12px;padding:5px 10px;flex-shrink:0" onclick="copyInviteLink('${fullLink}',this)">Copy</button>
+      </div>`;
+  }catch(e){errEl.textContent='Could not connect to server.';}
+}
+
+async function createBulkInvitesClick(){
+  const raw = document.getElementById('invBulkInput').value;
+  const labels = raw.split(/[\n,]+/).map(s=>s.trim()).filter(Boolean);
+  const errEl = document.getElementById('inviteError');
+  errEl.textContent = '';
+  if(labels.length === 0){errEl.textContent='Enter at least one label.';return;}
+  try{
+    const res = await fetch('/api/teams/'+authUser.teamId+'/invites/bulk',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+getToken()},body:JSON.stringify({labels})});
+    const data = await res.json();
+    if(!res.ok){errEl.textContent=data.error||'Could not create invites.';return;}
+    const resultEl = document.getElementById('invBulkResult');
+    resultEl.innerHTML = data.invites.map(inv=>{
+      const fullLink = window.location.origin + inv.link;
+      return `<div class="invite-link-row">
+        <span class="invite-link-text">${inv.label||'(no label)'}: ${fullLink}</span>
+        <button class="btn-ghost" style="font-size:11px;padding:4px 8px;flex-shrink:0" onclick="copyInviteLink('${fullLink}',this)">Copy</button>
+      </div>`;
+    }).join('');
+  }catch(e){errEl.textContent='Could not connect to server.';}
+}
+
+function copyInviteLink(link, btn){
+  navigator.clipboard.writeText(link).then(()=>{
+    const orig = btn.textContent;
+    btn.textContent = 'Copied!';
+    setTimeout(()=>{btn.textContent=orig;}, 1500);
+  });
+}
+
+// ── Member management ──────────────────────────────────────
+function openRemoveMemberModal(userId, name){
+  _pendingRemoveUserId = userId;
+  document.getElementById('removeMemberName').textContent = name;
+  document.getElementById('removeMemberModal').classList.add('open');
+}
+
+async function confirmRemoveMember(){
+  if(!_pendingRemoveUserId || !authUser?.teamId) return;
+  try{
+    const res = await fetch('/api/teams/'+authUser.teamId+'/members/'+_pendingRemoveUserId,{method:'DELETE',headers:{'Authorization':'Bearer '+getToken()}});
+    if(res.ok){
+      document.getElementById('removeMemberModal').classList.remove('open');
+      _pendingRemoveUserId = null;
+      renderTeamMembers();
+    }
+  }catch(e){}
+}
+
+async function changeRole(userId, role){
+  if(!authUser?.teamId) return;
+  try{
+    await fetch('/api/teams/'+authUser.teamId+'/members/'+userId+'/role',{method:'PUT',headers:{'Content-Type':'application/json','Authorization':'Bearer '+getToken()},body:JSON.stringify({role})});
+    renderTeamMembers();
+  }catch(e){}
+}
+
+// ── Team prompt submission ─────────────────────────────────
+function openTeamPromptSubmitModal(){
+  document.getElementById('tpTitle').value = '';
+  document.getElementById('tpError').textContent = '';
+  document.getElementById('teamPromptSubmitModal').classList.add('open');
+}
+
+async function submitToTeamLibraryClick(){
+  const title = document.getElementById('tpTitle').value.trim();
+  const category = document.getElementById('tpCategory').value;
+  const errEl = document.getElementById('tpError');
+  errEl.textContent = '';
+  if(!title){errEl.textContent='Please add a title.';return;}
+  if(!authUser?.teamId){errEl.textContent='Not on a team.';return;}
+  try{
+    const res = await fetch('/api/teams/'+authUser.teamId+'/prompts',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+getToken()},body:JSON.stringify({title,prompt:_sbPromptText,category,score:_sbPromptScore})});
+    const data = await res.json();
+    if(!res.ok){errEl.textContent=data.error||'Could not submit.';return;}
+    document.getElementById('teamPromptSubmitModal').classList.remove('open');
+    const pubArea = document.getElementById('sbPublishArea');
+    if(pubArea){
+      const note = document.createElement('div');
+      note.style.cssText='margin-top:12px;padding:10px 14px;border-radius:10px;background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.3);color:#7c3aed;font-size:13px;font-weight:700';
+      note.textContent = data.entry.status==='pending' ? 'Submitted to Team Library (pending approval)' : 'Published to Team Library!';
+      pubArea.prepend(note);
+    }
+  }catch(e){errEl.textContent='Could not connect to server.';}
+}
+
+// ── Certificates ────────────────────────────────────────────
+async function checkAndOfferCertificate(categoryId, categoryName){
+  if(!authUser) return;
+  try{
+    const res = await fetch('/api/certificates/mine',{headers:{'Authorization':'Bearer '+getToken()}});
+    if(!res.ok) return;
+    const certs = await res.json();
+    const existing = certs.find(c=>c.categoryId===categoryId);
+    if(existing){openCertificateModal(existing);return;}
+    // Create new cert
+    const createRes = await fetch('/api/certificates',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+getToken()},body:JSON.stringify({type:'category',categoryId,categoryName})});
+    const data = await createRes.json();
+    if(createRes.ok) openCertificateModal(data.cert);
+  }catch(e){}
+}
+
+function openCertificateModal(cert){
+  document.getElementById('certName').textContent = authUser?.name || 'Learner';
+  document.getElementById('certTrack').textContent = cert.categoryName || cert.categoryId || 'Prompt Engineering';
+  document.getElementById('certDate').textContent = 'Completed on '+new Date(cert.earnedAt).toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+  document.getElementById('certId').textContent = 'Certificate ID: '+cert.id;
+  document.getElementById('certificateModal').classList.add('open');
+}
+
 // ── Auth modal close on overlay click ─────────────────────
 document.getElementById('authModal').addEventListener('click',function(e){if(e.target===this)closeAuth();});
+['inviteModal','acceptInviteModal','removeMemberModal','teamPromptSubmitModal','createTeamModal'].forEach(id=>{
+  const el=document.getElementById(id);
+  if(el)el.addEventListener('click',function(e){if(e.target===this)this.classList.remove('open');});
+});
 
 // ── Scroll fade-in ────────────────────────────────────────
 initScrollAnimations();
@@ -2922,7 +3709,7 @@ document.getElementById('lessonModal').addEventListener('click',function(e){if(e
 // ── Init ──────────────────────────────────────────────────
 updateNav();
 renderPOTD();
-restoreSession();
+restoreSession().then(()=>{ if(!authUser) checkInviteParam(); });
 </script>
 </body>
 </html>
