@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: promptcraft
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: JWT_SECRET
+        sync: false
