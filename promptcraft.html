@@ -41,6 +41,7 @@ body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);font-s
 .page{position:relative;z-index:1}
 /* Nav */
 nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 48px;height:64px;background:var(--bg);border-bottom:1px solid var(--border);backdrop-filter:blur(12px);transition:background .3s}
+.nav-logo-group{display:flex;align-items:center;gap:10px}
 .logo{font-family:'DM Serif Display',serif;font-size:22px;color:var(--accent-text);letter-spacing:-.5px;text-decoration:none;cursor:pointer}
 [data-theme="dark"] .logo{color:var(--accent)}
 .logo span{color:var(--text)}
@@ -54,10 +55,16 @@ nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-co
 [data-theme="dark"] .theme-toggle:hover{border-color:var(--accent);color:var(--accent)}
 .btn-nav{background:var(--text);color:var(--bg);border:none;padding:10px 22px;border-radius:40px;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:opacity .15s,transform .1s}
 .btn-nav:hover{opacity:.85;transform:scale(1.02)}
+/* Hamburger menu */
+.nav-hamburger{display:none;width:38px;height:38px;border-radius:50%;border:1px solid var(--border2);background:var(--surface);color:var(--text2);font-size:18px;cursor:pointer;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s;line-height:1;padding:0;vertical-align:middle}
+.nav-hamburger:hover{border-color:var(--accent-text);color:var(--accent-text)}
+.nav-dropdown{position:absolute;top:64px;left:0;right:0;background:var(--bg);border-bottom:1px solid var(--border);padding:8px 16px 12px;display:flex;flex-direction:column;gap:2px;z-index:99;box-shadow:0 8px 24px rgba(0,0,0,.1);pointer-events:none;opacity:0;transform:translateY(-8px);transition:opacity .18s,transform .18s}
+.nav-dropdown.open{pointer-events:all;opacity:1;transform:translateY(0)}
+.nav-dropdown .nav-link{border-radius:10px;text-align:left;padding:10px 14px;font-size:14px}
 /* XP bar in nav */
-.xp-pill{display:flex;align-items:center;gap:8px;background:var(--accent-bg);border:1px solid var(--accent-border);padding:6px 14px;border-radius:40px;font-size:12px;font-weight:700;color:var(--accent-text);cursor:pointer}
+.xp-pill{display:flex;align-items:center;gap:8px;background:var(--accent-bg);border:1px solid var(--accent-border);padding:6px 14px;border-radius:40px;font-size:12px;font-weight:700;color:var(--accent-text);cursor:pointer;white-space:nowrap;flex-shrink:0}
 [data-theme="dark"] .xp-pill{color:var(--accent)}
-.xp-pill .streak{color:var(--orange);margin-right:4px}
+.xp-pill .streak{color:var(--orange);margin-right:4px;white-space:nowrap}
 /* Pages */
 .view{display:none}
 .view.active{display:block}
@@ -392,8 +399,11 @@ footer{border-top:1px solid var(--border);padding:48px;display:grid;grid-templat
 .fade-up.visible{opacity:1;transform:none}
 /* Responsive */
 @media(max-width:900px){
-  nav{padding:0 20px}
+  nav{padding:0 16px;gap:8px}
   .nav-center{display:none}
+  .nav-hamburger{display:flex}
+  .nav-logo-group{display:flex;align-items:center;gap:10px}
+  .logo{font-size:18px}
   .hero{padding:60px 24px 50px}
   .stats-bar .stat{flex:0 0 50%;border-right:none;border-bottom:1px solid var(--border)}
   .section,.how-section,.learn-header,.lessons-section,.missions-section,.library-view,.leaderboard-view,.sandbox-view{padding-left:24px;padding-right:24px}
@@ -551,19 +561,21 @@ footer{border-top:1px solid var(--border);padding:48px;display:grid;grid-templat
 .settings-divider{font-size:11px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);margin:20px 0 8px;padding-top:12px;border-top:1px solid var(--border)}
 /* ── Teams ───────────────────────────────────────────────── */
 .teams-view{padding:60px 48px 80px;max-width:1100px;margin:0 auto}
-.teams-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:36px;gap:16px;flex-wrap:wrap}
-.teams-dashboard{display:flex;gap:24px}
-.teams-sidebar{width:160px;flex-shrink:0;display:flex;flex-direction:column;gap:2px}
-.teams-sidebar-btn{width:100%;text-align:left;padding:9px 14px;border-radius:10px;border:none;background:transparent;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--muted);cursor:pointer;transition:color .15s,background .15s}
-.teams-sidebar-btn:hover{color:var(--text)}
-.teams-sidebar-btn.active{background:var(--accent-bg);color:var(--accent-text)}
-.teams-content{flex:1;min-width:0}
+.teams-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px;gap:16px;flex-wrap:wrap}
+.teams-dashboard{display:flex;flex-direction:column;gap:0;background:var(--card);border:1px solid var(--border);border-radius:20px;overflow:hidden}
+.teams-tab-bar{display:flex;gap:4px;padding:12px 16px;border-bottom:1px solid var(--border);background:var(--bg2);flex-wrap:wrap}
+.teams-tab-btn{padding:7px 18px;border-radius:40px;border:none;background:transparent;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--muted);cursor:pointer;transition:color .15s,background .15s;white-space:nowrap}
+.teams-tab-btn:hover{color:var(--text);background:var(--bg)}
+.teams-tab-btn.active{background:var(--card);color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.teams-content{padding:24px}
 .teams-section{display:none}
 .teams-section.active{display:block}
-.members-table{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden}
-.members-row{display:grid;grid-template-columns:1fr 80px 90px 80px 60px 70px 110px;align-items:center;gap:10px;padding:12px 18px;border-bottom:1px solid var(--border);font-size:13px}
+.members-table-wrap{overflow-x:auto;border-radius:16px}
+.members-table{border-radius:16px;overflow:hidden;min-width:680px}
+.members-row{display:grid;grid-template-columns:minmax(140px,2fr) 100px 90px 80px 90px minmax(160px,1.2fr);align-items:center;gap:16px;padding:12px 18px;border-bottom:1px solid var(--border);font-size:13px}
+.members-row>span:nth-child(n+3):nth-child(-n+5){text-align:center}
 .members-row:last-child{border-bottom:none}
-.members-row.header{background:var(--bg2);font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--muted)}
+.members-row.header{border-bottom:2px solid var(--border);font-size:10px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);padding-bottom:10px}
 .role-badge{display:inline-block;padding:3px 8px;border-radius:20px;font-size:10px;font-weight:800;letter-spacing:.5px;text-transform:uppercase}
 .role-badge.owner{background:rgba(245,158,11,.15);color:#d97706}
 .role-badge.admin{background:var(--purple-bg,rgba(139,92,246,.15));color:var(--purple,#7c3aed)}
@@ -598,8 +610,8 @@ footer{border-top:1px solid var(--border);padding:48px;display:grid;grid-templat
 .invite-link-row:last-child{border-bottom:none}
 .invite-link-text{font-size:12px;font-family:monospace;color:var(--muted);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .teams-empty{padding:48px 24px;text-align:center;color:var(--muted);font-size:14px}
-.teams-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px}
-.teams-card+.teams-card{margin-top:12px}
+.teams-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px;box-sizing:border-box}
+.teams-card+.teams-card{margin-top:14px}
 .tp-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:10px}
 .tp-card-title{font-weight:700;font-size:14px;margin-bottom:6px}
 .tp-card-meta{font-size:11px;color:var(--muted);margin-bottom:10px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
@@ -617,7 +629,15 @@ input:checked+.toggle-slider{background:var(--accent-text)}
 input:checked+.toggle-slider:before{transform:translateX(18px)}
 .onboard-modal{background:var(--card);border-radius:20px;padding:40px;max-width:440px;width:100%;position:relative}
 @media print{body>*:not(.certificate-overlay){display:none!important}.certificate-overlay{position:static;background:none;opacity:1;pointer-events:all}.cert-actions,.certificate-overlay .settings-close{display:none!important}}
-@media(max-width:768px){.teams-dashboard{flex-direction:column}.teams-sidebar{width:100%;flex-direction:row;flex-wrap:wrap}.members-row{grid-template-columns:1fr 80px 80px;}.members-row>*:nth-child(n+4){display:none}}
+@media(max-width:768px){
+  .teams-view{padding:40px 20px 60px}
+  .teams-tab-bar{gap:2px;padding:10px 12px;overflow-x:auto;flex-wrap:nowrap;scrollbar-width:none}
+  .teams-tab-bar::-webkit-scrollbar{display:none}
+  .teams-tab-btn{font-size:12px;padding:6px 14px;flex-shrink:0}
+  .teams-content{padding:16px}
+  .members-row{grid-template-columns:minmax(80px,1fr) 80px minmax(140px,auto)}
+  .members-row>*:nth-child(n+4){display:none}
+}
 </style>
 </head>
 <body>
@@ -625,8 +645,12 @@ input:checked+.toggle-slider:before{transform:translateX(18px)}
 <div class="xp-toast" id="xpToast"></div>
 
 <div class="page">
-<nav>
-  <a class="logo" onclick="showView('home')">Prompt<span>Craft</span></a>
+<nav style="position:relative">
+  <div class="nav-dropdown" id="navDropdown"></div>
+  <div class="nav-logo-group">
+    <button class="nav-hamburger" id="navHamburger" onclick="toggleNavDropdown()" aria-label="Menu">☰</button>
+    <a class="logo" onclick="showView('home')">Prompt<span>Craft</span></a>
+  </div>
   <div class="nav-center">
     <button class="nav-link active" onclick="showView('home')">Home</button>
     <button class="nav-link" onclick="showView('learn')">Learn</button>
@@ -1115,13 +1139,13 @@ input:checked+.toggle-slider:before{transform:translateX(18px)}
       <button class="btn-primary" onclick="openInviteModal()">+ Invite Members</button>
     </div>
     <div class="teams-dashboard">
-      <nav class="teams-sidebar">
-        <button class="teams-sidebar-btn active" onclick="showTeamTab('members',this)">Members</button>
-        <button class="teams-sidebar-btn" onclick="showTeamTab('analytics',this)">Analytics</button>
-        <button class="teams-sidebar-btn" onclick="showTeamTab('library',this)">Library</button>
-        <button class="teams-sidebar-btn" onclick="showTeamTab('assign',this)">Assign</button>
-        <button class="teams-sidebar-btn" onclick="showTeamTab('tmsettings',this)">Settings</button>
-      </nav>
+      <div class="teams-tab-bar">
+        <button class="teams-tab-btn active" onclick="showTeamTab('members',this)">Members</button>
+        <button class="teams-tab-btn" onclick="showTeamTab('analytics',this)">Analytics</button>
+        <button class="teams-tab-btn" onclick="showTeamTab('library',this)">Library</button>
+        <button class="teams-tab-btn" onclick="showTeamTab('assign',this)">Assign</button>
+        <button class="teams-tab-btn" onclick="showTeamTab('tmsettings',this)">Settings</button>
+      </div>
       <div class="teams-content">
         <div class="teams-section active" id="tsec-members"><div class="teams-empty">Loading…</div></div>
         <div class="teams-section" id="tsec-analytics"><div class="teams-empty">Loading…</div></div>
@@ -1302,6 +1326,28 @@ async function syncProgress(){
   } catch(e){}
 }
 
+function toggleNavDropdown(){
+  const dd = document.getElementById('navDropdown');
+  dd.classList.toggle('open');
+}
+
+function populateNavDropdown(){
+  const dd = document.getElementById('navDropdown');
+  const links = document.querySelectorAll('.nav-center .nav-link');
+  dd.innerHTML = '';
+  links.forEach(l=>{
+    const btn = document.createElement('button');
+    btn.className = 'nav-link' + (l.classList.contains('active') ? ' active' : '');
+    btn.setAttribute('onclick', l.getAttribute('onclick'));
+    btn.textContent = l.textContent;
+    dd.appendChild(btn);
+  });
+}
+
+function closeNavDropdown(){
+  document.getElementById('navDropdown').classList.remove('open');
+}
+
 function updateNavAuth(){
   const area = document.getElementById('navAuthArea');
   const teamBtn = document.getElementById('teamNavBtn');
@@ -1324,8 +1370,11 @@ function toggleAvatarMenu(e){
   if(m) m.classList.toggle('open');
   e.stopPropagation();
 }
-document.addEventListener('click', ()=>{
+document.addEventListener('click', (e)=>{
   document.querySelectorAll('.nav-avatar-menu.open').forEach(m=>m.classList.remove('open'));
+  const dd = document.getElementById('navDropdown');
+  const burger = document.getElementById('navHamburger');
+  if(dd && burger && !dd.contains(e.target) && e.target !== burger) dd.classList.remove('open');
 });
 
 function openAuth(tab){
@@ -2330,6 +2379,8 @@ function showView(name){
     l.classList.remove('active');
     if(l.getAttribute('onclick')&&l.getAttribute('onclick').includes("'"+name+"'"))l.classList.add('active');
   });
+  closeNavDropdown();
+  populateNavDropdown();
   window.scrollTo({top:0,behavior:'smooth'});
   if(name==='learn')renderLearn();
   if(name==='library')renderLibrary();
@@ -2988,15 +3039,39 @@ function useInSandbox(id){const p=LIBRARY.find(x=>x.id===id);if(!p)return;showVi
 async function renderLeaderboard(tab){
   const lbType = window.teamData?.settings?.leaderboardType ?? 'global';
   const table = document.getElementById('lbTable');
+  const tabsEl = document.querySelector('.lb-tabs');
+
   if(lbType === 'none'){
-    table.innerHTML = '<div class="teams-empty" style="padding:40px;text-align:center;color:var(--muted)">Leaderboard hidden by your team admin.</div>';
+    table.innerHTML = '<div style="padding:40px;text-align:center;color:var(--muted);font-size:14px">Leaderboard hidden by your team admin.</div>';
+    if(tabsEl) tabsEl.style.display='none';
     return;
   }
-  if(lbType === 'team' && authUser && authUser.teamId){
+  if(tabsEl) tabsEl.style.display='';
+
+  if(lbType === 'both' && authUser && authUser.teamId){
+    // Show two tabs: Team and Global
+    if(tabsEl){
+      tabsEl.innerHTML = `<button class="lb-tab ${tab==='team'||tab==='weekly'?'active':''}" onclick="switchLbTab(this,'team')">Team</button><button class="lb-tab ${tab==='global'?'active':''}" onclick="switchLbTab(this,'global')">Global</button>`;
+    }
+    if(tab === 'global'){
+      // fall through to global render below
+    } else {
+      await renderTeamLeaderboard();
+      return;
+    }
+  } else if(lbType === 'both'){
+    // no team, just show global
+  } else if(lbType === 'team' && authUser && authUser.teamId){
+    if(tabsEl) tabsEl.style.display='none';
     await renderTeamLeaderboard();
     return;
+  } else if(lbType === 'global'){
+    if(tabsEl){
+      tabsEl.innerHTML = `<button class="lb-tab ${tab==='weekly'||!tab?'active':''}" onclick="switchLbTab(this,'weekly')">This Week</button><button class="lb-tab ${tab==='alltime'?'active':''}" onclick="switchLbTab(this,'alltime')">All Time</button>`;
+    }
   }
-  const data=[...LEADERBOARD[tab]].map(r=>({...r}));
+  const lbKey = (tab==='alltime') ? 'alltime' : 'weekly';
+  const data=[...LEADERBOARD[lbKey]].map(r=>({...r}));
   // Insert user's real XP
   data.forEach(r=>{if(r.you){r.xp=state.xp;r.streak=state.streak;}});
   data.sort((a,b)=>b.xp-a.xp);
@@ -3282,7 +3357,7 @@ async function submitCreateTeam(){
 
 function showTeamTab(id, btn){
   document.querySelectorAll('.teams-section').forEach(s=>s.classList.remove('active'));
-  document.querySelectorAll('.teams-sidebar-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.teams-tab-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('tsec-'+id).classList.add('active');
   if(btn) btn.classList.add('active');
   if(id==='members') renderTeamMembers();
@@ -3319,7 +3394,7 @@ async function renderTeamDashboard(){
   if(!activeTab || !activeTab.id) renderTeamMembers();
   else {
     const tabId = activeTab.id.replace('tsec-','');
-    showTeamTab(tabId, document.querySelector('.teams-sidebar-btn.active'));
+    showTeamTab(tabId, document.querySelector('.teams-tab-btn.active'));
   }
 }
 
@@ -3332,21 +3407,20 @@ async function renderTeamMembers(){
     const members = await res.json();
     const isOwner = authUser.teamRole === 'owner';
     const isAdmin = authUser.teamRole === 'admin' || isOwner;
-    sec.innerHTML = `<div class="members-table">
-      <div class="members-row header"><span>Name</span><span>Role</span><span>Joined</span><span>Last Active</span><span>Streak</span><span>XP</span><span>Actions</span></div>
+    sec.innerHTML = `<div class="members-table-wrap"><div class="members-table">
+      <div class="members-row header"><span>Name</span><span style="text-align:center">Role</span><span style="text-align:center">XP</span><span style="text-align:center">Streak</span><span style="text-align:center">Lessons</span><span>Actions</span></div>
       ${members.map(m=>`<div class="members-row">
-        <span style="font-weight:700">${m.name}${m.id===authUser.id?' <span style="font-size:10px;color:var(--muted)">(you)</span>':''}</span>
-        <span><span class="role-badge ${m.role}">${m.role}</span></span>
-        <span style="color:var(--muted);font-size:12px">${m.joinedAt?new Date(m.joinedAt).toLocaleDateString():'-'}</span>
-        <span style="color:var(--muted);font-size:12px">${m.lastVisit||'-'}</span>
-        <span style="color:var(--muted)">${m.streak||0}</span>
-        <span style="font-weight:700">${(m.xp||0).toLocaleString()}</span>
-        <span style="display:flex;gap:6px;align-items:center">
+        <span style="font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${m.name}${m.id===authUser.id?' <span style="font-size:10px;color:var(--muted)">(you)</span>':''}</span>
+        <span style="text-align:center"><span class="role-badge ${m.role}">${m.role}</span></span>
+        <span style="font-weight:700;text-align:center">${(m.xp||0).toLocaleString()}</span>
+        <span style="color:var(--muted);text-align:center">${m.streak||0}</span>
+        <span style="color:var(--muted);text-align:center">${m.lessonsCompleted||0}</span>
+        <span style="display:flex;gap:6px;align-items:center;flex-wrap:nowrap">
           ${isOwner && m.id!==authUser.id && m.role!=='owner' ? `<select style="font-size:11px;padding:3px 6px;border-radius:6px;border:1px solid var(--border);background:var(--bg2);color:var(--text);cursor:pointer" onchange="changeRole('${m.id}',this.value)"><option value="member"${m.role==='member'?' selected':''}>Member</option><option value="admin"${m.role==='admin'?' selected':''}>Admin</option></select>` : ''}
-          ${isAdmin && m.id!==authUser.id && m.role!=='owner' ? `<button class="btn-ghost" style="font-size:11px;padding:4px 8px;color:var(--red,#dc2626);border-color:rgba(220,38,38,.3)" onclick="openRemoveMemberModal('${m.id}','${m.name.replace(/'/g,"\\'")}')">Remove</button>` : ''}
+          ${isAdmin && m.id!==authUser.id && m.role!=='owner' ? `<button class="btn-ghost" style="font-size:11px;padding:4px 8px;color:var(--red,#dc2626);border-color:rgba(220,38,38,.3);white-space:nowrap" onclick="openRemoveMemberModal('${m.id}','${m.name.replace(/'/g,"\\'")}')">Remove</button>` : ''}
         </span>
       </div>`).join('')}
-    </div>`;
+    </div></div>`;
   }catch(e){sec.innerHTML='<div class="teams-empty">Error loading members.</div>';}
 }
 
@@ -3358,14 +3432,14 @@ async function renderTeamAnalytics(){
     if(!res.ok){sec.innerHTML='<div class="teams-empty">Could not load analytics.</div>';return;}
     const data = await res.json();
     sec.innerHTML = `
-      <div class="teams-card" style="margin-bottom:20px">
+      <div style="margin-bottom:28px">
         <div style="font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:12px">Team Completion Rate</div>
         <div style="display:flex;align-items:center;gap:16px">
           <div style="flex:1;height:12px;background:var(--border);border-radius:6px;overflow:hidden"><div style="height:100%;background:var(--accent-text);border-radius:6px;width:${data.completionRate}%"></div></div>
           <span style="font-size:24px;font-weight:800;min-width:52px;text-align:right">${data.completionRate}%</span>
         </div>
       </div>
-      <div class="teams-card" style="margin-bottom:20px">
+      <div style="margin-bottom:20px">
         <div style="font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:16px">Top Performers</div>
         ${data.topPerformers.map((p,i)=>`<div style="display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--border)"><span style="font-size:14px;font-weight:800;color:var(--muted);min-width:20px">${i+1}</span><span style="font-weight:700;flex:1">${p.name}</span><span style="color:var(--accent-text);font-weight:800">${p.xp.toLocaleString()} XP</span></div>`).join('')}
       </div>`;
@@ -3499,7 +3573,7 @@ function renderTeamSettings(){
     <div class="teams-card" style="margin-top:12px">
       <div style="font-size:14px;font-weight:800;margin-bottom:16px">Leaderboard</div>
       <div style="display:flex;flex-direction:column;gap:8px">
-        ${['global','team','none'].map(opt=>`<label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:14px"><input type="radio" name="lbType" value="${opt}" ${(s.leaderboardType||'team')===opt?'checked':''} onchange="saveTeamSetting('leaderboardType','${opt}')">${opt==='global'?'Global (all PromptCraft users)':opt==='team'?'Team only':'Hidden'}</label>`).join('')}
+        ${[['both','Global + Team (show both tabs)'],['global','Global only'],['team','Team only'],['none','Hidden']].map(([val,label])=>`<label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:14px"><input type="radio" name="lbType" value="${val}" ${(s.leaderboardType||'team')===val?'checked':''} onchange="saveTeamSetting('leaderboardType','${val}')">${label}</label>`).join('')}
       </div>
     </div>
     <div class="teams-card" style="margin-top:12px">
@@ -3709,6 +3783,7 @@ document.getElementById('lessonModal').addEventListener('click',function(e){if(e
 // ── Init ──────────────────────────────────────────────────
 updateNav();
 renderPOTD();
+populateNavDropdown();
 restoreSession().then(()=>{ if(!authUser) checkInviteParam(); });
 </script>
 </body>
