@@ -12,3 +12,13 @@ services:
         sync: false
       - key: JWT_SECRET
         sync: false
+      - key: BASE_URL
+        value: https://promptcraft-2q3v.onrender.com
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: MS_CLIENT_ID
+        sync: false
+      - key: MS_CLIENT_SECRET
+        sync: false

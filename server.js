@@ -676,6 +676,113 @@ app.get('/api/certificates/mine', requireAuth, (req, res) => {
 // Modify POST /api/library to check blockCommunityPublish
 // (already defined above — we patch by overriding the route handler logic via checking team settings)
 
+// ── OAuth ─────────────────────────────────────────────────────────────────
+const BASE_URL = process.env.BASE_URL || 'http://localhost:3000';
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
+const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
+const MS_CLIENT_ID = process.env.MS_CLIENT_ID;
+const MS_CLIENT_SECRET = process.env.MS_CLIENT_SECRET;
+
+function oauthFindOrCreateUser(email, name) {
+  let user = db.data.users.find(u => u.email === email.toLowerCase());
+  if (!user) {
+    const id = crypto.randomUUID();
+    const now = new Date();
+    const monthKey = `${now.getFullYear()}-${now.getMonth() + 1}`;
+    user = { id, name, email: email.toLowerCase(), passwordHash: null, plan: 'free', sbRunsThisMonth: 0, sbResetMonth: monthKey, xp: 0, streak: 1, lastVisit: '', completedLessons: [], passedMissions: [], teamId: null, teamRole: null };
+    db.data.users.push(user);
+  }
+  return user;
+}
+
+// GET /auth/google
+app.get('/auth/google', (req, res) => {
+  const params = new URLSearchParams({
+    client_id: GOOGLE_CLIENT_ID,
+    redirect_uri: `${BASE_URL}/auth/google/callback`,
+    response_type: 'code',
+    scope: 'openid email profile',
+  });
+  res.redirect(`https://accounts.google.com/o/oauth2/v2/auth?${params}`);
+});
+
+// GET /auth/google/callback
+app.get('/auth/google/callback', async (req, res) => {
+  const { code } = req.query;
+  if (!code) return res.redirect('/?auth_error=1');
+  try {
+    const tokenRes = await fetch('https://oauth2.googleapis.com/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        code,
+        client_id: GOOGLE_CLIENT_ID,
+        client_secret: GOOGLE_CLIENT_SECRET,
+        redirect_uri: `${BASE_URL}/auth/google/callback`,
+        grant_type: 'authorization_code',
+      }),
+    });
+    const tokenData = await tokenRes.json();
+    if (!tokenData.access_token) return res.redirect('/?auth_error=1');
+    const userRes = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
+      headers: { Authorization: `Bearer ${tokenData.access_token}` },
+    });
+    const profile = await userRes.json();
+    if (!profile.email) return res.redirect('/?auth_error=1');
+    const user = oauthFindOrCreateUser(profile.email, profile.name || profile.email.split('@')[0]);
+    await db.write();
+    const token = jwt.sign({ id: user.id, email: user.email, name: user.name }, JWT_SECRET, { expiresIn: '30d' });
+    res.redirect(`/?token=${token}`);
+  } catch {
+    res.redirect('/?auth_error=1');
+  }
+});
+
+// GET /auth/microsoft
+app.get('/auth/microsoft', (req, res) => {
+  const params = new URLSearchParams({
+    client_id: MS_CLIENT_ID,
+    redirect_uri: `${BASE_URL}/auth/microsoft/callback`,
+    response_type: 'code',
+    scope: 'openid email profile User.Read',
+    response_mode: 'query',
+  });
+  res.redirect(`https://login.microsoftonline.com/common/oauth2/v2.0/authorize?${params}`);
+});
+
+// GET /auth/microsoft/callback
+app.get('/auth/microsoft/callback', async (req, res) => {
+  const { code } = req.query;
+  if (!code) return res.redirect('/?auth_error=1');
+  try {
+    const tokenRes = await fetch('https://login.microsoftonline.com/common/oauth2/v2.0/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        code,
+        client_id: MS_CLIENT_ID,
+        client_secret: MS_CLIENT_SECRET,
+        redirect_uri: `${BASE_URL}/auth/microsoft/callback`,
+        grant_type: 'authorization_code',
+      }),
+    });
+    const tokenData = await tokenRes.json();
+    if (!tokenData.access_token) return res.redirect('/?auth_error=1');
+    const userRes = await fetch('https://graph.microsoft.com/v1.0/me', {
+      headers: { Authorization: `Bearer ${tokenData.access_token}` },
+    });
+    const profile = await userRes.json();
+    const email = profile.mail || profile.userPrincipalName;
+    if (!email) return res.redirect('/?auth_error=1');
+    const user = oauthFindOrCreateUser(email, profile.displayName || email.split('@')[0]);
+    await db.write();
+    const token = jwt.sign({ id: user.id, email: user.email, name: user.name }, JWT_SECRET, { expiresIn: '30d' });
+    res.redirect(`/?token=${token}`);
+  } catch {
+    res.redirect('/?auth_error=1');
+  }
+});
+
 // ── Start ─────────────────────────────────────────────────────────────────
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`PromptCraft server running at http://localhost:${PORT}`));
