@@ -2761,6 +2761,35 @@
       border-color: var(--text)
     }
 
+    /* Admin view */
+    .admin-view { max-width: 1100px; margin: 0 auto; padding: 48px 24px }
+    .admin-header { margin-bottom: 32px }
+    .admin-header h1 { font-family: 'DM Serif Display', serif; font-size: 32px; color: var(--text); margin-bottom: 6px }
+    .admin-header p { color: var(--muted); font-size: 14px }
+    .admin-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px; margin-bottom: 32px }
+    .admin-stat { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 20px; text-align: center }
+    .admin-stat-num { font-size: 28px; font-weight: 800; color: var(--text); font-family: 'Syne', sans-serif }
+    .admin-stat-label { font-size: 12px; color: var(--muted); margin-top: 4px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase }
+    .admin-search { width: 100%; padding: 12px 16px; border-radius: 12px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-family: 'Syne', sans-serif; font-size: 14px; outline: none; margin-bottom: 16px; box-sizing: border-box }
+    .admin-search:focus { border-color: var(--accent-text) }
+    .admin-table-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow: hidden }
+    .admin-table { width: 100%; border-collapse: collapse; font-size: 13px }
+    .admin-table th { padding: 12px 16px; text-align: left; font-size: 11px; font-weight: 800; letter-spacing: .8px; text-transform: uppercase; color: var(--muted); border-bottom: 1px solid var(--border); background: var(--bg2) }
+    .admin-table td { padding: 14px 16px; border-bottom: 1px solid var(--border); color: var(--text); vertical-align: middle }
+    .admin-table tr:last-child td { border-bottom: none }
+    .admin-table tr:hover td { background: var(--bg2) }
+    .admin-plan-badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 800; letter-spacing: .5px }
+    .admin-plan-badge.pro { background: var(--accent); color: #fff }
+    .admin-plan-badge.free { background: var(--bg2); color: var(--muted); border: 1px solid var(--border) }
+    .admin-badge-admin { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 10px; font-weight: 800; background: #fef3c7; color: #92400e; margin-left: 6px }
+    [data-theme="dark"] .admin-badge-admin { background: #451a03; color: #fbbf24 }
+    .admin-select { padding: 6px 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 700; cursor: pointer }
+    .admin-btn-delete { padding: 6px 12px; border-radius: 8px; border: 1px solid var(--border); background: transparent; color: var(--red, #dc2626); font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 700; cursor: pointer; transition: background .15s }
+    .admin-btn-delete:hover { background: #fee2e2 }
+    [data-theme="dark"] .admin-btn-delete:hover { background: #450a0a }
+    .admin-user-cell { display: flex; align-items: center; gap: 10px }
+    .admin-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--accent); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; flex-shrink: 0 }
+
     /* Nav avatar */
     .nav-avatar {
       width: 34px;
@@ -4111,6 +4140,7 @@
         <button class="nav-link" onclick="showView('library')">Library</button>
         <button class="nav-link" onclick="showView('leaderboard')">Leaderboard</button>
         <button class="nav-link" id="teamNavBtn" style="display:none" onclick="showView('teams')">Team</button>
+        <button class="nav-link" id="adminNavBtn" style="display:none" onclick="showView('admin')">Admin</button>
       </div>
       <div class="nav-right">
         <div class="xp-pill" onclick="showView('leaderboard')">
@@ -4980,6 +5010,35 @@
         </div>
       </div>
     </div>
+    <!-- ══ ADMIN VIEW ══ -->
+    <div class="view" id="view-admin">
+      <div class="admin-view">
+        <div class="admin-header">
+          <h1>Admin Panel</h1>
+          <p>Manage all user accounts and plan levels.</p>
+        </div>
+        <div class="admin-stats" id="adminStats"></div>
+        <input class="admin-search" id="adminSearch" type="text" placeholder="Search by name or email…" oninput="filterAdminUsers()" />
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>User</th>
+                <th>Email</th>
+                <th>Plan</th>
+                <th>Runs</th>
+                <th>XP</th>
+                <th>Lessons</th>
+                <th>Last Visit</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="adminUsersBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
   </div><!-- /page -->
   <script>
     // ── State ──────────────────────────────────────────────
@@ -5058,9 +5117,13 @@
         const planLabel = isPro ? ' <span style="font-size:10px;color:var(--accent-text);font-weight:800">PRO</span>' : '';
         area.innerHTML = `<div class="nav-avatar" title="${authUser.name}" onclick="toggleAvatarMenu(event)">${initials}<div class="nav-avatar-menu" onclick="event.stopPropagation()"><div style="padding:8px 14px 4px;font-size:12px;color:var(--muted);font-weight:700">${authUser.name}${planLabel}</div><div style="padding:2px 14px 8px;font-size:11px;color:var(--muted)">${runs}/${limit} sandbox runs</div><hr style="border:none;border-top:1px solid var(--border);margin:4px 8px"><button onclick="openSettings()">Settings</button><button onclick="handleSignout()">Sign Out</button></div></div>`;
         if (teamBtn) teamBtn.style.display = (authUser.teamRole === 'owner' || authUser.teamRole === 'admin') ? '' : 'none';
+        const adminBtn = document.getElementById('adminNavBtn');
+        if (adminBtn) adminBtn.style.display = authUser.isAdmin ? '' : 'none';
       } else {
         area.innerHTML = '<button class="btn-nav" onclick="openAuth()">Sign In</button>';
         if (teamBtn) teamBtn.style.display = 'none';
+        const adminBtn = document.getElementById('adminNavBtn');
+        if (adminBtn) adminBtn.style.display = 'none';
       }
     }
 
@@ -6398,13 +6461,15 @@ Output:</div><p>The model extracts the underlying transformation rule (informal 
         openAuth('signup');
         return;
       }
+      // Admin view requires isAdmin
+      if (name === 'admin' && (!authUser || !authUser.isAdmin)) { showView('home'); return; }
       // Teams view requires admin/owner role
       if (name === 'teams' && authUser && authUser.teamRole !== 'owner' && authUser.teamRole !== 'admin') {
         showView('home'); return;
       }
       document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
       document.getElementById('view-' + name).classList.add('active');
-      const navNames = ['home', 'learn', 'sandbox', 'library', 'leaderboard', 'teams'];
+      const navNames = ['home', 'learn', 'sandbox', 'library', 'leaderboard', 'teams', 'admin'];
       document.querySelectorAll('.nav-link').forEach(l => {
         l.classList.remove('active');
         if (l.getAttribute('onclick') && l.getAttribute('onclick').includes("'" + name + "'")) l.classList.add('active');
@@ -6417,6 +6482,7 @@ Output:</div><p>The model extracts the underlying transformation rule (informal 
       if (name === 'leaderboard') renderLeaderboard('weekly');
       if (name === 'sandbox') renderSandboxTemplates();
       if (name === 'teams') renderTeamDashboard();
+      if (name === 'admin') loadAdminUsers();
     }
 
     // ── Scroll animations ────────────────────────────────────
@@ -7874,6 +7940,80 @@ Output:</div><p>The model extracts the underlying transformation rule (informal 
     updateNav();
     renderPOTD();
     populateNavDropdown();
+    // ── Admin Panel ──────────────────────────────────────────
+    let _adminUsers = [];
+
+    async function loadAdminUsers() {
+      const token = getToken();
+      try {
+        const res = await fetch('/api/admin/users', { headers: { 'Authorization': 'Bearer ' + token } });
+        if (!res.ok) return;
+        _adminUsers = await res.json();
+        renderAdminUsers(_adminUsers);
+      } catch (e) { console.error(e); }
+    }
+
+    function renderAdminUsers(users) {
+      const total = users.length;
+      const pro = users.filter(u => u.plan === 'pro').length;
+      const free = users.filter(u => u.plan === 'free').length;
+      document.getElementById('adminStats').innerHTML = `
+        <div class="admin-stat"><div class="admin-stat-num">${total}</div><div class="admin-stat-label">Total Users</div></div>
+        <div class="admin-stat"><div class="admin-stat-num">${pro}</div><div class="admin-stat-label">Pro</div></div>
+        <div class="admin-stat"><div class="admin-stat-num">${free}</div><div class="admin-stat-label">Free</div></div>
+      `;
+      const tbody = document.getElementById('adminUsersBody');
+      if (!users.length) { tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:32px">No users found.</td></tr>'; return; }
+      tbody.innerHTML = users.map(u => {
+        const initials = u.name.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
+        const adminBadge = u.isAdmin ? '<span class="admin-badge-admin">ADMIN</span>' : '';
+        const planBadge = `<span class="admin-plan-badge ${u.plan}">${u.plan.toUpperCase()}</span>`;
+        const lastVisit = u.lastVisit ? new Date(u.lastVisit).toLocaleDateString() : '—';
+        const deleteBtn = u.isAdmin ? '' : `<button class="admin-btn-delete" onclick="adminDeleteUser('${u.id}','${u.name.replace(/'/g,"\\'")}')">Delete</button>`;
+        const planSelect = u.isAdmin ? planBadge : `
+          <select class="admin-select" onchange="adminSetPlan('${u.id}', this.value)">
+            <option value="free" ${u.plan === 'free' ? 'selected' : ''}>Free</option>
+            <option value="pro" ${u.plan === 'pro' ? 'selected' : ''}>Pro</option>
+          </select>`;
+        return `<tr>
+          <td><div class="admin-user-cell"><div class="admin-avatar">${initials}</div><span>${u.name}${adminBadge}</span></div></td>
+          <td style="color:var(--muted)">${u.email}</td>
+          <td>${planSelect}</td>
+          <td>${u.sbRunsThisMonth}</td>
+          <td>${u.xp}</td>
+          <td>${u.lessonsCompleted}</td>
+          <td style="color:var(--muted)">${lastVisit}</td>
+          <td>${deleteBtn}</td>
+        </tr>`;
+      }).join('');
+    }
+
+    function filterAdminUsers() {
+      const q = document.getElementById('adminSearch').value.toLowerCase();
+      const filtered = q ? _adminUsers.filter(u => u.name.toLowerCase().includes(q) || u.email.toLowerCase().includes(q)) : _adminUsers;
+      renderAdminUsers(filtered);
+    }
+
+    async function adminSetPlan(userId, plan) {
+      const token = getToken();
+      await fetch(`/api/admin/users/${userId}/plan`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+        body: JSON.stringify({ plan }),
+      });
+      await loadAdminUsers();
+    }
+
+    async function adminDeleteUser(userId, name) {
+      if (!confirm(`Delete "${name}"? This cannot be undone.`)) return;
+      const token = getToken();
+      await fetch(`/api/admin/users/${userId}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': 'Bearer ' + token },
+      });
+      await loadAdminUsers();
+    }
+
     // Handle OAuth redirect — save token from URL then clean up
     (function () {
       const p = new URLSearchParams(window.location.search);

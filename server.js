@@ -46,7 +46,8 @@ async function queryOne(sql, params = []) {
   return res.rows[0] || null;
 }
 
-// Create tables on startup
+// Create tables and migrate schema on startup
+await query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS is_admin BOOLEAN NOT NULL DEFAULT false;`).catch(() => {});
 await query(`
   CREATE TABLE IF NOT EXISTS users (
     id TEXT PRIMARY KEY,
@@ -136,6 +137,7 @@ function rowToUser(row) {
     completedLessons: row.completed_lessons || [],
     passedMissions: row.passed_missions || [],
     teamId: row.team_id || null, teamRole: row.team_role || null,
+    isAdmin: row.is_admin || false,
   };
 }
 
@@ -145,6 +147,7 @@ function publicUser(u) {
     sbRunsThisMonth: u.sbRunsThisMonth, xp: u.xp, streak: u.streak,
     lastVisit: u.lastVisit, completedLessons: u.completedLessons,
     passedMissions: u.passedMissions, teamId: u.teamId || null, teamRole: u.teamRole || null,
+    isAdmin: u.isAdmin || false,
   };
 }
 
@@ -232,6 +235,28 @@ function requireTeamRole(...roles) {
     }
   };
 }
+
+// ── Seed admin account ────────────────────────────────────────────────────
+async function ensureAdmin() {
+  const email = process.env.ADMIN_EMAIL;
+  const password = process.env.ADMIN_PASSWORD;
+  if (!email || !password) return;
+  const existing = await queryOne('SELECT id, is_admin FROM users WHERE email = $1', [email.toLowerCase()]);
+  if (existing) {
+    if (!existing.is_admin) await query('UPDATE users SET is_admin = true, plan = $1 WHERE id = $2', ['pro', existing.id]);
+    return;
+  }
+  const id = randomUUID();
+  const passwordHash = await bcrypt.hash(password, 10);
+  const now = new Date();
+  const monthKey = `${now.getFullYear()}-${now.getMonth() + 1}`;
+  await query(
+    `INSERT INTO users (id, name, email, password_hash, plan, sb_runs_this_month, sb_reset_month, xp, streak, last_visit, completed_lessons, passed_missions, team_id, team_role, is_admin)
+     VALUES ($1,'Admin',$2,$3,'pro',0,$4,0,1,'','[]','[]',NULL,NULL,true)`,
+    [id, email.toLowerCase(), passwordHash, monthKey]
+  );
+}
+await ensureAdmin();
 
 // ── Reset monthly runs if month changed ───────────────────────────────────
 async function checkMonthReset(user) {
@@ -334,16 +359,6 @@ app.put('/api/me/profile', requireAuth, async (req, res) => {
   }
   const updated = await getUser(req.user.id);
   res.json({ success: true, name: updated.name });
-});
-
-// PUT /api/me/plan
-app.put('/api/me/plan', requireAuth, async (req, res) => {
-  const { plan } = req.body;
-  if (plan !== 'free' && plan !== 'pro') return res.status(400).json({ error: 'Plan must be "free" or "pro"' });
-  await query('UPDATE users SET plan = $1 WHERE id = $2', [plan, req.user.id]);
-  const user = await getUser(req.user.id);
-  const limit = plan === 'pro' ? PRO_RUN_LIMIT : FREE_RUN_LIMIT;
-  res.json({ plan: user.plan, sbRunsThisMonth: user.sbRunsThisMonth, limit });
 });
 
 // POST /api/sandbox/run
@@ -792,6 +807,59 @@ app.post('/api/certificates', requireAuth, async (req, res) => {
 app.get('/api/certificates/mine', requireAuth, async (req, res) => {
   const result = await query('SELECT * FROM certificates WHERE user_id = $1', [req.user.id]);
   res.json(result.rows.map(rowToCert));
+});
+
+// ── Admin ─────────────────────────────────────────────────────────────────
+async function requireAdmin(req, res, next) {
+  const auth = req.headers.authorization;
+  if (!auth || !auth.startsWith('Bearer ')) return res.status(401).json({ error: 'Not authenticated' });
+  try {
+    const payload = jwt.verify(auth.slice(7), JWT_SECRET);
+    const user = await getUser(payload.id);
+    if (!user?.isAdmin) return res.status(403).json({ error: 'Admin access required' });
+    req.user = payload;
+    next();
+  } catch {
+    res.status(401).json({ error: 'Invalid or expired token' });
+  }
+}
+
+// GET /api/admin/users
+app.get('/api/admin/users', requireAdmin, async (req, res) => {
+  const result = await query('SELECT * FROM users ORDER BY is_admin DESC, name ASC');
+  res.json(result.rows.map(row => {
+    const u = rowToUser(row);
+    return {
+      id: u.id, name: u.name, email: u.email, plan: u.plan, isAdmin: u.isAdmin,
+      sbRunsThisMonth: u.sbRunsThisMonth, xp: u.xp, streak: u.streak,
+      lastVisit: u.lastVisit,
+      lessonsCompleted: (u.completedLessons || []).length,
+      missionsPassed: (u.passedMissions || []).length,
+      teamId: u.teamId, teamRole: u.teamRole,
+    };
+  }));
+});
+
+// PUT /api/admin/users/:id/plan
+app.put('/api/admin/users/:id/plan', requireAdmin, async (req, res) => {
+  const { plan } = req.body;
+  if (plan !== 'free' && plan !== 'pro') return res.status(400).json({ error: 'Plan must be free or pro' });
+  const result = await query('UPDATE users SET plan = $1 WHERE id = $2', [plan, req.params.id]);
+  if (result.rowCount === 0) return res.status(404).json({ error: 'User not found' });
+  res.json({ success: true, plan });
+});
+
+// DELETE /api/admin/users/:id
+app.delete('/api/admin/users/:id', requireAdmin, async (req, res) => {
+  const user = await getUser(req.params.id);
+  if (!user) return res.status(404).json({ error: 'User not found' });
+  if (user.isAdmin) return res.status(400).json({ error: 'Cannot delete admin account' });
+  await query('DELETE FROM certificates WHERE user_id = $1', [req.params.id]);
+  await query('DELETE FROM team_members WHERE user_id = $1', [req.params.id]);
+  await query('DELETE FROM team_invites WHERE created_by = $1', [req.params.id]);
+  await query('DELETE FROM team_prompts WHERE submitted_by = $1', [req.params.id]);
+  await query('DELETE FROM users WHERE id = $1', [req.params.id]);
+  res.json({ success: true });
 });
 
 // ── OAuth ─────────────────────────────────────────────────────────────────

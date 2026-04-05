@@ -24,3 +24,7 @@ services:
         sync: false
       - key: MS_CLIENT_SECRET
         sync: false
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
