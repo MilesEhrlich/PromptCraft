@@ -71,6 +71,8 @@ async function queryOne(sql, params = []) {
 
 // Create tables and migrate schema on startup
 await query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS is_admin BOOLEAN NOT NULL DEFAULT false;`).catch(() => {});
+// Fix users who got streak=1 from the old DB default but have never completed a lesson
+await query(`UPDATE users SET streak = 0 WHERE streak = 1 AND (last_visit = '' OR last_visit IS NULL) AND (completed_lessons = '[]' OR completed_lessons IS NULL);`).catch(() => {});
 await query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS password_reset_token TEXT;`).catch(() => {});
 await query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS password_reset_expires TEXT;`).catch(() => {});
 await query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS email_verified BOOLEAN NOT NULL DEFAULT false;`).catch(() => {});
@@ -95,7 +97,7 @@ await query(`
     sb_runs_this_month INT NOT NULL DEFAULT 0,
     sb_reset_month TEXT NOT NULL DEFAULT '',
     xp INT NOT NULL DEFAULT 0,
-    streak INT NOT NULL DEFAULT 1,
+    streak INT NOT NULL DEFAULT 0,
     last_visit TEXT NOT NULL DEFAULT '',
     completed_lessons JSONB NOT NULL DEFAULT '[]',
     passed_missions JSONB NOT NULL DEFAULT '[]',
@@ -411,7 +413,7 @@ app.post('/api/sandbox/run', requireAuth, async (req, res) => {
   const user = await getUser(req.user.id);
   if (!user) return res.status(404).json({ error: 'User not found' });
   await checkMonthReset(user);
-  const limit = user.plan === 'pro' ? PRO_RUN_LIMIT : FREE_RUN_LIMIT;
+  const limit = (user.plan === 'pro' || user.teamId) ? PRO_RUN_LIMIT : FREE_RUN_LIMIT;
   if (user.sbRunsThisMonth >= limit)
     return res.status(429).json({ error: 'Monthly sandbox limit reached', limit, used: user.sbRunsThisMonth });
   const { systemPrompt, userText } = req.body;
@@ -436,7 +438,7 @@ app.post('/api/sandbox/dissect', requireAuth, async (req, res) => {
   const user = await getUser(req.user.id);
   if (!user) return res.status(404).json({ error: 'User not found' });
   await checkMonthReset(user);
-  const limit = user.plan === 'pro' ? PRO_RUN_LIMIT : FREE_RUN_LIMIT;
+  const limit = (user.plan === 'pro' || user.teamId) ? PRO_RUN_LIMIT : FREE_RUN_LIMIT;
   if (user.sbRunsThisMonth >= limit)
     return res.status(429).json({ error: 'Monthly sandbox limit reached', limit, used: user.sbRunsThisMonth });
   const { userText } = req.body;
@@ -506,7 +508,7 @@ app.post('/api/library', requireAuth, async (req, res) => {
     if (teamRow?.settings?.blockCommunityPublish)
       return res.status(403).json({ error: 'Community publishing disabled by your team admin' });
   }
-  if (user.plan !== 'pro') return res.status(403).json({ error: 'Pro plan required to publish prompts' });
+  if (user.plan !== 'pro' && !user.teamId) return res.status(403).json({ error: 'Pro plan required to publish prompts' });
   const { prompt, title, category, score } = req.body;
   if (!prompt || !title || !category) return res.status(400).json({ error: 'prompt, title, and category are required' });
   if (!score || score < 90) return res.status(400).json({ error: 'Only prompts scoring 90 or above can be published' });
@@ -1006,6 +1008,36 @@ app.put('/api/admin/teams/:id/max-members', requireAdmin, async (req, res) => {
   const settings = { ...(teamRow.settings || {}), maxMembers: max };
   await query('UPDATE teams SET settings = $1 WHERE id = $2', [JSON.stringify(settings), req.params.id]);
   res.json({ success: true, maxMembers: max });
+});
+
+// PUT /api/admin/teams/:id/owner
+app.put('/api/admin/teams/:id/owner', requireAdmin, async (req, res) => {
+  const { userId } = req.body;
+  if (!userId) return res.status(400).json({ error: 'userId required' });
+  const teamRow = await queryOne('SELECT * FROM teams WHERE id = $1', [req.params.id]);
+  if (!teamRow) return res.status(404).json({ error: 'Team not found' });
+  const newOwner = await getUser(userId);
+  if (!newOwner) return res.status(404).json({ error: 'User not found' });
+  const oldOwnerId = teamRow.owner_id;
+  if (oldOwnerId === userId) return res.status(400).json({ error: 'User is already the owner' });
+  if (newOwner.teamId && newOwner.teamId !== req.params.id)
+    return res.status(400).json({ error: `${newOwner.name} is already on a different team` });
+  // Demote old owner to member
+  await query('UPDATE team_members SET role = $1 WHERE user_id = $2 AND team_id = $3', ['member', oldOwnerId, req.params.id]);
+  await query('UPDATE users SET team_role = $1 WHERE id = $2', ['member', oldOwnerId]);
+  // If new owner not yet on this team, add them
+  const existingMember = await queryOne('SELECT id FROM team_members WHERE user_id = $1 AND team_id = $2', [userId, req.params.id]);
+  if (!existingMember) {
+    const memberId = 'tm_' + randomUUID();
+    await query('INSERT INTO team_members (id, team_id, user_id, role, joined_at) VALUES ($1,$2,$3,$4,$5)',
+      [memberId, req.params.id, userId, 'owner', new Date().toISOString()]);
+    await query('UPDATE users SET team_id = $1, team_role = $2 WHERE id = $3', [req.params.id, 'owner', userId]);
+  } else {
+    await query('UPDATE team_members SET role = $1 WHERE user_id = $2 AND team_id = $3', ['owner', userId, req.params.id]);
+    await query('UPDATE users SET team_role = $1 WHERE id = $2', ['owner', userId]);
+  }
+  await query('UPDATE teams SET owner_id = $1 WHERE id = $2', [userId, req.params.id]);
+  res.json({ success: true, newOwnerId: userId, newOwnerName: newOwner.name });
 });
 
 // GET /api/leaderboard?tab=weekly|alltime

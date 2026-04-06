@@ -3370,7 +3370,13 @@
       padding: 12px 16px;
       border-bottom: 1px solid var(--border);
       background: var(--bg2);
-      flex-wrap: wrap
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      scrollbar-width: none
+    }
+
+    .settings-nav::-webkit-scrollbar {
+      display: none
     }
 
     .settings-nav-btn {
@@ -4137,13 +4143,6 @@
         padding: 16px
       }
 
-      .members-row {
-        grid-template-columns: minmax(80px, 1fr) 80px minmax(140px, auto)
-      }
-
-      .members-row>*:nth-child(n+4) {
-        display: none
-      }
     }
   </style>
 </head>
@@ -4169,7 +4168,7 @@
         <button class="nav-link" id="adminNavBtn" style="display:none" onclick="showView('admin')">Admin</button>
       </div>
       <div class="nav-right">
-        <div class="xp-pill" onclick="showView('leaderboard')">
+        <div class="xp-pill" id="xpPill" onclick="showView('leaderboard')" style="display:none">
           <span class="streak" id="navStreak">⏱0</span>
           <span id="navXP">0 XP</span>
         </div>
@@ -4403,7 +4402,7 @@
 
       <div class="stats-bar fade-up">
         <div class="stat"><span class="stat-num">120+</span><span class="stat-label">Lessons</span></div>
-        <div class="stat"><span class="stat-num">13</span><span class="stat-label">Learning Paths</span></div>
+        <div class="stat"><span class="stat-num">13</span><span class="stat-label">Learning Tracks</span></div>
         <div class="stat"><span class="stat-num">Live</span><span class="stat-label">Personalized Feedback</span></div>
         <div class="stat"><span class="stat-num">94%</span><span class="stat-label">Report Better AI Results</span>
         </div>
@@ -4609,7 +4608,7 @@
             <div class="plan-desc">Access the Core Skills track and try out the sandbox with 10 runs a month.</div>
             <div class="plan-divider"></div>
             <ul class="plan-features">
-              <li>Foundations tier</li>
+              <li>Core Skills track</li>
               <li>Core Techniques tier</li>
               <li>10 AI-powered sandbox runs/month</li>
               <li>Community Library</li>
@@ -4622,7 +4621,7 @@
             <div class="plan-desc">Unlock all 13 tracks, more sandbox runs, and AI grading on your submissions.</div>
             <div class="plan-divider"></div>
             <ul class="plan-features">
-              <li>All five tiers unlocked</li>
+              <li>All 13 learning tracks unlocked</li>
               <li>200 AI-powered sandbox <runs>
                   <month></month>
               </li>
@@ -4825,7 +4824,7 @@
         <button class="settings-close"
           onclick="document.getElementById('acceptInviteModal').classList.remove('open')">✕</button>
         <div id="acceptInviteContent">
-          <div style="font-size:32px;margin-bottom:16px">🤝</div>
+          <div style="font-size:32px;margin-bottom:16px"></div>
           <h3 style="font-size:22px;margin-bottom:8px" id="acceptInviteTeamName">Join Team</h3>
           <p style="color:var(--muted);font-size:14px;margin-bottom:24px" id="acceptInviteSubtitle">You've been invited
             to join a team on PromptCraft.</p>
@@ -4837,29 +4836,16 @@
 
     <!-- Invite Modal -->
     <div class="auth-overlay" id="inviteModal">
-      <div class="onboard-modal" style="max-width:520px">
+      <div class="onboard-modal" style="max-width:480px">
         <button class="settings-close"
           onclick="document.getElementById('inviteModal').classList.remove('open')">✕</button>
-        <h3 style="font-size:20px;margin-bottom:20px">Invite Members</h3>
-        <div
-          style="display:flex;gap:0;margin-bottom:20px;border:1px solid var(--border);border-radius:12px;overflow:hidden">
-          <button class="lb-tab active" style="flex:1;border-radius:0;border:none" id="invTabSingle"
-            onclick="switchInvTab('single')">Single Link</button>
-          <button class="lb-tab" style="flex:1;border-radius:0;border:none" id="invTabBulk"
-            onclick="switchInvTab('bulk')">Bulk</button>
+        <h3 style="font-size:20px;margin-bottom:8px">Invite Members</h3>
+        <p style="color:var(--muted);font-size:13px;margin-bottom:20px">Share this link with anyone you want to join your team.</p>
+        <div id="invLinkBox" style="display:flex;align-items:center;gap:8px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:10px 14px;min-height:44px">
+          <span id="invLinkText" style="flex:1;font-size:13px;color:var(--muted);word-break:break-all">Generating…</span>
+          <button class="btn-ghost" id="invCopyBtn" style="font-size:12px;padding:5px 12px;flex-shrink:0" onclick="copyCurrentInviteLink(this)">Copy</button>
         </div>
-        <div id="invSinglePanel">
-          <input class="pub-input" id="invLabelInput" placeholder="Label (optional, e.g. name or email)"
-            style="width:100%;margin-bottom:12px">
-          <button class="btn-primary" style="width:100%" onclick="createInviteClick()">Create Link →</button>
-          <div id="invSingleResult" style="margin-top:14px"></div>
-        </div>
-        <div id="invBulkPanel" style="display:none">
-          <textarea class="pub-input" id="invBulkInput" placeholder="Enter labels, one per line (up to 50)" rows="5"
-            style="width:100%;font-family:monospace;font-size:12px;resize:vertical;margin-bottom:12px"></textarea>
-          <button class="btn-primary" style="width:100%" onclick="createBulkInvitesClick()">Create All Links →</button>
-          <div id="invBulkResult" style="margin-top:14px;max-height:240px;overflow-y:auto"></div>
-        </div>
+        <button class="btn-ghost" style="margin-top:12px;font-size:12px;width:100%" onclick="createInviteClick()">Generate New Link</button>
         <div class="pub-error" id="inviteError" style="margin-top:10px"></div>
       </div>
     </div>
@@ -4981,7 +4967,7 @@
         <p class="contact-sub">PromptCraft is an AI prompting school built to help anyone — from curious beginners to working professionals — learn how to communicate effectively with AI.</p>
         <div class="contact-form-card" style="padding:36px;line-height:1.8;color:var(--text2);font-size:15px">
           <h2 style="font-family:'DM Serif Display',serif;font-size:22px;color:var(--text);margin:0 0 12px">What we do</h2>
-          <p style="margin:0 0 24px">We teach prompt engineering through structured lessons, hands-on sandbox practice, and AI-graded missions. Our curriculum is organized into 13 learning paths covering everything from core foundations to advanced domain-specific techniques in writing, code, research, marketing, and more.</p>
+          <p style="margin:0 0 24px">We teach prompt engineering through structured lessons, hands-on sandbox practice, and AI-graded missions. Our curriculum is organized into 13 learning tracks covering everything from core foundations to advanced domain-specific techniques in writing, code, research, marketing, and more.</p>
           <h2 style="font-family:'DM Serif Display',serif;font-size:22px;color:var(--text);margin:0 0 12px">Why it matters</h2>
           <p style="margin:0 0 24px">The difference between a mediocre AI interaction and a genuinely useful one comes down to how you ask. Prompt engineering is quickly becoming a foundational skill — not just for developers, but for anyone who uses AI tools in their work or daily life. PromptCraft makes that skill learnable, measurable, and fun.</p>
           <h2 style="font-family:'DM Serif Display',serif;font-size:22px;color:var(--text);margin:0 0 12px">Built with Claude</h2>
@@ -5043,6 +5029,26 @@
     </div>
 
     <!-- Pro Inquiry Modal -->
+    <!-- Assign Owner Modal -->
+    <div class="auth-overlay" id="assignOwnerModal">
+      <div class="onboard-modal" style="max-width:480px">
+        <button class="settings-close" onclick="document.getElementById('assignOwnerModal').classList.remove('open')">✕</button>
+        <h3 style="font-size:20px;margin-bottom:4px">Assign Team Owner</h3>
+        <p style="color:var(--muted);font-size:13px;margin-bottom:16px">Assign a new owner to <strong id="assignOwnerTeamName"></strong>. The current owner will become a regular member.</p>
+        <div style="position:relative;margin-bottom:8px">
+          <label style="font-size:11px;font-weight:700;color:var(--muted);display:block;margin-bottom:4px">Search user (name or email)</label>
+          <input id="assignOwnerSearch" type="text" placeholder="Search user…" oninput="filterAssignOwnerUsers()" style="width:100%;padding:9px 12px;border-radius:6px;border:1px solid var(--border);background:var(--bg2);color:var(--text);font-size:13px;box-sizing:border-box">
+          <div id="assignOwnerResults" style="display:none;position:absolute;background:var(--bg);border:1px solid var(--border);border-radius:8px;z-index:50;max-height:160px;overflow-y:auto;width:100%;box-shadow:var(--shadow-lg)"></div>
+        </div>
+        <div id="assignOwnerSelectedUser" style="font-size:12px;color:var(--accent-text);margin-bottom:12px;min-height:16px"></div>
+        <div class="auth-error" id="assignOwnerError" style="margin-bottom:10px"></div>
+        <div style="display:flex;gap:10px">
+          <button class="btn-ghost" style="flex:1" onclick="document.getElementById('assignOwnerModal').classList.remove('open')">Cancel</button>
+          <button class="btn-primary" style="flex:1" onclick="adminAssignOwner()">Assign Owner</button>
+        </div>
+      </div>
+    </div>
+
     <div class="auth-overlay" id="proInquiryModal">
       <div class="inquiry-modal">
         <button class="settings-close" onclick="document.getElementById('proInquiryModal').classList.remove('open')" style="float:right;margin:-8px -8px 0 0">✕</button>
@@ -5131,7 +5137,7 @@
               </div>
               <div>
                 <label style="font-size:11px;font-weight:700;color:var(--muted);display:block;margin-bottom:4px">Team Name</label>
-                <input id="createTeamName" type="text" placeholder="e.g. Acme Corp" style="width:100%;padding:9px 12px;border-radius:6px;border:1px solid var(--border);background:var(--bg2);color:var(--text);font-size:13px;box-sizing:border-box">
+                <input id="adminCreateTeamName" type="text" placeholder="e.g. Acme Corp" style="width:100%;padding:9px 12px;border-radius:6px;border:1px solid var(--border);background:var(--bg2);color:var(--text);font-size:13px;box-sizing:border-box">
               </div>
               <div>
                 <label style="font-size:11px;font-weight:700;color:var(--muted);display:block;margin-bottom:4px">Max Members</label>
@@ -5220,6 +5226,7 @@
       const links = document.querySelectorAll('.nav-center .nav-link');
       dd.innerHTML = '';
       links.forEach(l => {
+        if (l.style.display === 'none') return;
         const btn = document.createElement('button');
         btn.className = 'nav-link' + (l.classList.contains('active') ? ' active' : '');
         btn.setAttribute('onclick', l.getAttribute('onclick'));
@@ -5238,9 +5245,9 @@
       if (authUser) {
         const initials = authUser.name.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
         const runs = authUser.sbRunsThisMonth || 0;
-        const isPro = authUser.plan === 'pro';
+        const isPro = authUser.plan === 'pro' || !!authUser.teamId;
         const limit = isPro ? 200 : FREE_LIMIT;
-        const planLabel = isPro ? ' <span style="font-size:10px;color:var(--accent-text);font-weight:800">PRO</span>' : '';
+        const planLabel = authUser.teamId ? ' <span style="font-size:10px;color:var(--accent-text);font-weight:800">TEAM</span>' : authUser.plan === 'pro' ? ' <span style="font-size:10px;color:var(--accent-text);font-weight:800">PRO</span>' : '';
         area.innerHTML = `<div class="nav-avatar" title="${authUser.name}" onclick="toggleAvatarMenu(event)">${initials}<div class="nav-avatar-menu" onclick="event.stopPropagation()"><div style="padding:8px 14px 8px;font-size:12px;color:var(--muted);font-weight:700">${authUser.name}${planLabel}</div><hr style="border:none;border-top:1px solid var(--border);margin:4px 8px"><button onclick="openSettings()">Settings</button><button onclick="handleSignout()">Sign Out</button></div></div>`;
         if (teamBtn) teamBtn.style.display = (authUser.teamRole === 'owner' || authUser.teamRole === 'admin') ? '' : 'none';
         const adminBtn = document.getElementById('adminNavBtn');
@@ -5252,18 +5259,23 @@
             banner = document.createElement('div');
             banner.id = 'verifyEmailBanner';
             banner.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);z-index:250;background:var(--bg);border:1px solid var(--border2);border-radius:10px;box-shadow:var(--shadow-lg,0 8px 32px rgba(0,0,0,.3));padding:12px 20px;display:flex;align-items:center;gap:14px;font-size:13px;color:var(--text2);white-space:nowrap;max-width:calc(100vw - 32px)';
-            banner.innerHTML = `<span style="font-size:15px">✉️</span><span>Verify your email to keep your account secure.</span><button onclick="resendVerification(this)" style="background:var(--accent-bg);color:var(--accent-text);border:none;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;padding:5px 12px;flex-shrink:0">Resend</button><button onclick="document.getElementById('verifyEmailBanner').remove()" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:18px;line-height:1;padding:0 0 0 4px;flex-shrink:0">✕</button>`;
+            banner.innerHTML = `<span style="font-size:15px;flex-shrink:0"></span><span style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Verify your email to keep your account secure.</span><button onclick="resendVerification(this)" style="background:var(--accent-bg);color:var(--accent-text);border:none;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;padding:5px 12px;flex-shrink:0">Resend</button><button onclick="document.getElementById('verifyEmailBanner').remove()" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:18px;line-height:1;padding:0 0 0 4px;flex-shrink:0">✕</button>`;
             document.body.appendChild(banner);
           }
         } else if (banner) { banner.remove(); }
+        const xpPill = document.getElementById('xpPill');
+        if (xpPill) xpPill.style.display = '';
       } else {
         area.innerHTML = '<button class="btn-nav" onclick="openAuth()">Sign In</button>';
         if (teamBtn) teamBtn.style.display = 'none';
         const adminBtn = document.getElementById('adminNavBtn');
         if (adminBtn) adminBtn.style.display = 'none';
+        const xpPill = document.getElementById('xpPill');
+        if (xpPill) xpPill.style.display = 'none';
         const banner = document.getElementById('verifyEmailBanner');
         if (banner) banner.remove();
       }
+      populateNavDropdown();
     }
 
     async function resendVerification(btn) {
@@ -5420,7 +5432,7 @@
       if (authUser && data.sbRunsThisMonth !== undefined) {
         authUser.sbRunsThisMonth = data.sbRunsThisMonth;
         updateNavAuth();
-        const limit = data.limit || (authUser.plan === 'pro' ? 200 : FREE_LIMIT);
+        const limit = data.limit || ((authUser.plan === 'pro' || authUser.teamId) ? 200 : FREE_LIMIT);
         const el = document.getElementById('sbRunCount');
         if (el) el.textContent = `Runs: ${data.sbRunsThisMonth}/${limit}`;
       }
@@ -6601,10 +6613,17 @@ Output:</div><p>The model extracts the underlying transformation rule (informal 
       t.classList.add('show');
       setTimeout(() => t.classList.remove('show'), 2500);
     }
+    function getEffectiveStreak() {
+      if (!state.lastVisit) return 0;
+      const today = new Date().toISOString().slice(0, 10);
+      const yesterday = new Date(Date.now() - 864e5).toISOString().slice(0, 10);
+      return (state.lastVisit === today || state.lastVisit === yesterday) ? state.streak : 0;
+    }
+
     function updateNav() {
       const s = window.teamData?.settings || {};
       document.getElementById('navXP').textContent = s.showXP === false ? '***' : state.xp + ' XP';
-      document.getElementById('navStreak').textContent = s.showStreaks === false ? '***' : '⏱' + state.streak;
+      document.getElementById('navStreak').textContent = s.showStreaks === false ? '***' : '⏱' + getEffectiveStreak();
     }
 
     // ── Navigation ──────────────────────────────────────────
@@ -6670,14 +6689,13 @@ Output:</div><p>The model extracts the underlying transformation rule (informal 
         const done = tiers.reduce((s, t) => s + t.lessons.filter(l => state.completedLessons.includes(l.id)).length, 0);
         const pct = total > 0 ? Math.round((done / total) * 100) : 0;
         const teamLocked = isCategoryLockedByTeam(c.id);
-        const proLocked = c.id !== 'core' && (!authUser || (authUser.plan !== 'pro' && !authUser.isAdmin));
+        const proLocked = c.id !== 'core' && (!authUser || (authUser.plan !== 'pro' && !authUser.isAdmin && !authUser.teamId));
         const locked = teamLocked || proLocked;
-        const clickAction = locked ? (proLocked ? `openProInquiry()` : '') : `selectCategory('${c.id}')`;
-        return `<div class="cat-card${c.id === cat && !proLocked ? ' active' : ''}${teamLocked ? ' team-locked' : ''}${proLocked ? ' pro-locked' : ''}" ${locked ? (proLocked ? `onclick="${clickAction}"` : '') : `onclick="${clickAction}"`} style="${proLocked ? 'cursor:pointer;opacity:.75;' : ''}">
-      <span class="cat-name">${c.name}${teamLocked ? ' 🔒' : ''}${proLocked ? ' <span style="font-size:10px;font-weight:800;color:var(--accent-text);border:1px solid var(--accent-text);border-radius:3px;padding:1px 4px;vertical-align:middle">PRO</span>' : ''}</span>
+        return `<div class="cat-card${c.id === cat && !locked ? ' active' : ''}${locked ? ' team-locked' : ''}" ${locked ? '' : `onclick="selectCategory('${c.id}')"`}>
+      <span class="cat-name">${c.name}${locked ? ' 🔒' : ''}</span>
       <div class="cat-progress-wrap">
-        <div class="cat-progress-bar"><div class="cat-progress-fill" style="width:${proLocked ? 0 : pct}%"></div></div>
-        <span class="cat-progress">${proLocked ? 'Pro only' : done + '/' + total}</span>
+        <div class="cat-progress-bar"><div class="cat-progress-fill" style="width:${locked ? 0 : pct}%"></div></div>
+        <span class="cat-progress">${locked ? 'Locked' : done + '/' + total}</span>
       </div>
     </div>`;
       }).join('');
@@ -6879,7 +6897,7 @@ Output:</div><p>The model extracts the underlying transformation rule (informal 
     function completeLesson() {
       if (!currentLesson || state.completedLessons.includes(currentLesson.id)) return;
       const plan = authUser ? authUser.plan : null;
-      if (currentLesson.applyChallenge && plan === 'pro') {
+      if (currentLesson.applyChallenge && (plan === 'pro' || authUser?.teamId)) {
         showApplyChallenge(); return;
       }
       finishLesson();
@@ -7035,7 +7053,7 @@ Output:</div><p>The model extracts the underlying transformation rule (informal 
         // Community library (pro, score ≥ 90)
         const teamData_local = window.teamData;
         const blockCommunity = teamData_local?.settings?.blockCommunityPublish;
-        if (score >= 90 && authUser && authUser.plan === 'pro' && !blockCommunity) {
+        if (score >= 90 && authUser && (authUser.plan === 'pro' || authUser.teamId) && !blockCommunity) {
           pubHtml += `
         <button class="btn-publish" onclick="togglePublishForm()">Publish to Community Library</button>
         <div class="publish-form" id="publishForm">
@@ -7165,7 +7183,7 @@ Output:</div><p>The model extracts the underlying transformation rule (informal 
 
     // ── Sandbox tabs ──────────────────────────────────────────
     function switchSandboxTab(btn, tab) {
-      if (tab === 'dissect' && authUser && authUser.plan !== 'pro' && !authUser.isAdmin) {
+      if (tab === 'dissect' && authUser && authUser.plan !== 'pro' && !authUser.isAdmin && !authUser.teamId) {
         openProInquiry();
         return;
       }
@@ -7198,7 +7216,7 @@ Output:</div><p>The model extracts the underlying transformation rule (informal 
         if (authUser && data.sbRunsThisMonth !== undefined) {
           authUser.sbRunsThisMonth = data.sbRunsThisMonth;
           updateNavAuth();
-          const limit = data.limit || (authUser.plan === 'pro' ? 200 : FREE_LIMIT);
+          const limit = data.limit || ((authUser.plan === 'pro' || authUser.teamId) ? 200 : FREE_LIMIT);
           const el = document.getElementById('sbRunCount');
           if (el) el.textContent = `Runs: ${data.sbRunsThisMonth}/${limit}`;
         }
@@ -7489,12 +7507,12 @@ Output:</div><p>The model extracts the underlying transformation rule (informal 
       if (authUser) {
         document.getElementById('settingsName').value = authUser.name || '';
         document.getElementById('settingsEmail').textContent = authUser.email || '';
-        const isPro = authUser.plan === 'pro';
+        const isPro = authUser.plan === 'pro' || !!authUser.teamId;
         const limit = isPro ? 200 : FREE_LIMIT;
         const runs = authUser.sbRunsThisMonth || 0;
         const pct = Math.min(100, Math.round((runs / limit) * 100));
-        document.getElementById('planDesc').textContent = isPro ? 'Pro — 200 AI sandbox runs/month' : 'Free — 10 AI sandbox runs/month';
-        document.getElementById('planBadge').textContent = isPro ? 'PRO' : 'FREE';
+        document.getElementById('planDesc').textContent = authUser.teamId ? 'Team — 200 AI sandbox runs/month' : isPro ? 'Pro — 200 AI sandbox runs/month' : 'Free — 10 AI sandbox runs/month';
+        document.getElementById('planBadge').textContent = authUser.teamId ? 'TEAM' : isPro ? 'PRO' : 'FREE';
         document.getElementById('planBadge').style.background = isPro ? 'var(--accent-bg)' : 'var(--bg2)';
         document.getElementById('planBadge').style.color = isPro ? 'var(--accent-text)' : 'var(--text2)';
         document.getElementById('usageSub').textContent = `${runs} of ${limit} used this month`;
@@ -7568,10 +7586,10 @@ Output:</div><p>The model extracts the underlying transformation rule (informal 
 
     function confirmResetProgress() {
       if (!confirm('Reset all learning progress? This will clear your XP, completed lessons, and passed missions. This cannot be undone.')) return;
-      state.xp = 0; state.streak = 1; state.completedLessons = []; state.passedMissions = [];
+      state.xp = 0; state.streak = 0; state.lastVisit = ''; state.completedLessons = []; state.passedMissions = [];
       save();
       if (authUser) {
-        fetch('/api/me/progress', { method: 'PUT', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getToken() }, body: JSON.stringify({ xp: 0, streak: 1, completedLessons: [], passedMissions: [] }) });
+        fetch('/api/me/progress', { method: 'PUT', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getToken() }, body: JSON.stringify({ xp: 0, streak: 0, lastVisit: '', completedLessons: [], passedMissions: [] }) });
       }
       renderLearn();
       closeSettings();
@@ -7661,7 +7679,7 @@ Output:</div><p>The model extracts the underlying transformation rule (informal 
         return;
       }
       if (authUser.teamId) { showView('teams'); return; }
-      document.getElementById('createTeamName').value = '';
+      document.getElementById('adminCreateTeamName').value = '';
       document.getElementById('createTeamError').textContent = '';
       document.getElementById('createTeamModal').classList.add('open');
     }
@@ -7845,8 +7863,7 @@ Output:</div><p>The model extracts the underlying transformation rule (informal 
     ${cats.map(c => `<div class="assign-card">
       <div class="assign-card-name">${c.name}</div>
       <select class="assign-select" id="assign-${c.id}">
-        <option value="optional"${assigned[c.id] === 'optional' || !assigned[c.id] ? ' selected' : ''}>Optional</option>
-        <option value="required"${assigned[c.id] === 'required' ? ' selected' : ''}>Required</option>
+        <option value="optional"${assigned[c.id] !== 'locked' ? ' selected' : ''}>Unlocked</option>
         <option value="locked"${assigned[c.id] === 'locked' ? ' selected' : ''}>Locked</option>
       </select>
     </div>`).join('')}
@@ -7965,58 +7982,35 @@ Output:</div><p>The model extracts the underlying transformation rule (informal 
     }
 
     // ── Invite flow ────────────────────────────────────────────
-    function openInviteModal() {
-      document.getElementById('invLabelInput').value = '';
-      document.getElementById('invSingleResult').innerHTML = '';
-      document.getElementById('invBulkInput').value = '';
-      document.getElementById('invBulkResult').innerHTML = '';
-      document.getElementById('inviteError').textContent = '';
-      document.getElementById('inviteModal').classList.add('open');
-    }
+    let _currentInviteLink = '';
 
-    function switchInvTab(tab) {
-      document.getElementById('invSinglePanel').style.display = tab === 'single' ? '' : 'none';
-      document.getElementById('invBulkPanel').style.display = tab === 'bulk' ? '' : 'none';
-      document.getElementById('invTabSingle').classList.toggle('active', tab === 'single');
-      document.getElementById('invTabBulk').classList.toggle('active', tab === 'bulk');
+    async function openInviteModal() {
+      document.getElementById('inviteError').textContent = '';
+      document.getElementById('invLinkText').textContent = 'Generating…';
+      _currentInviteLink = '';
+      document.getElementById('inviteModal').classList.add('open');
+      await createInviteClick();
     }
 
     async function createInviteClick() {
-      const label = document.getElementById('invLabelInput').value.trim();
       const errEl = document.getElementById('inviteError');
       errEl.textContent = '';
+      document.getElementById('invLinkText').textContent = 'Generating…';
       try {
-        const res = await fetch('/api/teams/' + authUser.teamId + '/invites', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getToken() }, body: JSON.stringify({ label }) });
+        const res = await fetch('/api/teams/' + authUser.teamId + '/invites', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getToken() }, body: JSON.stringify({ label: '' }) });
         const data = await res.json();
-        if (!res.ok) { errEl.textContent = data.error || 'Could not create invite.'; return; }
-        const fullLink = window.location.origin + data.link;
-        document.getElementById('invSingleResult').innerHTML = `
-      <div class="invite-link-row" style="border:none;background:var(--bg2);padding:10px 12px;border-radius:10px">
-        <span class="invite-link-text">${fullLink}</span>
-        <button class="btn-ghost" style="font-size:12px;padding:5px 10px;flex-shrink:0" onclick="copyInviteLink('${fullLink}',this)">Copy</button>
-      </div>`;
-      } catch (e) { errEl.textContent = 'Could not connect to server.'; }
+        if (!res.ok) { errEl.textContent = data.error || 'Could not create invite.'; document.getElementById('invLinkText').textContent = '—'; return; }
+        _currentInviteLink = window.location.origin + data.link;
+        document.getElementById('invLinkText').textContent = _currentInviteLink;
+      } catch (e) { errEl.textContent = 'Could not connect to server.'; document.getElementById('invLinkText').textContent = '—'; }
     }
 
-    async function createBulkInvitesClick() {
-      const raw = document.getElementById('invBulkInput').value;
-      const labels = raw.split(/[\n,]+/).map(s => s.trim()).filter(Boolean);
-      const errEl = document.getElementById('inviteError');
-      errEl.textContent = '';
-      if (labels.length === 0) { errEl.textContent = 'Enter at least one label.'; return; }
-      try {
-        const res = await fetch('/api/teams/' + authUser.teamId + '/invites/bulk', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getToken() }, body: JSON.stringify({ labels }) });
-        const data = await res.json();
-        if (!res.ok) { errEl.textContent = data.error || 'Could not create invites.'; return; }
-        const resultEl = document.getElementById('invBulkResult');
-        resultEl.innerHTML = data.invites.map(inv => {
-          const fullLink = window.location.origin + inv.link;
-          return `<div class="invite-link-row">
-        <span class="invite-link-text">${inv.label || '(no label)'}: ${fullLink}</span>
-        <button class="btn-ghost" style="font-size:11px;padding:4px 8px;flex-shrink:0" onclick="copyInviteLink('${fullLink}',this)">Copy</button>
-      </div>`;
-        }).join('');
-      } catch (e) { errEl.textContent = 'Could not connect to server.'; }
+    function copyCurrentInviteLink(btn) {
+      if (!_currentInviteLink) return;
+      navigator.clipboard.writeText(_currentInviteLink).then(() => {
+        btn.textContent = 'Copied!';
+        setTimeout(() => { btn.textContent = 'Copy'; }, 1500);
+      });
     }
 
     function copyInviteLink(link, btn) {
@@ -8121,7 +8115,7 @@ Output:</div><p>The model extracts the underlying transformation rule (informal 
 
     // ── Auth modal close on overlay click ─────────────────────
     document.getElementById('authModal').addEventListener('click', function (e) { if (e.target === this) closeAuth(); });
-    ['inviteModal', 'acceptInviteModal', 'removeMemberModal', 'teamPromptSubmitModal', 'createTeamModal'].forEach(id => {
+    ['inviteModal', 'acceptInviteModal', 'removeMemberModal', 'teamPromptSubmitModal', 'createTeamModal', 'assignOwnerModal'].forEach(id => {
       const el = document.getElementById(id);
       if (el) el.addEventListener('click', function (e) { if (e.target === this) this.classList.remove('open'); });
     });
@@ -8347,7 +8341,10 @@ Output:</div><p>The model extracts the underlying transformation rule (informal 
           <td>${maxDisplay}</td>
           <td>${maxInput}</td>
           <td style="color:var(--muted);font-size:12px">${created}</td>
-          <td><button class="admin-btn-delete" onclick="adminDeleteTeam('${t.id}','${t.name.replace(/'/g,"\\'")}')">Delete</button></td>
+          <td style="display:flex;gap:6px;flex-wrap:wrap">
+            <button class="btn-ghost" onclick="showAssignOwnerModal('${t.id}','${t.name.replace(/'/g,"\\'")}','${t.ownerId}')" style="font-size:12px;padding:6px 12px">Change Owner</button>
+            <button class="admin-btn-delete" onclick="adminDeleteTeam('${t.id}','${t.name.replace(/'/g,"\\'")}')">Delete</button>
+          </td>
         </tr>`;
       }).join('');
     }
@@ -8355,7 +8352,7 @@ Output:</div><p>The model extracts the underlying transformation rule (informal 
     function showCreateTeamForm() {
       _createTeamSelectedUserId = null;
       document.getElementById('createTeamUserSearch').value = '';
-      document.getElementById('createTeamName').value = '';
+      document.getElementById('adminCreateTeamName').value = '';
       document.getElementById('createTeamMax').value = '';
       document.getElementById('createTeamSelectedUser').textContent = '';
       document.getElementById('createTeamErr').textContent = '';
@@ -8387,7 +8384,7 @@ Output:</div><p>The model extracts the underlying transformation rule (informal 
       const err = document.getElementById('createTeamErr');
       err.textContent = '';
       if (!_createTeamSelectedUserId) { err.textContent = 'Select a user first.'; return; }
-      const teamName = document.getElementById('createTeamName').value.trim();
+      const teamName = document.getElementById('adminCreateTeamName').value.trim();
       if (!teamName) { err.textContent = 'Enter a team name.'; return; }
       const maxMembers = document.getElementById('createTeamMax').value || null;
       const btn = event.target; btn.disabled = true; btn.textContent = 'Creating…';
@@ -8413,6 +8410,59 @@ Output:</div><p>The model extracts the underlying transformation rule (informal 
         body: JSON.stringify({ maxMembers }),
       });
       await loadAdminTeams();
+    }
+
+    let _assignOwnerTeamId = null;
+    let _assignOwnerUserId = null;
+
+    function showAssignOwnerModal(teamId, teamName, currentOwnerId) {
+      _assignOwnerTeamId = teamId;
+      _assignOwnerUserId = null;
+      document.getElementById('assignOwnerTeamName').textContent = teamName;
+      document.getElementById('assignOwnerSearch').value = '';
+      document.getElementById('assignOwnerResults').style.display = 'none';
+      document.getElementById('assignOwnerSelectedUser').textContent = '';
+      document.getElementById('assignOwnerError').textContent = '';
+      document.getElementById('assignOwnerModal').classList.add('open');
+    }
+
+    function filterAssignOwnerUsers() {
+      const q = document.getElementById('assignOwnerSearch').value.toLowerCase();
+      const resultsEl = document.getElementById('assignOwnerResults');
+      if (!q) { resultsEl.style.display = 'none'; return; }
+      const matches = _adminUsers.filter(u => !u.isAdmin && (u.name.toLowerCase().includes(q) || u.email.toLowerCase().includes(q))).slice(0, 6);
+      if (!matches.length) { resultsEl.style.display = 'none'; return; }
+      resultsEl.style.display = '';
+      resultsEl.innerHTML = matches.map(u =>
+        `<div onclick="selectAssignOwnerUser('${u.id}','${u.name.replace(/'/g,"\\'")}','${u.email}')" style="padding:9px 14px;cursor:pointer;font-size:13px;border-bottom:1px solid var(--border)" onmouseover="this.style.background='var(--bg2)'" onmouseout="this.style.background=''">
+          <span style="font-weight:600">${u.name}</span> <span style="color:var(--muted)">${u.email}</span>${u.teamId && u.teamId !== _assignOwnerTeamId ? ' <span style="color:#e55;font-size:11px">(other team)</span>' : ''}
+        </div>`).join('');
+    }
+
+    function selectAssignOwnerUser(id, name, email) {
+      _assignOwnerUserId = id;
+      document.getElementById('assignOwnerSearch').value = name;
+      document.getElementById('assignOwnerSelectedUser').textContent = '✓ Selected: ' + name + ' (' + email + ')';
+      document.getElementById('assignOwnerResults').style.display = 'none';
+    }
+
+    async function adminAssignOwner() {
+      const errEl = document.getElementById('assignOwnerError');
+      errEl.textContent = '';
+      if (!_assignOwnerUserId) { errEl.textContent = 'Select a user first.'; return; }
+      const btn = event.target; btn.disabled = true; btn.textContent = 'Assigning…';
+      try {
+        const res = await fetch(`/api/admin/teams/${_assignOwnerTeamId}/owner`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getToken() },
+          body: JSON.stringify({ userId: _assignOwnerUserId }),
+        });
+        const data = await res.json();
+        if (!res.ok) { errEl.textContent = data.error || 'Failed.'; btn.disabled = false; btn.textContent = 'Assign Owner'; return; }
+        document.getElementById('assignOwnerModal').classList.remove('open');
+        await loadAdminTeams();
+        await loadAdminUsers();
+      } catch (e) { errEl.textContent = 'Could not connect.'; btn.disabled = false; btn.textContent = 'Assign Owner'; }
     }
 
     async function adminDeleteTeam(teamId, name) {
