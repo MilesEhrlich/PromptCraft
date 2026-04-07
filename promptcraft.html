@@ -2787,6 +2787,15 @@
     .contact-view .contact-sub { font-size: 16px; color: var(--muted); margin-bottom: 40px; line-height: 1.6 }
     .contact-form-card { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 36px }
 
+    /* FAQ accordion */
+    .faq-item { border-bottom: 1px solid var(--border) }
+    .faq-q { width: 100%; background: none; border: none; text-align: left; padding: 18px 0; font-size: 15px; font-weight: 700; color: var(--text); cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 12px; line-height: 1.4 }
+    .faq-q:hover { color: var(--accent-text) }
+    .faq-chevron { font-size: 18px; flex-shrink: 0; transition: transform 0.2s; color: var(--muted) }
+    .faq-q.open .faq-chevron { transform: rotate(180deg) }
+    .faq-a { display: none; padding: 0 0 18px; font-size: 14px; line-height: 1.8; color: var(--text2) }
+    .faq-a.open { display: block }
+
     /* Admin view */
     .admin-view { max-width: 1100px; margin: 0 auto; padding: 48px 24px }
     .admin-header { margin-bottom: 32px }
@@ -5084,43 +5093,62 @@
       <div class="contact-view" style="max-width:720px">
         <h1>Frequently Asked Questions</h1>
         <p class="contact-sub">Everything you need to know about PromptCraft.</p>
-        <div class="contact-form-card" style="padding:36px;line-height:1.8;color:var(--text2);font-size:15px">
+        <div class="contact-form-card" style="padding:24px 36px;font-size:15px">
 
-          <h2 style="font-family:'DM Serif Display',serif;font-size:20px;color:var(--text);margin:0 0 10px">What is PromptCraft?</h2>
-          <p style="margin:0 0 28px">PromptCraft is an interactive school for prompt engineering — the skill of communicating effectively with AI. We offer structured lessons, hands-on sandbox practice, AI-graded missions, and a community prompt library to help you get dramatically better results from AI tools.</p>
+          <div class="faq-item">
+            <button class="faq-q" onclick="toggleFaq(this)">What is PromptCraft?<span class="faq-chevron">▾</span></button>
+            <div class="faq-a">PromptCraft is an interactive school for prompt engineering — the skill of communicating effectively with AI. We offer structured lessons, hands-on sandbox practice, AI-graded missions, and a community prompt library to help you get dramatically better results from AI tools.</div>
+          </div>
 
-          <h2 style="font-family:'DM Serif Display',serif;font-size:20px;color:var(--text);margin:0 0 10px">Is PromptCraft free?</h2>
-          <p style="margin:0 0 28px">Yes. The free plan gives you access to all lessons and 10 AI sandbox runs per month. You can also use the Offline Score mode in the sandbox unlimited times — it analyzes your prompt's structure without using an AI run. Pro and Team plans unlock higher run limits and additional features.</p>
+          <div class="faq-item">
+            <button class="faq-q" onclick="toggleFaq(this)">Is PromptCraft free?<span class="faq-chevron">▾</span></button>
+            <div class="faq-a">Yes. The free plan gives you access to all lessons and 10 AI sandbox runs per month. You can also use the Offline Score mode in the sandbox unlimited times — it analyzes your prompt's structure without using an AI run. Pro and Team plans unlock higher run limits and additional features.</div>
+          </div>
 
-          <h2 style="font-family:'DM Serif Display',serif;font-size:20px;color:var(--text);margin:0 0 10px">What's the difference between free and Pro?</h2>
-          <p style="margin:0 0 28px">Free accounts get 10 AI sandbox runs per month. Pro accounts get 200 runs per month, plus early access to new features. All lessons and content are available on both plans — the sandbox run limit is the main difference.</p>
+          <div class="faq-item">
+            <button class="faq-q" onclick="toggleFaq(this)">What's the difference between free and Pro?<span class="faq-chevron">▾</span></button>
+            <div class="faq-a">Free accounts get 10 AI sandbox runs per month. Pro accounts get 200 runs per month, plus early access to new features. All lessons and content are available on both plans — the sandbox run limit is the main difference.</div>
+          </div>
 
-          <h2 style="font-family:'DM Serif Display',serif;font-size:20px;color:var(--text);margin:0 0 10px">What is the sandbox?</h2>
-          <p style="margin:0 0 28px">The sandbox is a live prompt testing environment. You write a prompt, submit it, and get a quality score (0–100) along with specific coaching tips on how to improve it. There are two modes: <strong style="color:var(--text)">AI Grader</strong>, which uses Claude to evaluate your prompt and generate a real response, and <strong style="color:var(--text)">Offline Score</strong>, which analyzes your prompt's structure locally without using an AI run.</p>
+          <div class="faq-item">
+            <button class="faq-q" onclick="toggleFaq(this)">What is the sandbox?<span class="faq-chevron">▾</span></button>
+            <div class="faq-a">The sandbox is a live prompt testing environment. You write a prompt, submit it, and get a quality score (0–100) along with specific coaching tips on how to improve it. There are two modes: <strong>AI Grader</strong>, which uses AI to evaluate your prompt and generate a real response, and <strong>Offline Score</strong>, which analyzes your prompt's structure locally without using an AI run.</div>
+          </div>
 
-          <h2 style="font-family:'DM Serif Display',serif;font-size:20px;color:var(--text);margin:0 0 10px">What is the Prompt Dissector?</h2>
-          <p style="margin:0 0 28px">The Dissector is a tool inside the sandbox that breaks your prompt into components — role, format, tone, constraint, and context — and highlights which ones are present and which are missing. It's a quick way to diagnose the structure of any prompt without spending a sandbox run.</p>
+          <div class="faq-item">
+            <button class="faq-q" onclick="toggleFaq(this)">What is the Prompt Dissector?<span class="faq-chevron">▾</span></button>
+            <div class="faq-a">The Dissector is a tool inside the sandbox that breaks your prompt into components — role, format, tone, constraint, and context — and highlights which ones are present and which are missing. It's a quick way to diagnose the structure of any prompt without spending a sandbox run.</div>
+          </div>
 
-          <h2 style="font-family:'DM Serif Display',serif;font-size:20px;color:var(--text);margin:0 0 10px">How does XP and progression work?</h2>
-          <p style="margin:0 0 28px">You earn XP by completing lessons, passing quizzes, and clearing missions. XP accumulates on your profile and feeds the leaderboard. Maintaining a daily learning streak also earns bonus XP. There's no level cap — the more you learn, the higher you climb.</p>
+          <div class="faq-item">
+            <button class="faq-q" onclick="toggleFaq(this)">How does XP and progression work?<span class="faq-chevron">▾</span></button>
+            <div class="faq-a">You earn XP by completing lessons, passing quizzes, and clearing missions. XP accumulates on your profile and feeds the leaderboard. Maintaining a daily learning streak also earns bonus XP. There's no level cap — the more you learn, the higher you climb.</div>
+          </div>
 
-          <h2 style="font-family:'DM Serif Display',serif;font-size:20px;color:var(--text);margin:0 0 10px">What is the community library?</h2>
-          <p style="margin:0 0 28px">The library is a collection of high-quality prompts submitted by PromptCraft users. To publish a prompt, it must score 90 or above in the AI sandbox. You can browse prompts by category, copy any prompt to use in your own work, and filter by topic.</p>
+          <div class="faq-item">
+            <button class="faq-q" onclick="toggleFaq(this)">What is the community library?<span class="faq-chevron">▾</span></button>
+            <div class="faq-a">The library is a collection of high-quality prompts submitted by PromptCraft users. To publish a prompt, it must score 90 or above in the AI sandbox. You can browse prompts by category, copy any prompt to use in your own work, and filter by topic.</div>
+          </div>
 
-          <h2 style="font-family:'DM Serif Display',serif;font-size:20px;color:var(--text);margin:0 0 10px">What AI model powers the sandbox?</h2>
-          <p style="margin:0 0 28px">The sandbox is powered by Anthropic's Claude (claude-haiku-4-5). All scores, responses, and coaching feedback are generated by Claude in real time.</p>
+          <div class="faq-item">
+            <button class="faq-q" onclick="toggleFaq(this)">Does PromptCraft offer team plans?<span class="faq-chevron">▾</span></button>
+            <div class="faq-a">Yes. Team plans let you create a shared workspace with a team library, usage analytics, and member management. Each team member gets 200 sandbox runs per month. To get started, use the Teams tab in the nav or reach out via the <a onclick="showView('contact')" style="color:var(--accent-text);text-decoration:none;cursor:pointer">contact form</a>.</div>
+          </div>
 
-          <h2 style="font-family:'DM Serif Display',serif;font-size:20px;color:var(--text);margin:0 0 10px">Does PromptCraft offer team plans?</h2>
-          <p style="margin:0 0 28px">Yes. Team plans let you create a shared workspace with a team library, usage analytics, and member management. Each team member gets 200 sandbox runs per month. To get started, use the Teams tab in the nav or reach out via the <a onclick="showView('contact')" style="color:var(--accent-text);text-decoration:none;cursor:pointer">contact form</a>.</p>
+          <div class="faq-item">
+            <button class="faq-q" onclick="toggleFaq(this)">I forgot my password. How do I reset it?<span class="faq-chevron">▾</span></button>
+            <div class="faq-a">On the sign-in screen, click <strong>Forgot password?</strong> and enter your email address. You'll receive a reset link within a few minutes. If you signed up with Google or Microsoft, you'll need to use that same login method — there's no password to reset.</div>
+          </div>
 
-          <h2 style="font-family:'DM Serif Display',serif;font-size:20px;color:var(--text);margin:0 0 10px">I forgot my password. How do I reset it?</h2>
-          <p style="margin:0 0 28px">On the sign-in screen, click <strong style="color:var(--text)">Forgot password?</strong> and enter your email address. You'll receive a reset link within a few minutes. If you signed up with Google or Microsoft, you'll need to use that same login method — there's no password to reset.</p>
+          <div class="faq-item">
+            <button class="faq-q" onclick="toggleFaq(this)">How do I delete my account?<span class="faq-chevron">▾</span></button>
+            <div class="faq-a">Go to <strong>Settings → Data</strong> (accessible from your avatar menu) and select Delete Account. This permanently removes all your data from our systems. This action cannot be undone.</div>
+          </div>
 
-          <h2 style="font-family:'DM Serif Display',serif;font-size:20px;color:var(--text);margin:0 0 10px">How do I delete my account?</h2>
-          <p style="margin:0 0 28px">Go to <strong style="color:var(--text)">Settings → Data</strong> (accessible from your avatar menu) and select Delete Account. This permanently removes all your data from our systems. This action cannot be undone.</p>
-
-          <h2 style="font-family:'DM Serif Display',serif;font-size:20px;color:var(--text);margin:0 0 10px">I have a question that isn't answered here.</h2>
-          <p style="margin:0">Reach us at <a href="mailto:promptcraftadmin@gmail.com" style="color:var(--accent-text);text-decoration:none">promptcraftadmin@gmail.com</a> or use the <a onclick="showView('contact')" style="color:var(--accent-text);text-decoration:none;cursor:pointer">contact form</a> — we're happy to help.</p>
+          <div class="faq-item" style="border-bottom:none">
+            <button class="faq-q" onclick="toggleFaq(this)">I have a question that isn't answered here.<span class="faq-chevron">▾</span></button>
+            <div class="faq-a">Reach us at <a href="mailto:promptcraftadmin@gmail.com" style="color:var(--accent-text);text-decoration:none">promptcraftadmin@gmail.com</a> or use the <a onclick="showView('contact')" style="color:var(--accent-text);text-decoration:none;cursor:pointer">contact form</a> — we're happy to help.</div>
+          </div>
 
         </div>
       </div>
@@ -6674,6 +6702,13 @@ Output:</div><p>The model extracts the underlying transformation rule (informal 
     }
 
     // ── Navigation ──────────────────────────────────────────
+    function toggleFaq(btn) {
+      const answer = btn.nextElementSibling;
+      const isOpen = btn.classList.contains('open');
+      btn.classList.toggle('open', !isOpen);
+      answer.classList.toggle('open', !isOpen);
+    }
+
     function showView(name) {
       // Gate protected views behind auth
       if (['sandbox', 'learn', 'library', 'leaderboard', 'teams'].includes(name) && !authUser) {
