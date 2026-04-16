@@ -4485,6 +4485,24 @@
                   </div>
                 </div>
               </div>
+              <div class="settings-row" id="planUpgradeRow" style="display:none">
+                <div class="settings-row-info">
+                  <div class="settings-row-label">Upgrade to Pro</div>
+                  <div class="settings-row-sub">200 AI runs/month, unlimited access — $15/month</div>
+                </div>
+                <div class="settings-row-action">
+                  <button class="settings-btn primary" onclick="startStripeCheckout()">Upgrade to Pro</button>
+                </div>
+              </div>
+              <div class="settings-row" id="planCancelRow" style="display:none">
+                <div class="settings-row-info">
+                  <div class="settings-row-label">Cancel Subscription</div>
+                  <div class="settings-row-sub">You'll keep Pro access until the end of your billing period.</div>
+                </div>
+                <div class="settings-row-action">
+                  <button class="settings-btn" id="cancelSubBtn" onclick="cancelSubscription()" style="color:var(--danger,#e74c3c);border-color:var(--danger,#e74c3c)">Cancel Plan</button>
+                </div>
+              </div>
             </div>
 
             <!-- Security -->
@@ -7799,6 +7817,11 @@ Output:</div><p>The model extracts the underlying transformation rule (informal 
         fill.className = 'usage-bar-fill' + (pct >= 100 ? ' full' : pct >= 80 ? ' warn' : '');
         const sel = document.getElementById('settingsPlanSelect');
         if (sel) sel.value = authUser.plan;
+        // Show upgrade or cancel row based on plan
+        const upgradeRow = document.getElementById('planUpgradeRow');
+        const cancelRow = document.getElementById('planCancelRow');
+        if (upgradeRow) upgradeRow.style.display = (!isPro && !authUser.teamId) ? '' : 'none';
+        if (cancelRow) cancelRow.style.display = (isPro && !authUser.teamId) ? '' : 'none';
       }
       // Sync theme picker
       const cur = localStorage.getItem('theme_pref') || 'system';
@@ -8412,16 +8435,6 @@ Output:</div><p>The model extracts the underlying transformation rule (informal 
     renderPOTD();
     populateNavDropdown();
     // ── Inquiry & Contact Forms ──────────────────────────────
-    function openProInquiry() {
-      document.getElementById('proInquiryContent').innerHTML = `
-        <div class="inquiry-title">Upgrade to Pro</div>
-        <div class="inquiry-sub">We're currently finalizing our payment system. Fill out this form and we'll get back to you shortly — or reach us directly at <a href="mailto:promptlyperfectadmin@gmail.com">promptlyperfectadmin@gmail.com</a>.</div>
-        <div class="inquiry-field"><label>Name</label><input type="text" id="proInqName" placeholder="Your name" value="${authUser?.name || ''}"></div>
-        <div class="inquiry-field"><label>Email</label><input type="email" id="proInqEmail" placeholder="you@example.com" value="${authUser?.email || ''}"></div>
-        <div class="auth-error" id="proInqError"></div>
-        <button class="btn-auth" onclick="submitProInquiry()">Send Request</button>`;
-      document.getElementById('proInquiryModal').classList.add('open');
-    }
 
     async function submitProInquiry() {
       const name = document.getElementById('proInqName').value.trim();
@@ -8776,6 +8789,11 @@ Output:</div><p>The model extracts the underlying transformation rule (informal 
         window.history.replaceState({}, '', '/');
         window._showVerifiedToast = true;
       }
+
+      if (p.get('upgraded') === '1') {
+        window.history.replaceState({}, '', '/');
+        window._showUpgradedToast = true;
+      }
     })();
 
     function openResetModal(token) {
@@ -8988,6 +9006,59 @@ Output:</div><p>The model extracts the underlying transformation rule (informal 
       localStorage.setItem('pc_tour_done', '1');
     }
 
+    // ── Stripe ────────────────────────────────────────────────
+    async function startStripeCheckout() {
+      if (!authUser) { openAuth('login'); return; }
+      const btn = event?.currentTarget;
+      if (btn) { btn.disabled = true; btn.textContent = 'Redirecting…'; }
+      try {
+        const res = await fetch('/api/stripe/create-checkout', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getToken() },
+        });
+        const data = await res.json();
+        if (!res.ok || !data.url) {
+          if (btn) { btn.disabled = false; btn.textContent = 'Upgrade to Pro'; }
+          alert(data.error || 'Could not start checkout. Please try again.');
+          return;
+        }
+        window.location.href = data.url;
+      } catch (e) {
+        if (btn) { btn.disabled = false; btn.textContent = 'Upgrade to Pro'; }
+        alert('Could not connect to payment service. Please try again.');
+      }
+    }
+
+    function openProInquiry() {
+      if (authUser) { startStripeCheckout(); } else { openAuth('login'); }
+    }
+
+    async function cancelSubscription() {
+      if (!confirm('Cancel your Pro subscription? You\'ll keep access until the end of your current billing period.')) return;
+      const btn = document.getElementById('cancelSubBtn');
+      if (btn) { btn.disabled = true; btn.textContent = 'Cancelling…'; }
+      try {
+        const res = await fetch('/api/stripe/cancel', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getToken() },
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          if (btn) { btn.disabled = false; btn.textContent = 'Cancel Plan'; }
+          alert(data.error || 'Failed to cancel. Please try again.');
+          return;
+        }
+        if (btn) { btn.textContent = 'Cancellation scheduled'; }
+        const toast = document.getElementById('xpToast');
+        toast.textContent = 'Subscription will cancel at the end of your billing period.';
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 4000);
+      } catch (e) {
+        if (btn) { btn.disabled = false; btn.textContent = 'Cancel Plan'; }
+        alert('Could not connect. Please try again.');
+      }
+    }
+
     restoreSession().then(() => {
       if (!authUser) checkInviteParam();
       if (window._pendingResetToken) { openResetModal(window._pendingResetToken); window._pendingResetToken = null; }
@@ -9002,6 +9073,13 @@ Output:</div><p>The model extracts the underlying transformation rule (informal 
         window._showAuthErrorToast = false;
         const toast = document.getElementById('xpToast');
         toast.textContent = 'Sign-in failed. Please try again.';
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 4000);
+      }
+      if (window._showUpgradedToast) {
+        window._showUpgradedToast = false;
+        const toast = document.getElementById('xpToast');
+        toast.textContent = 'Welcome to Pro! Your plan has been upgraded.';
         toast.classList.add('show');
         setTimeout(() => toast.classList.remove('show'), 4000);
       }

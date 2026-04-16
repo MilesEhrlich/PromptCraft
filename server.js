@@ -8,6 +8,7 @@ import path from 'path';
 import { readFileSync } from 'fs';
 import { randomBytes, randomUUID } from 'crypto';
 import Anthropic from '@anthropic-ai/sdk';
+import Stripe from 'stripe';
 
 const { Pool } = pkg;
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -27,6 +28,7 @@ loadEnv();
 const JWT_SECRET = process.env.JWT_SECRET || 'promptlyperfect-secret-change-me';
 const BASE_URL = process.env.APP_URL || process.env.BASE_URL || process.env.RENDER_EXTERNAL_URL || 'http://localhost:3000';
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+const stripe = process.env.STRIPE_SECRET_KEY ? new Stripe(process.env.STRIPE_SECRET_KEY) : null;
 const FREE_RUN_LIMIT = 10;
 const PRO_RUN_LIMIT = 200;
 
@@ -77,6 +79,8 @@ await query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS password_reset_token TEX
 await query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS password_reset_expires TEXT;`).catch(() => {});
 await query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS email_verified BOOLEAN NOT NULL DEFAULT false;`).catch(() => {});
 await query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS verification_token TEXT;`).catch(() => {});
+await query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS stripe_customer_id TEXT;`).catch(() => {});
+await query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS stripe_subscription_id TEXT;`).catch(() => {});
 await query(`CREATE TABLE IF NOT EXISTS contact_submissions (
   id TEXT PRIMARY KEY,
   type TEXT NOT NULL,
@@ -181,6 +185,8 @@ function rowToUser(row) {
     verificationToken: row.verification_token || null,
     passwordResetToken: row.password_reset_token || null,
     passwordResetExpires: row.password_reset_expires || null,
+    stripeCustomerId: row.stripe_customer_id || null,
+    stripeSubscriptionId: row.stripe_subscription_id || null,
   };
 }
 
@@ -237,7 +243,17 @@ function rowToCert(row) {
 // ── Express setup ─────────────────────────────────────────────────────────
 const app = express();
 app.use(cors());
-app.use(express.json());
+// Preserve raw body for Stripe webhook signature verification
+app.use((req, res, next) => {
+  if (req.path === '/api/stripe/webhook') {
+    let data = '';
+    req.setEncoding('utf8');
+    req.on('data', chunk => { data += chunk; });
+    req.on('end', () => { req.rawBody = data; next(); });
+  } else {
+    express.json()(req, res, next);
+  }
+});
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'promptcraft.html')));
 app.use(express.static(__dirname));
 
@@ -1224,6 +1240,101 @@ app.get('/auth/microsoft/callback', async (req, res) => {
     const token = jwt.sign({ id: user.id, email: user.email, name: user.name }, JWT_SECRET, { expiresIn: '30d' });
     res.redirect(`/?token=${token}`);
   } catch { res.redirect('/?auth_error=1'); }
+});
+
+// ── Stripe ────────────────────────────────────────────────────────────────
+
+// POST /api/stripe/create-checkout
+app.post('/api/stripe/create-checkout', requireAuth, async (req, res) => {
+  if (!stripe) return res.status(503).json({ error: 'Stripe not configured' });
+  const priceId = process.env.STRIPE_PRO_PRICE_ID;
+  if (!priceId) return res.status(503).json({ error: 'Stripe price not configured' });
+
+  const user = await getUser(req.user.id);
+  if (!user) return res.status(404).json({ error: 'User not found' });
+  if (user.plan === 'pro') return res.status(400).json({ error: 'Already on Pro plan' });
+
+  // Reuse or create Stripe customer
+  let customerId = user.stripeCustomerId;
+  if (!customerId) {
+    const customer = await stripe.customers.create({ email: user.email, name: user.name, metadata: { userId: user.id } });
+    customerId = customer.id;
+    await query('UPDATE users SET stripe_customer_id = $1 WHERE id = $2', [customerId, user.id]);
+  }
+
+  const session = await stripe.checkout.sessions.create({
+    customer: customerId,
+    payment_method_types: ['card'],
+    mode: 'subscription',
+    line_items: [{ price: priceId, quantity: 1 }],
+    success_url: `${BASE_URL}/?upgraded=1`,
+    cancel_url: `${BASE_URL}/?upgraded=0`,
+    metadata: { userId: user.id },
+  });
+
+  res.json({ url: session.url });
+});
+
+// POST /api/stripe/webhook
+app.post('/api/stripe/webhook', async (req, res) => {
+  if (!stripe) return res.status(503).json({ error: 'Stripe not configured' });
+  const sig = req.headers['stripe-signature'];
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+  if (!webhookSecret) return res.status(503).json({ error: 'Webhook secret not configured' });
+
+  let event;
+  try {
+    event = stripe.webhooks.constructEvent(req.rawBody, sig, webhookSecret);
+  } catch (err) {
+    console.error('[stripe] Webhook signature failed:', err.message);
+    return res.status(400).json({ error: `Webhook error: ${err.message}` });
+  }
+
+  const obj = event.data.object;
+
+  if (event.type === 'checkout.session.completed') {
+    const userId = obj.metadata?.userId;
+    const subscriptionId = obj.subscription;
+    if (userId && subscriptionId) {
+      await query(
+        'UPDATE users SET plan = $1, stripe_subscription_id = $2 WHERE id = $3',
+        ['pro', subscriptionId, userId]
+      );
+      console.log('[stripe] Upgraded user to pro:', userId);
+    }
+  }
+
+  if (event.type === 'customer.subscription.deleted' || event.type === 'customer.subscription.paused') {
+    const customerId = obj.customer;
+    if (customerId) {
+      await query(
+        'UPDATE users SET plan = $1, stripe_subscription_id = NULL WHERE stripe_customer_id = $2',
+        ['free', customerId]
+      );
+      console.log('[stripe] Downgraded customer to free:', customerId);
+    }
+  }
+
+  if (event.type === 'invoice.payment_failed') {
+    const customerId = obj.customer;
+    console.log('[stripe] Payment failed for customer:', customerId);
+    // Don't downgrade immediately — Stripe will retry and eventually send subscription.deleted
+  }
+
+  res.json({ received: true });
+});
+
+// POST /api/stripe/cancel
+app.post('/api/stripe/cancel', requireAuth, async (req, res) => {
+  if (!stripe) return res.status(503).json({ error: 'Stripe not configured' });
+  const user = await getUser(req.user.id);
+  if (!user) return res.status(404).json({ error: 'User not found' });
+  if (user.plan !== 'pro') return res.status(400).json({ error: 'Not on Pro plan' });
+  if (!user.stripeSubscriptionId) return res.status(400).json({ error: 'No active subscription found' });
+
+  // Cancel at period end so user keeps access until billing cycle ends
+  await stripe.subscriptions.update(user.stripeSubscriptionId, { cancel_at_period_end: true });
+  res.json({ success: true, message: 'Subscription will cancel at end of billing period' });
 });
 
 // ── Start ─────────────────────────────────────────────────────────────────

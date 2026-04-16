@@ -14,7 +14,8 @@
     "jsonwebtoken": "^9.0.3",
     "lowdb": "^7.0.1",
     "pg": "^8.20.0",
-    "resend": "^6.10.0"
+    "resend": "^6.10.0",
+    "stripe": "^17.0.0"
   },
   "devDependencies": {
     "puppeteer": "^24.40.0"
