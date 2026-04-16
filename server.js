@@ -25,7 +25,7 @@ function loadEnv() {
 loadEnv();
 
 const JWT_SECRET = process.env.JWT_SECRET || 'promptlyperfect-secret-change-me';
-const BASE_URL = process.env.BASE_URL || process.env.RENDER_EXTERNAL_URL || 'http://localhost:3000';
+const BASE_URL = process.env.APP_URL || process.env.BASE_URL || process.env.RENDER_EXTERNAL_URL || 'http://localhost:3000';
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 const FREE_RUN_LIMIT = 10;
 const PRO_RUN_LIMIT = 200;
@@ -1228,4 +1228,8 @@ app.get('/auth/microsoft/callback', async (req, res) => {
 
 // ── Start ─────────────────────────────────────────────────────────────────
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`PromptlyPerfect server running at http://localhost:${PORT}`));
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(PORT, () => console.log(`PromptlyPerfect server running at http://localhost:${PORT}`));
+}
+
+export default app;
