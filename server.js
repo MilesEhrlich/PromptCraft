@@ -932,6 +932,17 @@ app.put('/api/admin/users/:id/plan', requireAdmin, async (req, res) => {
   res.json({ success: true, plan });
 });
 
+// DELETE /api/account  (self-deletion)
+app.delete('/api/account', requireAuth, async (req, res) => {
+  const userId = req.user.id;
+  await query('DELETE FROM certificates WHERE user_id = $1', [userId]);
+  await query('DELETE FROM team_members WHERE user_id = $1', [userId]);
+  await query('DELETE FROM team_invites WHERE created_by = $1', [userId]);
+  await query('DELETE FROM team_prompts WHERE submitted_by = $1', [userId]);
+  await query('DELETE FROM users WHERE id = $1', [userId]);
+  res.json({ success: true });
+});
+
 // DELETE /api/admin/users/:id
 app.delete('/api/admin/users/:id', requireAdmin, async (req, res) => {
   const user = await getUser(req.params.id);
