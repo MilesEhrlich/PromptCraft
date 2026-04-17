@@ -7,8 +7,24 @@
   <title>PromptlyPerfect — Learn to Speak Fluent AI</title>
   <link rel="icon" type="image/png" href="/Favicon.png?v=2">
   <link rel="apple-touch-icon" href="/Favicon.png?v=2">
-  <meta name="description"
-    content="Master the art of AI prompting through hands-on missions, live feedback, and real results.">
+  <meta name="description" content="PromptlyPerfect teaches you to get extraordinary results from AI through structured lessons, live sandbox practice, and a growing prompt library. Start free.">
+  <meta name="keywords" content="PromptlyPerfect, prompt engineering, learn AI prompting, AI prompts, ChatGPT prompts, prompt course">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://promptlyperfect.com/">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="PromptlyPerfect — Learn to Speak Fluent AI">
+  <meta property="og:description" content="Master AI prompting through structured lessons, live practice, and real feedback. Start free.">
+  <meta property="og:url" content="https://promptlyperfect.com/">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="https://promptlyperfect.com/Favicon.png">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="PromptlyPerfect — Learn to Speak Fluent AI">
+  <meta name="twitter:description" content="Master AI prompting through structured lessons, live practice, and real feedback. Start free.">
+  <meta name="twitter:image" content="https://promptlyperfect.com/Favicon.png">
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link
     href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&display=swap"
@@ -5408,8 +5424,8 @@
         <div class="footer-col-title">Company</div><a class="footer-link" onclick="showView('about')">About</a><a class="footer-link" onclick="showView('faq')">FAQ</a><a class="footer-link" onclick="showView('contact')">Contact</a>
       </div>
       <div class="footer-col">
-        <div class="footer-col-title">Legal</div><a class="footer-link" onclick="showView('privacy')">Privacy</a><a
-          class="footer-link" onclick="showView('terms')">Terms</a>
+        <div class="footer-col-title">Legal</div><a class="footer-link" href="/privacy">Privacy</a><a
+          class="footer-link" href="/terms">Terms</a>
       </div>
     </div>
   </footer>
@@ -6920,6 +6936,10 @@ Output:</div><p>The model extracts the underlying transformation rule (informal 
       closeNavDropdown();
       populateNavDropdown();
       window.scrollTo({ top: 0, behavior: 'smooth' });
+      // Update URL for linkable views
+      if (name === 'privacy') window.history.pushState({}, '', '/privacy');
+      else if (name === 'terms') window.history.pushState({}, '', '/terms');
+      else if (window.location.pathname !== '/') window.history.pushState({}, '', '/');
       if (name === 'learn') renderLearn();
       if (name === 'library') renderLibrary();
       if (name === 'leaderboard') renderLeaderboard('weekly');
@@ -9062,6 +9082,11 @@ Output:</div><p>The model extracts the underlying transformation rule (informal 
     }
 
     restoreSession().then(() => {
+      // Handle clean URL routes like /privacy and /terms
+      const _path = window.location.pathname;
+      if (_path === '/privacy') { window.history.replaceState({}, '', '/privacy'); showView('privacy'); }
+      else if (_path === '/terms') { window.history.replaceState({}, '', '/terms'); showView('terms'); }
+
       if (!authUser) checkInviteParam();
       if (window._pendingResetToken) { openResetModal(window._pendingResetToken); window._pendingResetToken = null; }
       if (window._showVerifiedToast) {

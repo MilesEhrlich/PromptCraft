@@ -255,6 +255,10 @@ app.use((req, res, next) => {
   }
 });
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'promptcraft.html')));
+app.get('/privacy', (req, res) => res.sendFile(path.join(__dirname, 'promptcraft.html')));
+app.get('/privacypolicy', (req, res) => res.redirect(301, '/privacy'));
+app.get('/terms', (req, res) => res.sendFile(path.join(__dirname, 'promptcraft.html')));
+app.get('/termsofservice', (req, res) => res.redirect(301, '/terms'));
 app.use(express.static(__dirname));
 
 // ── Auth middleware ───────────────────────────────────────────────────────
