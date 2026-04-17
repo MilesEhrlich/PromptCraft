@@ -254,6 +254,8 @@ app.use((req, res, next) => {
     express.json()(req, res, next);
   }
 });
+app.get('/sitemap.xml', (req, res) => { res.setHeader('Content-Type', 'application/xml'); res.sendFile(path.join(__dirname, 'sitemap.xml')); });
+app.get('/robots.txt', (req, res) => { res.setHeader('Content-Type', 'text/plain'); res.sendFile(path.join(__dirname, 'robots.txt')); });
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'promptcraft.html')));
 app.get('/privacy', (req, res) => res.sendFile(path.join(__dirname, 'promptcraft.html')));
 app.get('/privacypolicy', (req, res) => res.redirect(301, '/privacy'));
