@@ -8745,11 +8745,149 @@ Output:</div><p>The model extracts the underlying transformation rule (informal 
           <td>${maxInput}</td>
           <td style="color:var(--muted);font-size:12px">${created}</td>
           <td style="display:flex;gap:6px;flex-wrap:wrap">
+            <button class="btn-ghost" onclick="toggleAdminTeamMembers('${t.id}')" style="font-size:12px;padding:6px 12px" id="membersBtn-${t.id}">Members</button>
             <button class="btn-ghost" onclick="showAssignOwnerModal('${t.id}','${t.name.replace(/'/g,"\\'")}','${t.ownerId}')" style="font-size:12px;padding:6px 12px">Change Owner</button>
             <button class="admin-btn-delete" onclick="adminDeleteTeam('${t.id}','${t.name.replace(/'/g,"\\'")}')">Delete</button>
           </td>
-        </tr>`;
+        </tr>
+        <tr id="memberPanel-${t.id}" style="display:none"><td colspan="6" style="padding:0">
+          <div style="background:var(--bg2);border-top:1px solid var(--border);padding:16px 20px">
+            <div style="font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:12px">Members of ${t.name.replace(/</g,'&lt;')}</div>
+            <div id="memberList-${t.id}"><span style="color:var(--muted);font-size:13px">Loading…</span></div>
+            <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border)">
+              <div style="font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Add Member</div>
+              <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+                <input id="addMemberSearch-${t.id}" type="text" placeholder="Search user by name or email…" oninput="filterAddMember('${t.id}')" style="padding:7px 11px;border-radius:6px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:13px;width:240px;position:relative" autocomplete="off">
+                <div id="addMemberResults-${t.id}" style="display:none;position:absolute;background:var(--bg);border:1px solid var(--border);border-radius:8px;z-index:50;max-height:160px;overflow-y:auto;min-width:240px;box-shadow:0 4px 20px rgba(0,0,0,.15)"></div>
+                <button class="btn-primary" onclick="adminAddMember('${t.id}')" style="font-size:12px;padding:7px 14px">Add</button>
+                <span id="addMemberErr-${t.id}" style="font-size:12px;color:#e55"></span>
+              </div>
+              <div id="addMemberSelected-${t.id}" style="font-size:12px;color:var(--accent-text);margin-top:6px;min-height:16px"></div>
+            </div>
+          </div>
+        </td></tr>`;
       }).join('');
+    }
+
+    // ── Admin Team Member Management ──────────────────────────
+    const _adminTeamMemberSelections = {};
+
+    async function toggleAdminTeamMembers(teamId) {
+      const panel = document.getElementById('memberPanel-' + teamId);
+      const btn = document.getElementById('membersBtn-' + teamId);
+      if (panel.style.display !== 'none') {
+        panel.style.display = 'none';
+        btn.textContent = 'Members';
+        return;
+      }
+      panel.style.display = '';
+      btn.textContent = 'Hide Members';
+      await refreshAdminTeamMembers(teamId);
+    }
+
+    async function refreshAdminTeamMembers(teamId) {
+      const listEl = document.getElementById('memberList-' + teamId);
+      listEl.innerHTML = '<span style="color:var(--muted);font-size:13px">Loading…</span>';
+      try {
+        const res = await fetch(`/api/admin/teams/${teamId}/members`, { headers: { 'Authorization': 'Bearer ' + getToken() } });
+        if (!res.ok) { listEl.innerHTML = '<span style="color:#e55;font-size:13px">Could not load members.</span>'; return; }
+        const members = await res.json();
+        if (!members.length) { listEl.innerHTML = '<span style="color:var(--muted);font-size:13px">No members yet.</span>'; return; }
+        listEl.innerHTML = `<table style="width:100%;border-collapse:collapse;font-size:13px">
+          <thead><tr style="color:var(--muted);font-size:11px;font-weight:700;text-transform:uppercase">
+            <th style="text-align:left;padding:4px 8px">Name</th>
+            <th style="text-align:left;padding:4px 8px">Email</th>
+            <th style="text-align:center;padding:4px 8px">Role</th>
+            <th style="padding:4px 8px"></th>
+          </tr></thead>
+          <tbody>${members.map(m => `<tr style="border-top:1px solid var(--border)">
+            <td style="padding:7px 8px;font-weight:600">${m.name}</td>
+            <td style="padding:7px 8px;color:var(--muted)">${m.email}</td>
+            <td style="text-align:center;padding:7px 8px">
+              ${m.role === 'owner'
+                ? '<span style="font-size:11px;font-weight:700;color:var(--accent-text)">OWNER</span>'
+                : `<select onchange="adminSetMemberRole('${teamId}','${m.id}',this.value)" style="font-size:11px;padding:3px 6px;border-radius:5px;border:1px solid var(--border);background:var(--bg);color:var(--text)">
+                    <option value="member"${m.role==='member'?' selected':''}>Member</option>
+                    <option value="admin"${m.role==='admin'?' selected':''}>Admin</option>
+                   </select>`}
+            </td>
+            <td style="padding:7px 8px;text-align:right">
+              ${m.role !== 'owner' ? `<button class="admin-btn-delete" onclick="adminRemoveMember('${teamId}','${m.id}','${m.name.replace(/'/g,"\\'")}')">Remove</button>` : ''}
+            </td>
+          </tr>`).join('')}</tbody>
+        </table>`;
+      } catch (e) { listEl.innerHTML = '<span style="color:#e55;font-size:13px">Error loading members.</span>'; }
+    }
+
+    async function adminRemoveMember(teamId, userId, name) {
+      if (!confirm(`Remove "${name}" from this team?`)) return;
+      try {
+        const res = await fetch(`/api/admin/teams/${teamId}/members/${userId}`, { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + getToken() } });
+        if (!res.ok) { const d = await res.json(); alert(d.error || 'Failed.'); return; }
+        await refreshAdminTeamMembers(teamId);
+        await loadAdminTeams();
+      } catch (e) { alert('Could not connect.'); }
+    }
+
+    async function adminSetMemberRole(teamId, userId, role) {
+      try {
+        const res = await fetch(`/api/admin/teams/${teamId}/members/${userId}/role`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getToken() },
+          body: JSON.stringify({ role }),
+        });
+        if (!res.ok) { const d = await res.json(); alert(d.error || 'Failed.'); await refreshAdminTeamMembers(teamId); }
+      } catch (e) { alert('Could not connect.'); }
+    }
+
+    function filterAddMember(teamId) {
+      const q = document.getElementById('addMemberSearch-' + teamId).value.toLowerCase();
+      const resultsEl = document.getElementById('addMemberResults-' + teamId);
+      if (!q) { resultsEl.style.display = 'none'; return; }
+      const matches = _adminUsers.filter(u => !u.isAdmin && (u.name.toLowerCase().includes(q) || u.email.toLowerCase().includes(q))).slice(0, 6);
+      if (!matches.length) { resultsEl.style.display = 'none'; return; }
+      resultsEl.style.display = '';
+      resultsEl.innerHTML = matches.map(u =>
+        `<div onclick="selectAddMember('${teamId}','${u.id}','${u.name.replace(/'/g,"\\'")}','${u.email}')" style="padding:9px 14px;cursor:pointer;font-size:13px;border-bottom:1px solid var(--border)" onmouseover="this.style.background='var(--bg2)'" onmouseout="this.style.background=''">
+          <span style="font-weight:600">${u.name}</span> <span style="color:var(--muted)">${u.email}</span>${u.teamId ? ' <span style="color:#e55;font-size:11px">(on a team)</span>' : ''}
+        </div>`).join('');
+      // Position dropdown relative to input
+      const input = document.getElementById('addMemberSearch-' + teamId);
+      const rect = input.getBoundingClientRect();
+      resultsEl.style.position = 'fixed';
+      resultsEl.style.top = rect.bottom + 4 + 'px';
+      resultsEl.style.left = rect.left + 'px';
+      resultsEl.style.width = rect.width + 'px';
+    }
+
+    function selectAddMember(teamId, userId, name, email) {
+      _adminTeamMemberSelections[teamId] = userId;
+      document.getElementById('addMemberSearch-' + teamId).value = name;
+      document.getElementById('addMemberSelected-' + teamId).textContent = '✓ ' + name + ' (' + email + ')';
+      document.getElementById('addMemberResults-' + teamId).style.display = 'none';
+      document.getElementById('addMemberErr-' + teamId).textContent = '';
+    }
+
+    async function adminAddMember(teamId) {
+      const userId = _adminTeamMemberSelections[teamId];
+      const errEl = document.getElementById('addMemberErr-' + teamId);
+      errEl.textContent = '';
+      if (!userId) { errEl.textContent = 'Select a user first.'; return; }
+      try {
+        const res = await fetch(`/api/admin/teams/${teamId}/members`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getToken() },
+          body: JSON.stringify({ userId }),
+        });
+        const data = await res.json();
+        if (!res.ok) { errEl.textContent = data.error || 'Failed.'; return; }
+        delete _adminTeamMemberSelections[teamId];
+        document.getElementById('addMemberSearch-' + teamId).value = '';
+        document.getElementById('addMemberSelected-' + teamId).textContent = '';
+        await refreshAdminTeamMembers(teamId);
+        await loadAdminTeams();
+        await loadAdminUsers();
+      } catch (e) { errEl.textContent = 'Could not connect.'; }
     }
 
     function showCreateTeamForm() {

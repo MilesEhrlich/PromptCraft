@@ -1058,6 +1058,57 @@ app.delete('/api/admin/teams/:id', requireAdmin, async (req, res) => {
   res.json({ success: true });
 });
 
+// GET /api/admin/teams/:id/members
+app.get('/api/admin/teams/:id/members', requireAdmin, async (req, res) => {
+  const membersResult = await query('SELECT * FROM team_members WHERE team_id = $1 ORDER BY joined_at ASC', [req.params.id]);
+  const result = [];
+  for (const m of membersResult.rows) {
+    const u = await getUser(m.user_id);
+    if (!u) continue;
+    result.push({ id: u.id, name: u.name, email: u.email, role: m.role, joinedAt: m.joined_at });
+  }
+  res.json(result);
+});
+
+// POST /api/admin/teams/:id/members
+app.post('/api/admin/teams/:id/members', requireAdmin, async (req, res) => {
+  const { userId } = req.body;
+  if (!userId) return res.status(400).json({ error: 'userId required' });
+  const teamRow = await queryOne('SELECT * FROM teams WHERE id = $1', [req.params.id]);
+  if (!teamRow) return res.status(404).json({ error: 'Team not found' });
+  const user = await getUser(userId);
+  if (!user) return res.status(404).json({ error: 'User not found' });
+  if (user.teamId) return res.status(409).json({ error: `${user.name} is already on a team` });
+  const memberId = 'tm_' + randomUUID();
+  await query('INSERT INTO team_members (id, team_id, user_id, role, joined_at) VALUES ($1,$2,$3,$4,$5)',
+    [memberId, req.params.id, userId, 'member', new Date().toISOString()]);
+  await query('UPDATE users SET team_id = $1, team_role = $2 WHERE id = $3', [req.params.id, 'member', userId]);
+  res.json({ success: true });
+});
+
+// DELETE /api/admin/teams/:id/members/:userId
+app.delete('/api/admin/teams/:id/members/:userId', requireAdmin, async (req, res) => {
+  const teamRow = await queryOne('SELECT owner_id FROM teams WHERE id = $1', [req.params.id]);
+  if (req.params.userId === teamRow?.owner_id) return res.status(400).json({ error: 'Cannot remove the team owner' });
+  const result = await query('DELETE FROM team_members WHERE user_id = $1 AND team_id = $2', [req.params.userId, req.params.id]);
+  if (result.rowCount === 0) return res.status(404).json({ error: 'Member not found' });
+  await query('UPDATE users SET team_id = NULL, team_role = NULL WHERE id = $1', [req.params.userId]);
+  res.json({ success: true });
+});
+
+// PUT /api/admin/teams/:id/members/:userId/role
+app.put('/api/admin/teams/:id/members/:userId/role', requireAdmin, async (req, res) => {
+  const { role } = req.body;
+  if (!['admin', 'member'].includes(role)) return res.status(400).json({ error: 'Role must be admin or member' });
+  const teamRow = await queryOne('SELECT owner_id FROM teams WHERE id = $1', [req.params.id]);
+  if (req.params.userId === teamRow?.owner_id) return res.status(400).json({ error: 'Cannot change owner role' });
+  const result = await query('UPDATE team_members SET role = $1 WHERE user_id = $2 AND team_id = $3',
+    [role, req.params.userId, req.params.id]);
+  if (result.rowCount === 0) return res.status(404).json({ error: 'Member not found' });
+  await query('UPDATE users SET team_role = $1 WHERE id = $2', [role, req.params.userId]);
+  res.json({ success: true, role });
+});
+
 // PUT /api/admin/teams/:id/max-members
 app.put('/api/admin/teams/:id/max-members', requireAdmin, async (req, res) => {
   const { maxMembers } = req.body;
