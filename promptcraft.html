@@ -4809,12 +4809,6 @@
         <span class="section-eyebrow">Pricing</span>
         <h2 class="section-title">Start free.<br>Go further when ready.</h2>
         <p class="section-sub">No credit card required. Upgrade only when you want advanced content.</p>
-        <div style="display:flex;justify-content:center;margin-bottom:28px">
-          <div style="display:inline-flex;background:var(--bg2);border:1px solid var(--border);border-radius:999px;padding:4px;gap:4px">
-            <button id="pill-monthly" class="billing-pill active" onclick="setBillingInterval('monthly')">Monthly</button>
-            <button id="pill-annual" class="billing-pill" onclick="setBillingInterval('annual')">Annual <span style="background:var(--accent-text);color:#fff;font-size:10px;font-weight:800;padding:2px 7px;border-radius:999px;margin-left:4px;vertical-align:middle">Save 20%</span></button>
-          </div>
-        </div>
         <div class="pricing-grid fade-up">
           <div class="pricing-card">
             <div class="plan-name">Free</div>
@@ -4831,8 +4825,13 @@
           <div class="pricing-card featured-plan">
             <div class="plan-badge">Most Popular</div>
             <div class="plan-name">Pro</div>
-            <div id="price-monthly" class="plan-price">$15 <span>/ mo</span></div>
-            <div id="price-annual" style="display:none;margin-bottom:4px;line-height:1">
+            <!-- Billing toggle inside card -->
+            <div style="display:inline-flex;background:var(--bg2);border:1px solid var(--border);border-radius:999px;padding:3px;gap:3px;margin-bottom:16px">
+              <button id="pill-monthly" class="billing-pill" onclick="setBillingInterval('monthly')">Monthly</button>
+              <button id="pill-annual" class="billing-pill active" onclick="setBillingInterval('annual')">Annual <span style="background:#fff;color:var(--accent-text);font-size:10px;font-weight:800;padding:2px 7px;border-radius:999px;margin-left:4px;vertical-align:middle">Save 20%</span></button>
+            </div>
+            <div id="price-monthly" class="plan-price" style="display:none">$15 <span>/ mo</span></div>
+            <div id="price-annual" style="margin-bottom:4px;line-height:1">
               <div style="font-family:'DM Mono',monospace;line-height:1">
                 <span style="font-size:22px;font-weight:500;color:var(--muted);text-decoration:line-through">$15</span>
                 <span style="font-size:40px;font-weight:500;color:var(--text);margin-left:6px">$12</span>
@@ -9336,7 +9335,7 @@ Output:</div><p>The model extracts the underlying transformation rule (informal 
     }
 
     // ── Stripe ────────────────────────────────────────────────
-    let _billingInterval = 'monthly';
+    let _billingInterval = 'annual';
 
     function setBillingInterval(interval) {
       _billingInterval = interval;
