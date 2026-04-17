@@ -1205,6 +1205,7 @@ app.get('/auth/google', (req, res) => {
     redirect_uri: `${BASE_URL}/auth/google/callback`,
     response_type: 'code',
     scope: 'openid email profile',
+    prompt: 'select_account',
   });
   res.redirect(`https://accounts.google.com/o/oauth2/v2/auth?${params}`);
 });
