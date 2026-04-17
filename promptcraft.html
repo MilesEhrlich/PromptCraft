@@ -8944,6 +8944,7 @@ Output:</div><p>The model extracts the underlying transformation rule (informal 
     // ── Tutorial Tour ─────────────────────────────────────
     const TOUR_STEPS = [
       {
+        view: 'home',
         selector: '.hero',
         radius: '20px',
         placement: 'bottom',
@@ -8952,6 +8953,7 @@ Output:</div><p>The model extracts the underlying transformation rule (informal 
         desc: 'PromptlyPerfect teaches you to get extraordinary results from AI through structured lessons, live practice, and a growing community. Here\'s a quick look at everything available to you.'
       },
       {
+        view: 'home',
         selector: '.potd-banner',
         radius: '16px',
         placement: 'bottom',
@@ -8960,32 +8962,36 @@ Output:</div><p>The model extracts the underlying transformation rule (informal 
         desc: 'Every day a new expert-crafted prompt appears here. Study the structure, then hit "Try in Sandbox" to experiment with it live and understand why it works.'
       },
       {
-        selector: '.nav-center button[onclick*="\'learn\'"]',
-        radius: '10px',
+        view: 'learn',
+        selector: '.learn-header',
+        radius: '16px',
         placement: 'bottom',
         label: 'Learn',
         title: 'Structured lessons',
         desc: 'Lessons are organized by skill tier — from writing your first prompt all the way to advanced chain-of-thought techniques. Each lesson earns XP and ends with a short quiz.'
       },
       {
-        selector: '.nav-center button[onclick*="\'sandbox\'"]',
-        radius: '10px',
-        placement: 'bottom',
+        view: 'sandbox',
+        selector: '.sandbox-body',
+        radius: '16px',
+        placement: 'top',
         label: 'Sandbox',
         title: 'Live AI practice',
         desc: 'The Sandbox connects to real AI. Type a prompt, adjust the system instructions, and see exactly how your wording changes the output. It\'s the fastest way to build real intuition.'
       },
       {
-        selector: '.nav-center button[onclick*="\'library\'"]',
-        radius: '10px',
+        view: 'library',
+        selector: '.library-view',
+        radius: '16px',
         placement: 'bottom',
         label: 'Library',
         title: 'Community prompt library',
         desc: 'A curated collection of top-rated prompts from the PromptlyPerfect community, organized by category. Copy any prompt directly into the Sandbox to remix and learn from it.'
       },
       {
-        selector: '.nav-center button[onclick*="\'leaderboard\'"]',
-        radius: '10px',
+        view: 'leaderboard',
+        selector: '.leaderboard-view',
+        radius: '16px',
         placement: 'bottom',
         label: 'Leaderboard',
         title: 'Compete and improve',
@@ -9002,9 +9008,19 @@ Output:</div><p>The model extracts the underlying transformation rule (informal 
     ];
 
     let tourStep = 0;
+    let _tourScrollLocked = false;
+
+    function _preventScroll(e) { if (_tourScrollLocked) e.preventDefault(); }
+    function _preventScrollKey(e) {
+      if (_tourScrollLocked && ['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', ' '].includes(e.key)) e.preventDefault();
+    }
 
     function startTour() {
       tourStep = 0;
+      _tourScrollLocked = true;
+      window.addEventListener('wheel', _preventScroll, { passive: false });
+      window.addEventListener('touchmove', _preventScroll, { passive: false });
+      window.addEventListener('keydown', _preventScrollKey);
       showView('home');
       setTimeout(() => {
         document.getElementById('tourOverlay').classList.add('open');
@@ -9019,14 +9035,12 @@ Output:</div><p>The model extracts the underlying transformation rule (informal 
       const margin = 14;
       const W = Math.min(340, vw - 24);
 
-      // Set width and push off-screen so we can measure actual rendered height
       tooltip.style.width = W + 'px';
       tooltip.style.transform = 'none';
       tooltip.style.bottom = 'auto';
       tooltip.style.left = '0px';
       tooltip.style.top = '-9999px';
 
-      // Force reflow → real height
       const th = tooltip.getBoundingClientRect().height || 240;
 
       const spBottom = rect.bottom + pad;
@@ -9044,15 +9058,46 @@ Output:</div><p>The model extracts the underlying transformation rule (informal 
       } else if (fitsBelow) {
         top = spBottom + margin;
       } else {
-        // Neither fits cleanly — anchor to bottom of viewport
         top = vh - th - 12;
       }
 
-      // Hard clamp so tooltip never exits the screen
       top = Math.max(8, Math.min(vh - th - 8, top));
-
       tooltip.style.left = left + 'px';
       tooltip.style.top = top + 'px';
+    }
+
+    function _placeTourSpotlight(step) {
+      const spotlight = document.getElementById('tourSpotlight');
+      const el = step.selector ? document.querySelector(step.selector) : null;
+      if (!el) { spotlight.style.display = 'none'; return; }
+      const pad = 10;
+      const rect0 = el.getBoundingClientRect();
+      const outOfView = rect0.top < 0 || rect0.bottom > window.innerHeight;
+      if (outOfView) {
+        // Temporarily allow scroll for scrollIntoView, then re-lock
+        _tourScrollLocked = false;
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        setTimeout(() => {
+          _tourScrollLocked = true;
+          const rect = el.getBoundingClientRect();
+          spotlight.style.display = 'block';
+          spotlight.style.top = (rect.top - pad) + 'px';
+          spotlight.style.left = (rect.left - pad) + 'px';
+          spotlight.style.width = (rect.width + pad * 2) + 'px';
+          spotlight.style.height = (rect.height + pad * 2) + 'px';
+          spotlight.style.borderRadius = step.radius || '12px';
+          positionTooltip(rect, pad, step.placement);
+        }, 350);
+      } else {
+        const rect = el.getBoundingClientRect();
+        spotlight.style.display = 'block';
+        spotlight.style.top = (rect.top - pad) + 'px';
+        spotlight.style.left = (rect.left - pad) + 'px';
+        spotlight.style.width = (rect.width + pad * 2) + 'px';
+        spotlight.style.height = (rect.height + pad * 2) + 'px';
+        spotlight.style.borderRadius = step.radius || '12px';
+        positionTooltip(rect, pad, step.placement);
+      }
     }
 
     function renderTourStep() {
@@ -9070,28 +9115,22 @@ Output:</div><p>The model extracts the underlying transformation rule (informal 
       });
       document.getElementById('tourBack').style.visibility = tourStep === 0 ? 'hidden' : 'visible';
       document.getElementById('tourNext').textContent = tourStep === TOUR_STEPS.length - 1 ? 'Done' : 'Next';
-      // Position spotlight + tooltip
-      const spotlight = document.getElementById('tourSpotlight');
-      const el = step.selector ? document.querySelector(step.selector) : null;
-      if (!el) { spotlight.style.display = 'none'; return; }
-      const inNav = el.closest('.nav-center') !== null;
-      const rect0 = el.getBoundingClientRect();
-      const alreadyVisible = rect0.top >= 0 && rect0.bottom <= window.innerHeight;
-      const scrollDelay = (!inNav && !alreadyVisible) ? 220 : 0;
-      if (!inNav && !alreadyVisible) {
-        el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+      // Switch view if step specifies one and it's different from current
+      const currentViewId = document.querySelector('.view.active')?.id;
+      const targetViewId = step.view ? 'view-' + step.view : null;
+      if (targetViewId && currentViewId !== targetViewId) {
+        // Temporarily unlock so showView's scrollTo can work
+        _tourScrollLocked = false;
+        showView(step.view);
+        // Wait for view render + scroll to settle, then re-lock and position
+        setTimeout(() => {
+          _tourScrollLocked = true;
+          _placeTourSpotlight(step);
+        }, 450);
+      } else {
+        _placeTourSpotlight(step);
       }
-      setTimeout(() => {
-        const pad = 10;
-        const rect = el.getBoundingClientRect();
-        spotlight.style.display = 'block';
-        spotlight.style.top = (rect.top - pad) + 'px';
-        spotlight.style.left = (rect.left - pad) + 'px';
-        spotlight.style.width = (rect.width + pad * 2) + 'px';
-        spotlight.style.height = (rect.height + pad * 2) + 'px';
-        spotlight.style.borderRadius = step.radius || '12px';
-        positionTooltip(rect, pad, step.placement);
-      }, scrollDelay);
     }
 
     function tourNext() {
@@ -9112,6 +9151,10 @@ Output:</div><p>The model extracts the underlying transformation rule (informal 
     function endTour() {
       document.getElementById('tourOverlay').classList.remove('open');
       document.getElementById('tourSpotlight').style.display = 'none';
+      _tourScrollLocked = false;
+      window.removeEventListener('wheel', _preventScroll);
+      window.removeEventListener('touchmove', _preventScroll);
+      window.removeEventListener('keydown', _preventScrollKey);
       localStorage.setItem('pc_tour_done', '1');
     }
 
