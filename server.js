@@ -1378,7 +1378,10 @@ app.get('/auth/microsoft/callback', async (req, res) => {
 // POST /api/stripe/create-checkout
 app.post('/api/stripe/create-checkout', requireAuth, async (req, res) => {
   if (!stripe) return res.status(503).json({ error: 'Stripe not configured' });
-  const priceId = process.env.STRIPE_PRO_PRICE_ID;
+  const { interval } = req.body || {};
+  const priceId = (interval === 'annual')
+    ? process.env.STRIPE_PRO_ANNUAL_PRICE_ID
+    : process.env.STRIPE_PRO_PRICE_ID;
   if (!priceId) return res.status(503).json({ error: 'Stripe price not configured' });
 
   const user = await getUser(req.user.id);

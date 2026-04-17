@@ -1248,6 +1248,22 @@
       color: var(--muted)
     }
 
+    .billing-pill {
+      padding: 7px 18px;
+      border-radius: 999px;
+      border: none;
+      background: transparent;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      color: var(--muted);
+      transition: background 0.15s, color 0.15s;
+    }
+    .billing-pill.active {
+      background: var(--accent-text);
+      color: #fff;
+    }
+
     .plan-desc {
       font-size: 13px;
       color: var(--text2);
@@ -4793,6 +4809,12 @@
         <span class="section-eyebrow">Pricing</span>
         <h2 class="section-title">Start free.<br>Go further when ready.</h2>
         <p class="section-sub">No credit card required. Upgrade only when you want advanced content.</p>
+        <div style="display:flex;justify-content:center;margin-bottom:28px">
+          <div style="display:inline-flex;background:var(--bg2);border:1px solid var(--border);border-radius:999px;padding:4px;gap:4px">
+            <button id="pill-monthly" class="billing-pill active" onclick="setBillingInterval('monthly')">Monthly</button>
+            <button id="pill-annual" class="billing-pill" onclick="setBillingInterval('annual')">Annual <span style="background:var(--accent-text);color:#fff;font-size:10px;font-weight:800;padding:2px 7px;border-radius:999px;margin-left:4px;vertical-align:middle">Save 20%</span></button>
+          </div>
+        </div>
         <div class="pricing-grid fade-up">
           <div class="pricing-card">
             <div class="plan-name">Free</div>
@@ -4809,7 +4831,15 @@
           <div class="pricing-card featured-plan">
             <div class="plan-badge">Most Popular</div>
             <div class="plan-name">Pro</div>
-            <div class="plan-price">$15 <span>/ mo</span></div>
+            <div id="price-monthly" class="plan-price">$15 <span>/ mo</span></div>
+            <div id="price-annual" style="display:none;margin-bottom:4px;line-height:1">
+              <div style="font-family:'DM Mono',monospace;line-height:1">
+                <span style="font-size:22px;font-weight:500;color:var(--muted);text-decoration:line-through">$15</span>
+                <span style="font-size:40px;font-weight:500;color:var(--text);margin-left:6px">$12</span>
+                <span style="font-size:18px;color:var(--muted)"> / mo</span>
+              </div>
+              <div style="font-size:11px;color:var(--muted);margin-top:4px">Billed $144/year</div>
+            </div>
             <div class="plan-desc">Unlock all 13 tracks, more sandbox runs, and AI grading on your submissions.</div>
             <div class="plan-divider"></div>
             <ul class="plan-features">
@@ -9306,6 +9336,16 @@ Output:</div><p>The model extracts the underlying transformation rule (informal 
     }
 
     // ── Stripe ────────────────────────────────────────────────
+    let _billingInterval = 'monthly';
+
+    function setBillingInterval(interval) {
+      _billingInterval = interval;
+      document.getElementById('pill-monthly').classList.toggle('active', interval === 'monthly');
+      document.getElementById('pill-annual').classList.toggle('active', interval === 'annual');
+      document.getElementById('price-monthly').style.display = interval === 'monthly' ? '' : 'none';
+      document.getElementById('price-annual').style.display = interval === 'annual' ? '' : 'none';
+    }
+
     async function startStripeCheckout() {
       if (!authUser) { openAuth('login'); return; }
       const btn = event?.currentTarget;
@@ -9314,6 +9354,7 @@ Output:</div><p>The model extracts the underlying transformation rule (informal 
         const res = await fetch('/api/stripe/create-checkout', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getToken() },
+          body: JSON.stringify({ interval: _billingInterval }),
         });
         const data = await res.json();
         if (!res.ok || !data.url) {
