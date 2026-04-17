@@ -4825,11 +4825,6 @@
           <div class="pricing-card featured-plan">
             <div class="plan-badge">Most Popular</div>
             <div class="plan-name">Pro</div>
-            <!-- Billing toggle inside card -->
-            <div style="display:inline-flex;background:var(--bg2);border:1px solid var(--border);border-radius:999px;padding:3px;gap:3px;margin-bottom:16px">
-              <button id="pill-monthly" class="billing-pill" onclick="setBillingInterval('monthly')">Monthly</button>
-              <button id="pill-annual" class="billing-pill active" onclick="setBillingInterval('annual')">Annual &nbsp;<span style="font-size:10px;font-weight:800;opacity:0.85">–20%</span></button>
-            </div>
             <div id="price-monthly" class="plan-price" style="display:none">$15 <span>/ mo</span></div>
             <div id="price-annual" style="margin-bottom:4px;line-height:1">
               <div style="font-family:'DM Mono',monospace;line-height:1">
@@ -4838,6 +4833,11 @@
                 <span style="font-size:18px;color:var(--muted)"> / mo</span>
               </div>
               <div style="font-size:11px;color:var(--muted);margin-top:4px">Billed $144/year</div>
+            </div>
+            <!-- Billing toggle inside card -->
+            <div style="display:inline-flex;background:var(--bg2);border:1px solid var(--border);border-radius:999px;padding:3px;gap:3px;margin-top:12px;margin-bottom:16px">
+              <button id="pill-monthly" class="billing-pill" onclick="setBillingInterval('monthly')">Monthly</button>
+              <button id="pill-annual" class="billing-pill active" onclick="setBillingInterval('annual')">Annual &nbsp;<span style="font-size:10px;font-weight:800;opacity:0.85">–20%</span></button>
             </div>
             <div class="plan-desc">Unlock all 13 tracks, more sandbox runs, and AI grading on your submissions.</div>
             <div class="plan-divider"></div>
